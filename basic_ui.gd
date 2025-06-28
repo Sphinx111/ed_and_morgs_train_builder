@@ -7,6 +7,23 @@ var textbox : TextEdit = find_child("TextEdit")
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
+	resource_panel_update()
+	print("Manual resource tick")
+
+func resource_panel_update():
+	$ResourcePanel/Speed.text = "Speed: " + String.num_int64(selectedTrain.get_res("speed"))
+	$ResourcePanel/Fuel.text = "Fuel: " + String.num_int64(selectedTrain.get_res("fuel"))
+	$ResourcePanel/Pop.text = "Pop: " + String.num_int64(selectedTrain.get_res("pop"))
+	$ResourcePanel/CleanWater.text = "Water: " + String.num_int64(selectedTrain.get_res("clean_water"))
+	$ResourcePanel/GreyWater.text = "Grey: " + String.num_int64(selectedTrain.get_res("grey_water"))
+	$ResourcePanel/BlackWater.text = "Black: " + String.num_int64(selectedTrain.get_res("black_water"))
+	$ResourcePanel/MechParts.text = "Parts: " + String.num_int64(selectedTrain.get_res("mech_parts"))
+	$ResourcePanel/Food.text = "Food: " + String.num_int64(selectedTrain.get_res("food1"))
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventAction:
+		if event.action == "enter" and event.is_pressed() == true:
+			_on_textinput_press()
 
 func _on_textinput_press():
 	parse_text_input()
@@ -22,6 +39,7 @@ func parse_text_input():
 	var text = textbox.text
 	text = text.to_lower()
 	var words : PackedStringArray = text.split(" ")
+	textbox.text = ""	# Clear textbox
 	var i = 0
 	
 	while i < words.size():
@@ -48,6 +66,8 @@ func parse_text_input():
 			wordsRead = 2
 		elif words[i] == "all" or words[i] == "every":
 			allSubjects = true
+		elif words[i] == "cabin":
+			subject = "cabin"
 		elif words[i] == "greywater" or words[i] == "graywater" or words[i] == "grey_water":
 			subject = "grey_water"
 		elif words[i] == "grey" and words[i+1] == "water":
@@ -76,7 +96,7 @@ func parse_text_input():
 			wordsRead = 2
 		
 		i += wordsRead
-	
+	print_debug("Input: " + verb + " " + subject + " " + location1 + " " + location2)
 	if verb != "" and subject != "" and location1 != "" and location2 != "":
 		if verb == "build":
 			selectedTrain.add_module(subject, location1.to_int(), location2.to_int())
@@ -84,3 +104,8 @@ func parse_text_input():
 		elif verb == "deconstruct":
 			selectedTrain.remove_module(location1.to_int(), location2.to_int())
 	
+
+
+func _on_debug_tick_pressed() -> void:
+	do_resource_tick()
+	pass # Replace with function body.

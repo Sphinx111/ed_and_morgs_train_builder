@@ -4,7 +4,7 @@ class_name Train
 
 var train_name : String = ""	#Give it a name?
 var players = []				#Which players run the train?
-var carriages = []
+var carriages = [null]	# first carriage is the train module?
 
 # x varieties of food
 var res = {
@@ -18,6 +18,7 @@ var res = {
 	"grey_water" : 0,
 	"black_water" : 0,
 	"mech_parts" : 0,
+	"speed" : 50,
 	"fuel" : 100,
 	"fertiliser" : 20,
 	"seeds1" : 10,
@@ -27,6 +28,9 @@ var res = {
 	"seeds5" : 10,
 	"seeds6" : 10
 }
+
+func _ready() -> void:
+	carriages.append(find_child("Traincar"))
 
 func get_res(key : String) -> int:
 	if res.has(key):
@@ -41,8 +45,10 @@ func add_res(key : String, amount : int):
 
 func resource_tick():
 	for carriage in carriages:
-		carriage.resource_tick()
-		pass
+		if carriage != null:
+			carriage.resource_tick()
 
 func add_module(type: String, carNum : int, position : int):
-	carriages[carNum].addModule(type, position)
+	if carriages.size() <= position:
+		print_debug("Error: attempting to add module to nonexistent car: " + String.num_int64(position))
+	carriages[carNum].add_module(type, position)

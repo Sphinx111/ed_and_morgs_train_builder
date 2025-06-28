@@ -14,30 +14,32 @@ var luxury : float = 0.0
 
 # List of modules in the car
 var modules = [null, null, null, null]
+var ModuleScene = preload("res://Scenes/module.tscn")
 
-func ready():
+func _ready():
 	position.x = sequence * (length + separation)
-	$Outline.transform.size.x = length
-	$Outline.transform.size.y = height
+	$Outline.size.x = length
+	$Outline.size.y = height
 	
 	for i in range(4):
-		add_module("empty", i)
+		add_module("cabin", i)
 
 func resource_tick():
 	for module in modules:
-		module.resource_tick()
+		if module != null:
+			module.resource_tick()
 
 func add_module(type : String, position : int):
 	#Todo: Instance a new Module scene
-	var newModule = ModuleBase.new()
+	var newModule = ModuleScene.instantiate()
+	self.add_child(newModule)
 	
 	newModule.set_type(type)
-	newModule.sequence = position
+	newModule.set_sequence(position)
 	
 	if modules[position] != null:
 		remove_module(position)
 	modules[position] = newModule
-	add_child(newModule)
 
 func remove_module(position: int):
 	var mod_to_remove = modules[position]

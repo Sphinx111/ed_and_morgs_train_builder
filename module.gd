@@ -5,15 +5,20 @@ class_name ModuleBase
 var parentCar : TraincarBase = null
 var parentTrain : Train = null
 var type : String = "empty"
+var sequence : int = 0
 var efficiency : float = 1.0
 var workers_needed : int = 0
 var luxury_effect : int = 0
 
+var length : int = 50
+var height : int = 50
+
 var enabled : bool = true
 
-func ready():
+func _ready():
 	parentCar = get_parent()
 	parentTrain = parentCar.get_parent()
+	position.x = sequence * length
 
 func resource_tick():
 	if type == "cabin":
@@ -49,7 +54,14 @@ func resource_tick():
 func cleanup():
 	pass
 
+func set_sequence(newSequence : int):
+	sequence = newSequence
+	position.x = sequence * length
+
 func set_type(newType : String):
 	self.type = newType
-	$Outline.modulate = Color.AQUA
+	if newType == "clean_water":
+		$Outline.color = Color.AQUA
+	elif newType == "cabin":
+		$Outline.color = Color.BROWN
 	$Label.text = newType

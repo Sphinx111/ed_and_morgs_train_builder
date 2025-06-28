@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://g076ilj8t33c"]
+
+[ext_resource type="Script" uid="uid://qjl7tjeu1s2e" path="res://traincar.gd" id="1_e2hjm"]
+
+[node name="Traincar" type="Node2D"]
+script = ExtResource("1_e2hjm")
+
+[node name="Outline" type="ColorRect" parent="."]
+offset_right = 200.0
+offset_bottom = 80.0

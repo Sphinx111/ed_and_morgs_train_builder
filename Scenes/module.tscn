@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://bsfxkkjoo7jrr"]
+
+[ext_resource type="Script" uid="uid://f3bd0aaqxam8" path="res://module.gd" id="1_w1di8"]
+
+[node name="Module" type="Node2D"]
+script = ExtResource("1_w1di8")
+
+[node name="Outline" type="ColorRect" parent="."]
+offset_top = 30.0
+offset_right = 50.0
+offset_bottom = 80.0
+color = Color(0.733333, 1, 1, 1)
+
+[node name="Label" type="Label" parent="."]
+offset_left = 2.0
+offset_top = 46.0
+offset_right = 922.0
+offset_bottom = 339.0
+scale = Vector2(0.05, 0.05)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 200
+text = "Empty"
+horizontal_alignment = 1
+autowrap_mode = 1
