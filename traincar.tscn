@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://dvfa2mi1q8kyn"]
+
+[ext_resource type="Script" uid="uid://qjl7tjeu1s2e" path="res://traincar.gd" id="1_dxtvp"]
+[ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
+[ext_resource type="Script" uid="uid://f3bd0aaqxam8" path="res://module.gd" id="2_ov8j3"]
+
+[node name="Train" type="Node2D"]
+script = ExtResource("1_rq5f1")
+
+[node name="Traincar" type="Node2D" parent="."]
+script = ExtResource("1_dxtvp")
+
+[node name="Outline" type="ColorRect" parent="Traincar"]
+offset_right = 200.0
+offset_bottom = 80.0
+
+[node name="Module" type="Node2D" parent="Traincar"]
+script = ExtResource("2_ov8j3")
