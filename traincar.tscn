@@ -1,18 +1,147 @@
-[gd_scene load_steps=4 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=5 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://qjl7tjeu1s2e" path="res://traincar.gd" id="1_dxtvp"]
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
 [ext_resource type="Script" uid="uid://f3bd0aaqxam8" path="res://module.gd" id="2_ov8j3"]
+[ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
 
-[node name="Train" type="Node2D"]
+[node name="SceneRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BasicUI" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 1153.0
+offset_bottom = 648.0
+script = ExtResource("4_fqnf8")
+
+[node name="ResourcePanel" type="Panel" parent="BasicUI"]
+layout_mode = 0
+offset_right = 1150.0
+offset_bottom = 89.0
+
+[node name="SpeedLabel" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_right = 60.0
+offset_bottom = 46.0
+text = "Speed: 50"
+fit_content = true
+
+[node name="Fuel" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_left = 75.0
+offset_right = 130.0
+offset_bottom = 46.0
+text = "Fuel:
+25"
+fit_content = true
+
+[node name="PopLabel" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_left = 150.0
+offset_right = 191.0
+offset_bottom = 46.0
+text = "Pop: 25"
+fit_content = true
+
+[node name="CleanWater" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_left = 213.0
+offset_right = 268.0
+offset_bottom = 46.0
+text = "Water:
+100"
+fit_content = true
+
+[node name="GreyWater" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_left = 283.0
+offset_right = 338.0
+offset_bottom = 46.0
+text = "Grey:
+0"
+fit_content = true
+
+[node name="BlackWater" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_left = 344.0
+offset_right = 399.0
+offset_bottom = 46.0
+text = "Black:
+0"
+fit_content = true
+
+[node name="MechParts" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_left = 479.0
+offset_right = 534.0
+offset_bottom = 46.0
+text = "Parts:
+100"
+fit_content = true
+
+[node name="Food" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_left = 409.0
+offset_right = 464.0
+offset_bottom = 46.0
+text = "Food:
+0"
+fit_content = true
+
+[node name="TextEdit" type="TextEdit" parent="BasicUI"]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 52.0
+offset_right = 974.0
+offset_bottom = 88.0
+placeholder_text = "Type instructions here"
+
+[node name="Button" type="Button" parent="BasicUI"]
+layout_mode = 0
+offset_left = 986.0
+offset_top = 56.0
+offset_right = 1145.0
+offset_bottom = 87.0
+text = "Give Order"
+
+[node name="Train" type="Node2D" parent="."]
+position = Vector2(32, 274)
 script = ExtResource("1_rq5f1")
 
-[node name="Traincar" type="Node2D" parent="."]
+[node name="Traincar" type="Node2D" parent="Train"]
 script = ExtResource("1_dxtvp")
 
-[node name="Outline" type="ColorRect" parent="Traincar"]
+[node name="Outline" type="ColorRect" parent="Train/Traincar"]
 offset_right = 200.0
 offset_bottom = 80.0
 
-[node name="Module" type="Node2D" parent="Traincar"]
+[node name="Module" type="Node2D" parent="Train/Traincar"]
 script = ExtResource("2_ov8j3")
+
+[node name="Outline" type="ColorRect" parent="Train/Traincar/Module"]
+offset_top = 30.0
+offset_right = 50.0
+offset_bottom = 80.0
+color = Color(0.733333, 1, 1, 1)
+
+[node name="Label" type="Label" parent="Train/Traincar/Module"]
+offset_left = 2.0
+offset_top = 46.0
+offset_right = 922.0
+offset_bottom = 339.0
+scale = Vector2(0.05, 0.05)
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 200
+text = "Empty"
+horizontal_alignment = 1
+autowrap_mode = 1
+
+[node name="PassengersManager" type="Node" parent="Train"]
+
+[node name="Passenger" type="Node2D" parent="Train/PassengersManager"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(576, 324)

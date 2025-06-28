@@ -11,5 +11,6 @@ config_version=5
 [application]
 
 config/name="Ed_and_morgans_train_builder"
+run/main_scene="uid://dvfa2mi1q8kyn"
 config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"

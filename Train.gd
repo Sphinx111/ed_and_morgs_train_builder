@@ -43,3 +43,6 @@ func resource_tick():
 	for carriage in carriages:
 		carriage.resource_tick()
 		pass
+
+func add_module(type: String, carNum : int, position : int):
+	carriages[carNum].addModule(type, position)
