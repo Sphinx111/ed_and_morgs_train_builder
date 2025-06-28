@@ -4,7 +4,9 @@ class_name Train
 
 var train_name : String = ""	#Give it a name?
 var players = []				#Which players run the train?
-var carriages = [null]	# first carriage is the train module?
+var carriages = []
+
+var CarriageScene = preload("res://Scenes/traincar_base.tscn")
 
 # x varieties of food
 var res = {
@@ -30,7 +32,8 @@ var res = {
 }
 
 func _ready() -> void:
-	carriages.append(find_child("Traincar"))
+	for i in range(0,3):
+		add_carriage(i)
 
 func get_res(key : String) -> int:
 	if res.has(key):
@@ -49,6 +52,17 @@ func resource_tick():
 			carriage.resource_tick()
 
 func add_module(type: String, carNum : int, position : int):
-	if carriages.size() <= position:
-		print_debug("Error: attempting to add module to nonexistent car: " + String.num_int64(position))
+	if carriages.size() <= position or carriages[carNum] == null:
+		print_debug("Error: attempting to add module to nonexistent car: " + String.num_int64(carNum))
 	carriages[carNum].add_module(type, position)
+
+func remove_module(carNum : int, position : int):
+	if carriages.size() <= position or carriages[carNum] == null:
+		print_debug("Error: attempting to remove module from nonexistent car: " + String.num_int64(carNum))
+	carriages[carNum].remove_module(position)
+
+func add_carriage(sequence : int):
+	var newCarriage = CarriageScene.instantiate()
+	add_child(newCarriage)
+	carriages.append(newCarriage)
+	newCarriage.set_sequence(sequence)

@@ -24,6 +24,10 @@ func _ready():
 	for i in range(4):
 		add_module("cabin", i)
 
+func set_sequence(newSequence : int):
+	sequence = newSequence
+	position.x = sequence * (length + separation)
+
 func resource_tick():
 	for module in modules:
 		if module != null:
