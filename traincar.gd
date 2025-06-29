@@ -54,5 +54,4 @@ func get_type_map(need_type_to_find : String) -> Array:
 	for i in range(4):
 		if modules[i].serves_need == need_type_to_find:
 			result[i] = 1
-	print_debug(result)
 	return result

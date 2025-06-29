@@ -91,7 +91,7 @@ func parse_text_input():
 		elif (words[i] == "car" or words[i] == "carriage") and words[i+1].is_valid_int():
 			location1 = words[i+1]
 			wordsRead = 2
-		elif (words[i] == "slot" or words[i] == "position") and words[i+1].is_valid_int():
+		elif (words[i] == "slot" or words[i] == "position" or words[i] == "pos") and words[i+1].is_valid_int():
 			location2 = words[i+1]
 			wordsRead = 2
 		
