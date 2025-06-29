@@ -6,3 +6,5 @@ var car_separation: int = 5
 
 var module_width : int = 50
 var module_height : int = 50
+
+var modules_per_car : int = 4

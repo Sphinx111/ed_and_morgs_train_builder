@@ -20,7 +20,7 @@ func resource_panel_update():
 	$ResourcePanel/MechParts.text = "Parts: " + String.num_int64(selectedTrain.get_res("mech_parts"))
 	$ResourcePanel/Food.text = "Food: " + String.num_int64(selectedTrain.get_res("food1"))
 
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event is InputEventAction:
 		if event.action == "enter" and event.is_pressed() == true:
 			_on_textinput_press()

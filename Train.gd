@@ -10,6 +10,7 @@ var tickCount = 0 				#Resource ticks since the train launched
 var CarriageScene = preload("res://Scenes/traincar_base.tscn")
 
 var passengerMap : PassengerMap = null
+var passengerManager : PassengerManager = null
 
 # x varieties of food
 var res = {
@@ -37,6 +38,7 @@ var res = {
 func _ready() -> void:
 	for i in range(0,3):
 		add_carriage(i)
+	passengerManager = find_child("PassengersManager")
 	init_passenger_map()
 
 func get_res(key : String) -> int:
@@ -54,6 +56,7 @@ func resource_tick():
 	for carriage in carriages:
 		if carriage != null:
 			carriage.resource_tick()
+	passengerManager.resource_tick()
 
 func add_module(type: String, carNum : int, position : int):
 	if carriages.size() <= position or carriages[carNum] == null:
@@ -92,7 +95,7 @@ func get_location_map_for_type(need_type_to_find : String) -> Array:
 	return result
 
 func get_trainpos_from_coords(localPos : Vector2) -> Array[int]:
-	var carIndex = floor(localPos.x / Globals.car_length + Globals.car_separation)
+	var carIndex : int = floor(localPos.x / (Globals.car_length + Globals.car_separation) )
 	var posInCar = localPos.x - carriages[carIndex].position.x
 	var moduleIndex = floor(posInCar / Globals.module_width)
 	return [carIndex,moduleIndex]
