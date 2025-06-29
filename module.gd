@@ -11,15 +11,12 @@ var efficiency : float = 1.0
 var workers_needed : int = 0
 var luxury_effect : int = 0
 
-var length : int = 50
-var height : int = 50
-
 var enabled : bool = true
 
 func _ready():
 	parentCar = get_parent()
 	parentTrain = parentCar.get_parent()
-	position.x = sequence * length
+	position.x = sequence * Globals.module_width
 
 func resource_tick():
 	if type == "cabin":
@@ -57,7 +54,7 @@ func cleanup():
 
 func set_sequence(newSequence : int):
 	sequence = newSequence
-	position.x = sequence * length
+	position.x = sequence * Globals.module_width
 
 func set_type(newType : String):
 	self.type = newType

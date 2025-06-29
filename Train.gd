@@ -90,3 +90,10 @@ func get_location_map_for_type(need_type_to_find : String) -> Array:
 		result.append(carriages[i].get_type_map(need_type_to_find))
 	
 	return result
+
+func get_trainpos_from_coords(localPos : Vector2) -> Array[int]:
+	var carIndex = floor(localPos.x / Globals.car_length + Globals.car_separation)
+	var posInCar = localPos.x - carriages[carIndex].position.x
+	var moduleIndex = floor(posInCar / Globals.module_width)
+	return [carIndex,moduleIndex]
+	pass
