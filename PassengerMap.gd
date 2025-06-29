@@ -72,7 +72,7 @@ func calc_direction_weights(needType : String):
 				scanner_position = lastFoundPos - floor(distBetweenModules / 2)
 			#  We keep adding distances to last tracked module
 			else:
-				if directionsMap[scanner_position] == 9999 or ( abs(distance) < abs(currentDistValue)):
+				if currentDistValue == 9999 or ( abs(distance) < abs(currentDistValue)):
 					directionsMap[scanner_position] = distance
 				scanner_position += 1
 	
