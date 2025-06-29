@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=5 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
+[ext_resource type="Script" uid="uid://cjbbfq5yg0tt8" path="res://passenger.gd" id="3_d8abk"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
+[ext_resource type="Texture2D" uid="uid://bji3n1mms68fq" path="res://images/capsule.png" id="4_ksonv"]
 
 [node name="SceneRoot" type="Control"]
 layout_mode = 3
@@ -123,9 +125,14 @@ text = "Tick"
 position = Vector2(51, 274)
 script = ExtResource("1_rq5f1")
 
-[node name="PassengersManager" type="Node" parent="Train"]
+[node name="PassengersManager" type="Node2D" parent="Train"]
 
 [node name="Passenger" type="Node2D" parent="Train/PassengersManager"]
+script = ExtResource("3_d8abk")
+
+[node name="Sprite2D" type="Sprite2D" parent="Train/PassengersManager/Passenger"]
+position = Vector2(0, -25)
+texture = ExtResource("4_ksonv")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(576, 324)

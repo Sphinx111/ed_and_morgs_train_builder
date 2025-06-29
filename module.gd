@@ -5,6 +5,7 @@ class_name ModuleBase
 var parentCar : TraincarBase = null
 var parentTrain : Train = null
 var type : String = "empty"
+var serves_need : String = "none"
 var sequence : int = 0
 var efficiency : float = 1.0
 var workers_needed : int = 0
@@ -60,6 +61,7 @@ func set_sequence(newSequence : int):
 
 func set_type(newType : String):
 	self.type = newType
+	self.serves_need = newType
 	if newType == "clean_water":
 		$Outline.color = Color.AQUA
 	elif newType == "cabin":

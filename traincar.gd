@@ -38,6 +38,9 @@ func add_module(type : String, position : int):
 	var newModule = ModuleScene.instantiate()
 	self.add_child(newModule)
 	
+	if position > 3:
+		position = 3
+	
 	newModule.set_type(type)
 	newModule.set_sequence(position)
 	
@@ -49,3 +52,11 @@ func remove_module(position: int):
 	var mod_to_remove = modules[position]
 	mod_to_remove.cleanup()
 	mod_to_remove.queue_free()
+
+func get_type_map(need_type_to_find : String) -> Array:
+	var result = [0,0,0,0]
+	for i in range(4):
+		if modules[i].serves_need == need_type_to_find:
+			result[i] = 1
+	print_debug(result)
+	return result
