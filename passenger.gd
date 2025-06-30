@@ -7,7 +7,7 @@ var parentTrain : Train = null   # Train the passenger is allocated to
 
 var firstname : String = ""
 var lastname : String = ""
-var movespeed = 15
+var movespeed = 30
 
 var home_cabin = null
 var destination : Vector2 = self.position

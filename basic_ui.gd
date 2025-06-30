@@ -3,7 +3,7 @@ extends Control
 @onready
 var selectedTrain : Train = get_parent().find_child("Train")
 @onready
-var textbox : TextEdit = find_child("TextEdit")
+var textbox : LineEdit = find_child("LineEdit")
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
@@ -20,10 +20,9 @@ func resource_panel_update():
 	$ResourcePanel/MechParts.text = "Parts: " + String.num_int64(selectedTrain.get_res("mech_parts"))
 	$ResourcePanel/Food.text = "Food: " + String.num_int64(selectedTrain.get_res("food1"))
 
-func _input(event: InputEvent) -> void:
-	if event is InputEventAction:
-		if event.action == "enter" and event.is_pressed() == true:
-			_on_textinput_press()
+func _on_line_edit_text_submitted(new_text: String) -> void:
+	parse_text_input()
+	pass # Replace with function body.
 
 func _on_textinput_press():
 	parse_text_input()
@@ -38,6 +37,8 @@ func parse_text_input():
 
 	var text = textbox.text
 	text = text.to_lower()
+	text.rstrip("\n")
+	print_debug(text)
 	var words : PackedStringArray = text.split(" ")
 	textbox.text = ""	# Clear textbox
 	var i = 0
@@ -83,6 +84,8 @@ func parse_text_input():
 		elif words[i] == "black" and words[i+1] == "water":
 			subject = "black_water"
 			wordsRead = 2
+		elif words[i] == "water":
+			subject = "clean_water"
 		elif words[i] == "mechparts" or words[i] == "mech_parts" or words[i] == "mechanicalparts" or words[i] == "mechanical_parts":
 			subject = "mech_parts"
 		elif (words[i] == "mech" or words[i] == "mechanical") and words[i+1] == "parts":
@@ -94,6 +97,10 @@ func parse_text_input():
 		elif (words[i] == "slot" or words[i] == "position" or words[i] == "pos") and words[i+1].is_valid_int():
 			location2 = words[i+1]
 			wordsRead = 2
+		elif (words[i].is_valid_int() and location1 == ""):
+			location1 = words[i]
+		elif (words[i].is_valid_int() and location2 == ""):
+			location2 = words[i]
 		
 		i += wordsRead
 	print_debug("Input: " + verb + " " + subject + " " + location1 + " " + location2)

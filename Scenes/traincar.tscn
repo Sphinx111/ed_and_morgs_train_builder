@@ -92,7 +92,7 @@ text = "Food:
 0"
 fit_content = true
 
-[node name="TextEdit" type="TextEdit" parent="BasicUI"]
+[node name="LineEdit" type="LineEdit" parent="BasicUI"]
 layout_mode = 0
 offset_left = 3.0
 offset_top = 52.0
@@ -139,5 +139,6 @@ texture = ExtResource("4_ksonv")
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(576, 324)
 
+[connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="BasicUI/Button" to="BasicUI" method="_on_textinput_press"]
 [connection signal="pressed" from="BasicUI/DebugPanel/Button2" to="BasicUI" method="_on_debug_tick_pressed"]
