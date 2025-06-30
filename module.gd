@@ -20,6 +20,7 @@ func _ready():
 
 func resource_tick():
 	if type == "cabin":
+		serves_need = "rest"
 		if parentTrain.get_res("clean_water") >= 1:
 			parentTrain.add_res("clean_water", -1)
 			parentTrain.add_res("black_water", 1)
@@ -29,12 +30,14 @@ func resource_tick():
 		return
 	
 	if type == "kitchen":
+		serves_need = "food"
 		if parentTrain.get_res("clean_water") >= 1:
 			parentTrain.add_res("clean_water", -1)
 			parentTrain.add_res("grey_water", 1)
 	elif type == "empty":
 		pass
 	elif type == "clean_water":
+		serves_need = "clean_water"
 		# Prioritise black water first
 		if parentTrain.get_res("black_water") >= 3:
 			parentTrain.add_res("black_water", -3)
@@ -45,8 +48,6 @@ func resource_tick():
 			if amount_to_convert >= 1:
 				parentTrain.add_res("grey_water", amount_to_convert)
 				parentTrain.add_res("clean_water", amount_to_convert)
-			
-	
 
 # Do anything we need before the module gets deleted
 func cleanup():
@@ -55,6 +56,14 @@ func cleanup():
 func set_sequence(newSequence : int):
 	sequence = newSequence
 	position.x = sequence * Globals.module_width
+
+func get_service() -> Array:
+	var response : Array = [serves_need, 0]
+	var resource_available = parentTrain.res[serves_need]
+	if resource_available >= 1:
+		parentTrain.res[serves_need] -= 1
+		response[1] = max(resource_available, 1)
+	return response
 
 func set_type(newType : String):
 	self.type = newType

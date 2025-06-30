@@ -4,11 +4,18 @@ extends Control
 var selectedTrain : Train = get_parent().find_child("Train")
 @onready
 var textbox : LineEdit = find_child("LineEdit")
+var time_since_update : float = 0.0
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
 	resource_panel_update()
 	print("Manual resource tick")
+
+func _process(delta : float) -> void:
+	time_since_update += delta
+	if time_since_update > 0.5:
+		time_since_update == 0
+		resource_panel_update()
 
 func resource_panel_update():
 	$ResourcePanel/Speed.text = "Speed: " + String.num_int64(selectedTrain.get_res("speed"))

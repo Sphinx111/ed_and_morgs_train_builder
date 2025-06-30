@@ -9,6 +9,10 @@ var firstname : String = ""
 var lastname : String = ""
 var movespeed = 30
 
+var current_module_pos : float = 0
+var current_module : ModuleBase = null
+var next_module_pos : float = Globals.module_width
+
 var home_cabin = null
 var destination : Vector2 = self.position
 
@@ -23,7 +27,8 @@ var needs = {
 	"food" : 0.0,
 	"bathroom" : 0.0,
 	"fun" : 0.0,
-	"social" : 0.0
+	"social" : 0.0,
+	"rest" : 0.0
 }
 
 var skills = {
@@ -40,12 +45,33 @@ func _ready():
 
 func _process(delta) -> void:
 	position = position.move_toward(destination, movespeed * delta)
+	if position.x >= next_module_pos:
+		recheck_module()
 	pass
+
+func recheck_module():
+	current_module_pos = position.x
+	next_module_pos = position.x + Globals.module_width
+	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
+	if myLocation[1] == 3:
+		next_module_pos += Globals.car_separation
+	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
+	var mod_serves_need : String = current_module.serves_need
+	if needs[mod_serves_need] > Globals.passenger_consume_threshold:
+		receive_service(current_module.get_service())
+	print("I'm at the " + current_module.type + " module!")
+
+func receive_service(serviceReceived : Array):
+	var type : String = serviceReceived[0]
+	var amount : float = serviceReceived[1]
+	needs[type] -= amount
+	if needs[type] < 0:
+		needs[type] = 0
 
 func resource_tick():
 	for key in needs.keys():
 		needs[key] += 0.01
-		if needs[key] > 0.8:
+		if needs[key] > Globals.passenger_seeks_threshold:
 			targetNeed = key
 			pick_direction()
 

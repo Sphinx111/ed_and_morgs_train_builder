@@ -1,10 +1,16 @@
 extends Node
 
+# Car variables
 var car_length : int = 200
 var car_height : int = 80
 var car_separation: int = 5
+var modules_per_car : int = 4
 
+# Module Variables
 var module_width : int = 50
 var module_height : int = 50
 
-var modules_per_car : int = 4
+
+# Passenger Variables
+var passenger_consume_threshold : float = 0.6
+var passenger_seeks_threshold : float = 0.8
