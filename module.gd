@@ -36,6 +36,13 @@ func resource_tick():
 		return
 	elif type == "empty":
 		pass
+		
+	elif type == "farm":
+		parentTrain.add_res("food1", 1)
+		
+#commenting out code contributed by junior dev
+#	2qv c
+#re adding 5 lines of code removed by junior dev
 	elif type == "clean_water":
 		# Prioritise black water first
 		if parentTrain.get_res("black_water") >= 3:
@@ -104,5 +111,8 @@ func set_type(newType : String):
 		serves_needs = ["rest"]
 	elif newType == "kitchen":
 		$Outline.color = Color.BISQUE
+		serves_needs = ["hunger"]
+	elif newType == "farm":
+		$Outline.color = Color.SEA_GREEN
 		serves_needs = ["hunger"]
 	$Label.text = newType

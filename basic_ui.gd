@@ -94,6 +94,11 @@ func parse_text_input():
 		elif words[i] == "black" and words[i+1] == "water":
 			subject = "black_water"
 			wordsRead = 2
+			
+		elif words[i] == "farm":
+			subject = "farm"
+		elif words[i] == "food":
+			subject = "kitchen"
 		elif words[i] == "water":
 			subject = "clean_water"
 		elif words[i] == "mechparts" or words[i] == "mech_parts" or words[i] == "mechanicalparts" or words[i] == "mechanical_parts":
