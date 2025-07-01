@@ -24,8 +24,8 @@ var foodsEaten = {
 
 var targetNeed = ""
 var needs = {
-	"thirst" : 0.75,
-	"hunger" : 0.0,
+	"thirst" : 0.0,
+	"hunger" : 0.78,
 	"rest" : 0.0
 }
 
@@ -77,9 +77,7 @@ func enter_customer_module(target : ModuleBase, attemptNo : int):
 		destination.x += randi_range(-Globals.module_width/4, Globals.module_width/4)    # Wait in random spot outside module
 
 func exit_customer_module():
-	current_module.remove_customer(self)
 	self.show()
-	next_module_pos = 0.0	# Force them to re-check modules
 	targetNeed = ""
 
 func resource_tick():
@@ -97,6 +95,7 @@ func check_needs():
 	if maxVal > Globals.passenger_seeks_threshold:
 		#if maxNeed != "" and maxNeed != targetNeed:
 		targetNeed = maxNeed
+		recheck_module()
 
 func pick_direction():
 	# Chance to idly move around if no behaviour

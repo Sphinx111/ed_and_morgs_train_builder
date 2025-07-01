@@ -98,6 +98,7 @@ func serve_customers():
 					needs_finished += 1
 		
 		if needs_finished >= serves_needs.size():
+			remove_customer(customer)
 			customer.exit_customer_module()
 		pass
 
