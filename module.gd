@@ -111,7 +111,7 @@ func set_type(newType : String):
 		serves_needs = ["rest"]
 	elif newType == "kitchen":
 		$Outline.color = Color.BISQUE
-		serves_needs = ["hunger"]
+		serves_needs = ["hunger", "thirst"]
 	elif newType == "farm":
 		$Outline.color = Color.SEA_GREEN
 		serves_needs = ["hunger"]
