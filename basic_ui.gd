@@ -30,7 +30,7 @@ func resource_panel_update():
 	$ResourcePanel/MechParts.text = "Parts: " + String.num_int64(selectedTrain.get_res("mech_parts"))
 	$ResourcePanel/Food.text = "Food: " + String.num_int64(selectedTrain.get_res("food1"))
 
-func _on_line_edit_text_submitted(new_text: String) -> void:
+func _on_line_edit_text_submitted(_new_text: String) -> void:
 	parse_text_input()
 	pass # Replace with function body.
 

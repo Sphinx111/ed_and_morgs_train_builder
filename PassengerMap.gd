@@ -76,7 +76,10 @@ func calc_direction_weights(needType : String):
 	needsMaps[needType] = directionsMap.duplicate()
 	pass
 
-func get_direction_from_to(position : Array[int], type : String):
+func get_direction_from_to(position : Array[int], type : String) -> int:
 	var index = -1
 	index = position[0] * 4 + position[1]
-	return needsMaps[type][index]
+	if needsMaps.has(type):
+		return needsMaps[type][index]
+	else:
+		return 0

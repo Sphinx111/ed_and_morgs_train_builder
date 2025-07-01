@@ -22,3 +22,4 @@ func resource_tick():
 func check_all_needs():
 	for passenger in passengers:
 		passenger.check_needs()
+		passenger.pick_direction()
