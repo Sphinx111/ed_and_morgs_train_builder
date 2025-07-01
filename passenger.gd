@@ -12,6 +12,7 @@ var movespeed = 30
 var current_module_pos : float = 0
 var current_module : ModuleBase = null
 var next_module_pos : float = Globals.module_width
+var direction : int = 0
 
 var home_cabin = null
 var destination : Vector2 = self.position
@@ -42,18 +43,11 @@ func _ready():
 
 func _process(delta) -> void:
 	position = position.move_toward(destination, movespeed * delta)
-	if position.x >= next_module_pos:
+	if (direction > 0 and position.x >= next_module_pos) or (direction < 0 and position.x <= next_module_pos):
 		recheck_module()
 	pass
 
 func recheck_module():
-	var direction : int = 0
-	if destination.x > self.position.x:
-		direction = 1
-	elif destination.x < self.position.x:
-		direction = -1
-	else:
-		direction = 0
 	current_module_pos = position.x
 	next_module_pos = position.x + (Globals.module_width * direction)
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
@@ -70,28 +64,48 @@ func enter_customer_module(target : ModuleBase, attemptNo : int):
 		self.hide()
 	else:
 		destination.x += randi_range(-Globals.module_width/4, Globals.module_width/4)    # Wait in random spot outside module
-		#TODO: Start a timer to retry entering, or choose a new need
-		pick_direction()
 
 func exit_customer_module():
 	current_module.remove_customer(self)
 	self.show()
 	next_module_pos = 0.0	# Force them to re-check modules
+	targetNeed = ""
 
 func resource_tick():
 	for key in needs.keys():
 		needs[key] += 0.01
 		if needs[key] > Globals.passenger_seeks_threshold:
 			targetNeed = key
-			pick_direction()
+
+func check_needs():
+	var maxVal : float = 0.0
+	var maxNeed : String = ""
+	for key in needs.keys():
+		if needs[key] > maxVal:
+			maxNeed = key
+	if maxVal > Globals.passenger_seeks_threshold:
+		targetNeed = maxNeed
+		pick_direction()
 
 func pick_direction():
+	# Chance to idly move around if no behaviour
+	if targetNeed == "" and randf() < Globals.idle_wander_chance:
+		destination = self.position
+		var offset : float = randi_range(-200, 200)
+		if offset >= 0: direction = 1
+		else: direction = -1
+		destination.x += offset
+	
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
 	var distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed)
+	if    distanceToTarget > 0: direction = 1
+	elif  distanceToTarget < 0: direction = -1
+	else: direction = 0
 	myLocation[0] += floor(distanceToTarget / Globals.modules_per_car) 
 	myLocation[1] += distanceToTarget % Globals.modules_per_car
 	destination = parentTrain.carriages[myLocation[0]].position
 	destination.x += (myLocation[1] + 0.5) * Globals.module_width
+	
 	if distanceToTarget > 7:
 		thoughts.append("It's a long way to " + targetNeed)
 		print(thoughts[thoughts.size()-1])
