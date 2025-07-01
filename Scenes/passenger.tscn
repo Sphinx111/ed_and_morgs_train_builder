@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://cw8ov34j2hlku"]
+
+[ext_resource type="Script" uid="uid://cjbbfq5yg0tt8" path="res://passenger.gd" id="1_lyrvh"]
+[ext_resource type="Texture2D" uid="uid://bji3n1mms68fq" path="res://images/capsule.png" id="2_uumvl"]
+
+[node name="Passenger" type="Node2D"]
+script = ExtResource("1_lyrvh")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -25)
+texture = ExtResource("2_uumvl")

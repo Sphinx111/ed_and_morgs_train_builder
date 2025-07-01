@@ -1,10 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=5 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
-[ext_resource type="Script" uid="uid://cjbbfq5yg0tt8" path="res://passenger.gd" id="3_d8abk"]
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
+[ext_resource type="PackedScene" uid="uid://cw8ov34j2hlku" path="res://Scenes/passenger.tscn" id="4_d8abk"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
-[ext_resource type="Texture2D" uid="uid://bji3n1mms68fq" path="res://images/capsule.png" id="4_ksonv"]
 
 [node name="SceneRoot" type="Control"]
 layout_mode = 3
@@ -111,7 +110,7 @@ text = "Give Order"
 [node name="DebugPanel" type="Panel" parent="BasicUI"]
 layout_mode = 0
 offset_top = 607.0
-offset_right = 108.0
+offset_right = 230.0
 offset_bottom = 647.0
 
 [node name="Button2" type="Button" parent="BasicUI/DebugPanel"]
@@ -122,6 +121,14 @@ offset_right = 44.0
 offset_bottom = 36.0
 text = "Tick"
 
+[node name="Button" type="Button" parent="BasicUI/DebugPanel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 5.0
+offset_right = 110.0
+offset_bottom = 36.0
+text = "Pass++"
+
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 274)
 script = ExtResource("1_rq5f1")
@@ -129,12 +136,7 @@ script = ExtResource("1_rq5f1")
 [node name="PassengersManager" type="Node2D" parent="Train"]
 script = ExtResource("3_ksonv")
 
-[node name="Passenger" type="Node2D" parent="Train/PassengersManager"]
-script = ExtResource("3_d8abk")
-
-[node name="Sprite2D" type="Sprite2D" parent="Train/PassengersManager/Passenger"]
-position = Vector2(0, -25)
-texture = ExtResource("4_ksonv")
+[node name="Passenger" parent="Train/PassengersManager" instance=ExtResource("4_d8abk")]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(576, 324)
@@ -142,3 +144,4 @@ offset = Vector2(576, 324)
 [connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="BasicUI/Button" to="BasicUI" method="_on_textinput_press"]
 [connection signal="pressed" from="BasicUI/DebugPanel/Button2" to="BasicUI" method="_on_debug_tick_pressed"]
+[connection signal="pressed" from="BasicUI/DebugPanel/Button" to="BasicUI" method="_on_add_passenger_pressed"]

@@ -83,6 +83,9 @@ func add_carriage(sequence : int):
 	carriages.append(newCarriage)
 	newCarriage.set_sequence(sequence)
 
+func add_passenger_debug():
+	passengerManager.add_passenger()
+
 func get_car_count():
 	return carriages.size()
 

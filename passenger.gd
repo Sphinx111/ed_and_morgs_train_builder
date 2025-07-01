@@ -99,16 +99,20 @@ func check_needs():
 
 func pick_direction():
 	# Chance to idly move around if no behaviour
-	if targetNeed == "" and randf() < Globals.idle_wander_chance:
-		destination = self.position
-		var offset : float = randi_range(-200, 200)
-		if offset >= 0: direction = 1
-		else: direction = -1
-		destination.x += offset
+	if targetNeed == "":
+		if randf() < Globals.idle_wander_chance:
+			destination = self.position
+			var offset : float = randi_range(-200, 200)
+			if offset >= 0: direction = 1
+			else: direction = -1
+			destination.x += offset
 		return	# End early if no target
 	
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
 	var distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed)
+	if distanceToTarget == 9999:
+		thoughts.append("This train has no way to help with %s" % targetNeed)
+		return
 	if    distanceToTarget > 0: direction = 1
 	elif  distanceToTarget < 0: direction = -1
 	else: direction = 0

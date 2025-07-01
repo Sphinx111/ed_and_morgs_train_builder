@@ -5,6 +5,8 @@ class_name PassengerManager
 var passengers : Array[Passenger] = []
 var needs_check_timer : Timer = null
 
+var PassengerScene = preload("res://Scenes/passenger.tscn")
+
 func _ready():
 	var firstPassenger : Passenger = find_child("Passenger")
 	passengers.append(firstPassenger)
@@ -23,3 +25,7 @@ func check_all_needs():
 	for passenger in passengers:
 		passenger.check_needs()
 		passenger.pick_direction()
+
+func add_passenger():
+	var newPass = PassengerScene.instantiate()
+	add_child(newPass)

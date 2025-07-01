@@ -131,3 +131,7 @@ func parse_text_input():
 func _on_debug_tick_pressed() -> void:
 	do_resource_tick()
 	pass # Replace with function body.
+
+func _on_add_passenger_pressed() -> void:
+	selectedTrain.add_passenger_debug()
+	pass # Replace with function body.
