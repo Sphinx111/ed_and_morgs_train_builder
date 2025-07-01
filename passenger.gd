@@ -9,9 +9,9 @@ var firstname : String = ""
 var lastname : String = ""
 var movespeed = 30
 
-var current_module_pos : float = 0
 var current_module : ModuleBase = null
-var next_module_pos : float = Globals.module_width
+var next_module_pos : float = Globals.module_width		# If position.x exceeds this, check module
+var last_module_pos : float = 0.0						# If position.x falls below this, check module
 var direction : int = 0
 
 var home_cabin = null
@@ -22,7 +22,7 @@ var foodsEaten = {
 	"food1" : 0
 }
 
-var targetNeed = "thirst"
+var targetNeed = ""
 var needs = {
 	"thirst" : 0.75,
 	"hunger" : 0.0,
@@ -42,18 +42,29 @@ func _ready():
 	parentTrain = manager.get_parent()
 
 func _process(delta) -> void:
+	destination.x = max(destination.x, parentTrain.minXpos)
+	destination.x = min(destination.x, parentTrain.maxXpos)
 	position = position.move_toward(destination, movespeed * delta)
-	if (direction > 0 and position.x >= next_module_pos) or (direction < 0 and position.x <= next_module_pos):
+	if (direction > 0 and position.x > next_module_pos) or (direction < 0 and position.x < last_module_pos):
 		recheck_module()
 	pass
 
+# Once at outset, or per module moved, confirm position on train and which module we are at
+# set thresholds to re-check module next
 func recheck_module():
-	current_module_pos = position.x
-	next_module_pos = position.x + (Globals.module_width * direction)
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
-	if myLocation[1] == 3:
-		next_module_pos += (Globals.car_separation * direction)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
+	
+	# If we move left of this point, we have left current module and need to check
+	last_module_pos = current_module.position.x
+	if myLocation[1] == 0:
+		last_module_pos -= Globals.car_separation
+
+	# Get thresholds to check next module (moving right)
+	next_module_pos = position.x + Globals.module_width
+	if myLocation[1] == 3:
+		next_module_pos += Globals.car_separation
+	
 	if current_module.can_serve_need(targetNeed):
 		enter_customer_module(current_module, 1)
 	print("I'm at the " + current_module.type + " module!")
@@ -74,8 +85,7 @@ func exit_customer_module():
 func resource_tick():
 	for key in needs.keys():
 		needs[key] += 0.01
-		if needs[key] > Globals.passenger_seeks_threshold:
-			targetNeed = key
+	check_needs()
 
 func check_needs():
 	var maxVal : float = 0.0
@@ -83,9 +93,10 @@ func check_needs():
 	for key in needs.keys():
 		if needs[key] > maxVal:
 			maxNeed = key
+			maxVal = needs[key]
 	if maxVal > Globals.passenger_seeks_threshold:
+		#if maxNeed != "" and maxNeed != targetNeed:
 		targetNeed = maxNeed
-		pick_direction()
 
 func pick_direction():
 	# Chance to idly move around if no behaviour
@@ -95,6 +106,7 @@ func pick_direction():
 		if offset >= 0: direction = 1
 		else: direction = -1
 		destination.x += offset
+		return	# End early if no target
 	
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
 	var distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed)

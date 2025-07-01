@@ -12,6 +12,9 @@ var CarriageScene = preload("res://Scenes/traincar_base.tscn")
 var passengerMap : PassengerMap = null
 var passengerManager : PassengerManager = null
 
+var minXpos : float = 0.0
+var maxXpos : float = 0.0
+
 # x varieties of food
 var res = {
 	"food1" : 100.0,
@@ -38,6 +41,7 @@ var res = {
 func _ready() -> void:
 	for i in range(0,3):
 		add_carriage(i)
+	maxXpos = (carriages.size() * (Globals.car_length + Globals.car_separation)) - Globals.car_separation
 	passengerManager = find_child("PassengersManager")
 	init_passenger_map()
 
@@ -101,4 +105,3 @@ func get_trainpos_from_coords(localPos : Vector2) -> Array[int]:
 	var posInCar = localPos.x - carriages[carIndex].position.x
 	var moduleIndex = floor(posInCar / Globals.module_width)
 	return [carIndex,moduleIndex]
-	pass
