@@ -52,6 +52,6 @@ func remove_module(position: int):
 func get_type_map(need_type_to_find : String) -> Array:
 	var result = [0,0,0,0]
 	for i in range(4):
-		if modules[i].serves_need == need_type_to_find:
+		if modules[i].can_serve_need(need_type_to_find):
 			result[i] = 1
 	return result

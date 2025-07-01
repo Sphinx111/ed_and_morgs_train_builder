@@ -21,13 +21,10 @@ var foodsEaten = {
 	"food1" : 0
 }
 
-var targetNeed = "clean_water"
+var targetNeed = "thirst"
 var needs = {
-	"clean_water" : 0.75,
-	"food" : 0.0,
-	"bathroom" : 0.0,
-	"fun" : 0.0,
-	"social" : 0.0,
+	"thirst" : 0.75,
+	"hunger" : 0.0,
 	"rest" : 0.0
 }
 
@@ -50,23 +47,36 @@ func _process(delta) -> void:
 	pass
 
 func recheck_module():
+	var direction : int = 0
+	if destination.x > self.position.x:
+		direction = 1
+	elif destination.x < self.position.x:
+		direction = -1
+	else:
+		direction = 0
 	current_module_pos = position.x
-	next_module_pos = position.x + Globals.module_width
+	next_module_pos = position.x + (Globals.module_width * direction)
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
 	if myLocation[1] == 3:
-		next_module_pos += Globals.car_separation
+		next_module_pos += (Globals.car_separation * direction)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
-	var mod_serves_need : String = current_module.serves_need
-	if needs[mod_serves_need] > Globals.passenger_consume_threshold:
-		receive_service(current_module.get_service())
+	if current_module.can_serve_need(targetNeed):
+		enter_customer_module(current_module, 1)
 	print("I'm at the " + current_module.type + " module!")
 
-func receive_service(serviceReceived : Array):
-	var type : String = serviceReceived[0]
-	var amount : float = serviceReceived[1]
-	needs[type] -= amount
-	if needs[type] < 0:
-		needs[type] = 0
+func enter_customer_module(target : ModuleBase, attemptNo : int):
+	if target.can_enter(self):
+		target.add_customer(self)
+		self.hide()
+	else:
+		destination.x += randi_range(-Globals.module_width/4, Globals.module_width/4)    # Wait in random spot outside module
+		#TODO: Start a timer to retry entering, or choose a new need
+		pick_direction()
+
+func exit_customer_module():
+	current_module.remove_customer(self)
+	self.show()
+	next_module_pos = 0.0	# Force them to re-check modules
 
 func resource_tick():
 	for key in needs.keys():
@@ -85,3 +95,8 @@ func pick_direction():
 	if distanceToTarget > 7:
 		thoughts.append("It's a long way to " + targetNeed)
 		print(thoughts[thoughts.size()-1])
+
+# adjust the need, and return the amount remaining
+func adjust_need(type : String, amount : float) -> float:
+	needs[type] = max(needs[type] - amount, 0)
+	return needs[type]

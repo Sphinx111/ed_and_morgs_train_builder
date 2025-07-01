@@ -11,11 +11,14 @@ func do_resource_tick():
 	resource_panel_update()
 	print("Manual resource tick")
 
-func _process(delta : float) -> void:
-	time_since_update += delta
-	if time_since_update > 0.5:
-		time_since_update == 0
-		resource_panel_update()
+func _ready() -> void:
+	var update_timer : Timer = Timer.new()
+	add_child(update_timer)
+	update_timer.wait_time = 0.5
+	update_timer.one_shot = false
+	update_timer.timeout.connect(resource_panel_update)
+	update_timer.start()
+
 
 func resource_panel_update():
 	$ResourcePanel/Speed.text = "Speed: " + String.num_int64(selectedTrain.get_res("speed"))

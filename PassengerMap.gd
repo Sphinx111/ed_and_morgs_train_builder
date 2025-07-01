@@ -5,19 +5,15 @@ class_name PassengerMap
 var train = null
 
 var needsLocations = {
-	"clean_water"    : [[]],
-	"food"     : [[]],
-	"bathroom" : [[]],
-	"rest"     : [[]],
-	"social"   : [[]]
+	"thirst"    : [[]],
+	"hunger"    : [[]],
+	"rest"      : [[]],
 }
 
 var needsMaps = {
-	"water"    : [[]],
-	"food"     : [[]],
-	"bathroom" : [[]],
-	"rest"     : [[]],
-	"social"   : [[]]
+	"thirst"    : [[]],
+	"hunger"    : [[]],
+	"rest"      : [[]]
 }
 
 func set_train(newTrain : Train):
