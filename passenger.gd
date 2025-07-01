@@ -17,6 +17,9 @@ var direction : int = 0
 var home_cabin = null
 var destination : Vector2 = self.position
 
+var debugLeft : Line2D = null
+var debugRight : Line2D = null
+
 # Foodtypes and last tick they were eaten on (to track food variety)
 var foodsEaten = {
 	"food1" : 0
@@ -40,41 +43,46 @@ var thoughts : PackedStringArray = []
 func _ready():
 	manager = get_parent()
 	parentTrain = manager.get_parent()
+	debugLeft = $DebugLeft
+	debugRight = $DebugRight
 
 func _process(delta) -> void:
 	destination.x = max(destination.x, parentTrain.minXpos)
 	destination.x = min(destination.x, parentTrain.maxXpos)
 	position = position.move_toward(destination, movespeed * delta)
 	if (direction > 0 and position.x > next_module_pos) or (direction < 0 and position.x < last_module_pos):
-		recheck_module()
-	pass
+		update_module_positions()
 
 # Once at outset, or per module moved, confirm position on train and which module we are at
 # set thresholds to re-check module next
-func recheck_module():
+func update_module_positions():
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
+	last_module_pos = parentTrain.get_xpos_from_trainpos(myLocation)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
 	
-	# If we move left of this point, we have left current module and need to check
-	last_module_pos = current_module.position.x
-	if myLocation[1] == 0:
-		last_module_pos -= Globals.car_separation
-
-	# Get thresholds to check next module (moving right)
-	next_module_pos = position.x + Globals.module_width
-	if myLocation[1] == 3:
-		next_module_pos += Globals.car_separation
+	myLocation[1] = myLocation[1] + 1
+	if myLocation[1] == Globals.modules_per_car:
+		myLocation[0] = myLocation[0] + 1
+		myLocation[1] = 0
+	next_module_pos = parentTrain.get_xpos_from_trainpos(myLocation)
+	print("next module: %f" % next_module_pos)
 	
+	debugLeft.position.x = last_module_pos# - position.x
+	debugRight.position.x = next_module_pos# - position.x
+
+
+# If my needs have just changed, check whether the module I am in serves what I need
+func check_current_module():
+	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
+	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
 	if current_module.can_serve_need(targetNeed):
 		enter_customer_module(current_module, 1)
-	print("I'm at the " + current_module.type + " module!")
+
 
 func enter_customer_module(target : ModuleBase, attemptNo : int):
 	if target.can_enter(self):
 		target.add_customer(self)
 		self.hide()
-	else:
-		destination.x += randi_range(-Globals.module_width/4, Globals.module_width/4)    # Wait in random spot outside module
 
 func exit_customer_module():
 	self.show()
@@ -95,7 +103,7 @@ func check_needs():
 	if maxVal > Globals.passenger_seeks_threshold:
 		#if maxNeed != "" and maxNeed != targetNeed:
 		targetNeed = maxNeed
-		recheck_module()
+		check_current_module()
 
 func pick_direction():
 	# Chance to idly move around if no behaviour

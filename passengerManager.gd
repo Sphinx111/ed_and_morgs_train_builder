@@ -29,3 +29,4 @@ func check_all_needs():
 func add_passenger():
 	var newPass = PassengerScene.instantiate()
 	add_child(newPass)
+	passengers.append(newPass)

@@ -65,6 +65,8 @@ func resource_tick():
 func add_module(type: String, carNum : int, position : int):
 	if carriages.size() <= position or carriages[carNum] == null:
 		print_debug("Error: attempting to add module to nonexistent car: " + String.num_int64(carNum))
+	remove_module(carNum, position)
+	
 	carriages[carNum].add_module(type, position)
 	for needType in carriages[carNum].modules[position].serves_needs:
 		passengerMap.update_single_type_map(needType)                         # Update the passenger nav map for this type
@@ -105,6 +107,11 @@ func get_location_map_for_type(need_type_to_find : String) -> Array:
 
 func get_trainpos_from_coords(localPos : Vector2) -> Array[int]:
 	var carIndex : int = floor(localPos.x / (Globals.car_length + Globals.car_separation) )
-	var posInCar = localPos.x - carriages[carIndex].position.x
-	var moduleIndex = floor(posInCar / Globals.module_width)
+	var posInCar : int = (localPos.x - carriages[carIndex].position.x)
+	var moduleIndex : int = floor(min((posInCar / Globals.module_width), (Globals.modules_per_car - 1)))
 	return [carIndex,moduleIndex]
+
+func get_xpos_from_trainpos(trainPos: Array) -> float:
+	var result : float = (trainPos[0] * (Globals.car_length + Globals.car_separation))
+	result = result + (trainPos[1] * Globals.module_width)
+	return result
