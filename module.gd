@@ -65,7 +65,8 @@ func set_sequence(newSequence : int):
 	position.x = sequence * Globals.module_width
 
 func add_customer(newCustomer : Passenger):
-	customers.append(newCustomer)
+	if customers.has(newCustomer) == false:
+		customers.append(newCustomer)
 
 func remove_customer(currentCustomer : Passenger):
 	customers.erase(currentCustomer)

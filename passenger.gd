@@ -33,7 +33,7 @@ var needs = {
 const maxNeeds = {
 	"thirst" : 1.0,
 	"hunger" : 1.0,
-	"rest" : 1.0
+	"rest" : 2.0
 }
 
 var skills = {
@@ -61,13 +61,13 @@ func update_module_positions():
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
 	last_module_pos = parentTrain.get_xpos_from_trainpos(myLocation)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
-	
-	myLocation[1] = myLocation[1] + 1
-	if myLocation[1] == Globals.modules_per_car:
-		myLocation[0] = myLocation[0] + 1
-		myLocation[1] = 0
-	next_module_pos = parentTrain.get_xpos_from_trainpos(myLocation)
-	print("next module: %f" % next_module_pos)
+	var nextLocation = myLocation
+	nextLocation[1] = nextLocation[1] + 1
+	if nextLocation[1] == Globals.modules_per_car:
+		nextLocation[0] = nextLocation[0] + 1
+		nextLocation[1] = 0
+	next_module_pos = parentTrain.get_xpos_from_trainpos(nextLocation)
+	check_current_module()
 
 
 # If my needs have just changed, check whether the module I am in serves what I need
@@ -102,9 +102,9 @@ func check_needs():
 			if maxVal >= maxNeeds[key]:
 				hit_max_need(key)
 	if maxVal > Globals.passenger_seeks_threshold:
-		#if maxNeed != "" and maxNeed != targetNeed:
-		targetNeed = maxNeed
-		check_current_module()
+		if maxNeed != "" and maxNeed != targetNeed:
+			targetNeed = maxNeed
+			check_current_module()
 
 func hit_max_need(needType : String):
 	print("%s %s: Oh no! My %s need hit max, I'm gonna die now" % [firstname, lastname, needType])
