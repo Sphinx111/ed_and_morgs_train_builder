@@ -17,8 +17,7 @@ var direction : int = 0
 var home_cabin = null
 var destination : Vector2 = self.position
 
-var debugLeft : Line2D = null
-var debugRight : Line2D = null
+var lastDebugChecked : float = self.position.x
 
 # Foodtypes and last tick they were eaten on (to track food variety)
 var foodsEaten = {
@@ -30,6 +29,11 @@ var needs = {
 	"thirst" : 0.0,
 	"hunger" : 0.78,
 	"rest" : 0.0
+}
+const maxNeeds = {
+	"thirst" : 1.0,
+	"hunger" : 1.0,
+	"rest" : 1.0
 }
 
 var skills = {
@@ -43,8 +47,6 @@ var thoughts : PackedStringArray = []
 func _ready():
 	manager = get_parent()
 	parentTrain = manager.get_parent()
-	debugLeft = $DebugLeft
-	debugRight = $DebugRight
 
 func _process(delta) -> void:
 	destination.x = max(destination.x, parentTrain.minXpos)
@@ -66,9 +68,6 @@ func update_module_positions():
 		myLocation[1] = 0
 	next_module_pos = parentTrain.get_xpos_from_trainpos(myLocation)
 	print("next module: %f" % next_module_pos)
-	
-	debugLeft.position.x = last_module_pos# - position.x
-	debugRight.position.x = next_module_pos# - position.x
 
 
 # If my needs have just changed, check whether the module I am in serves what I need
@@ -100,10 +99,16 @@ func check_needs():
 		if needs[key] > maxVal:
 			maxNeed = key
 			maxVal = needs[key]
+			if maxVal >= maxNeeds[key]:
+				hit_max_need(key)
 	if maxVal > Globals.passenger_seeks_threshold:
 		#if maxNeed != "" and maxNeed != targetNeed:
 		targetNeed = maxNeed
 		check_current_module()
+
+func hit_max_need(needType : String):
+	print("%s %s: Oh no! My %s need hit max, I'm gonna die now" % [firstname, lastname, needType])
+	manager.remove_passenger(self)
 
 func pick_direction():
 	# Chance to idly move around if no behaviour

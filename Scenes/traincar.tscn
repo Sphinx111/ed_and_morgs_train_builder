@@ -138,6 +138,18 @@ script = ExtResource("3_ksonv")
 
 [node name="Passenger" parent="Train/PassengersManager" instance=ExtResource("4_d8abk")]
 
+[node name="DebugRight" type="Line2D" parent="Train/PassengersManager"]
+position = Vector2(50, 0)
+points = PackedVector2Array(0, 0, 0, -15)
+width = 3.0
+default_color = Color(0.982137, 0.66339, 0.691368, 1)
+
+[node name="DebugLeft" type="Line2D" parent="Train/PassengersManager"]
+position = Vector2(-50, 0)
+points = PackedVector2Array(0, 0, 0, -15)
+width = 3.0
+default_color = Color(0.596078, 1, 1, 1)
+
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(576, 324)
 

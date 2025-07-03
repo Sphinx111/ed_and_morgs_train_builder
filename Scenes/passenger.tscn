@@ -9,17 +9,3 @@ script = ExtResource("1_lyrvh")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, -25)
 texture = ExtResource("2_uumvl")
-
-[node name="DebugRight" type="Line2D" parent="."]
-top_level = true
-position = Vector2(50, 0)
-points = PackedVector2Array(0, 0, 0, -15)
-width = 3.0
-default_color = Color(0.982137, 0.66339, 0.691368, 1)
-
-[node name="DebugLeft" type="Line2D" parent="."]
-top_level = true
-position = Vector2(-50, 0)
-points = PackedVector2Array(0, 0, 0, -15)
-width = 3.0
-default_color = Color(0.596078, 1, 1, 1)
