@@ -65,11 +65,12 @@ func resource_tick():
 func add_module(type: String, carNum : int, position : int):
 	if carriages.size() <= position or carriages[carNum] == null:
 		print_debug("Error: attempting to add module to nonexistent car: " + String.num_int64(carNum))
-	remove_module(carNum, position)
-	
+	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
 	carriages[carNum].add_module(type, position)
 	for needType in carriages[carNum].modules[position].serves_needs:
 		passengerMap.update_single_type_map(needType)                         # Update the passenger nav map for this type
+	for needsType in typesToRemove:
+		passengerMap.update_single_type_map(needsType)      
 
 func remove_module(carNum : int, position : int):
 	if carriages.size() <= position or carriages[carNum] == null:

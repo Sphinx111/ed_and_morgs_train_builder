@@ -16,8 +16,7 @@ var direction : int = 0
 
 var home_cabin = null
 var destination : Vector2 = self.position
-
-var lastDebugChecked : float = self.position.x
+var is_in_module : bool = false
 
 # Foodtypes and last tick they were eaten on (to track food variety)
 var foodsEaten = {
@@ -49,11 +48,12 @@ func _ready():
 	parentTrain = manager.get_parent()
 
 func _process(delta) -> void:
-	destination.x = max(destination.x, parentTrain.minXpos)
-	destination.x = min(destination.x, parentTrain.maxXpos)
-	position = position.move_toward(destination, movespeed * delta)
-	if (direction > 0 and position.x > next_module_pos) or (direction < 0 and position.x < last_module_pos):
-		update_module_positions()
+	if is_in_module == false:
+		destination.x = max(destination.x, parentTrain.minXpos)
+		destination.x = min(destination.x, parentTrain.maxXpos)
+		position = position.move_toward(destination, movespeed * delta)
+		if (direction > 0 and position.x > next_module_pos) or (direction < 0 and position.x < last_module_pos):
+			update_module_positions()
 
 # Once at outset, or per module moved, confirm position on train and which module we are at
 # set thresholds to re-check module next
@@ -82,10 +82,12 @@ func enter_customer_module(target : ModuleBase, attemptNo : int):
 	if target.can_enter(self):
 		target.add_customer(self)
 		self.hide()
+		is_in_module = true
 
 func exit_customer_module():
 	self.show()
 	targetNeed = ""
+	is_in_module = false
 
 func resource_tick():
 	for key in needs.keys():

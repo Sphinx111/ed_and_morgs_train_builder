@@ -56,10 +56,6 @@ func resource_tick():
 				parentTrain.add_res("clean_water", amount_to_convert)
 	serve_customers()
 
-# Do anything we need before the module gets deleted
-func cleanup():
-	pass
-
 func set_sequence(newSequence : int):
 	sequence = newSequence
 	position.x = sequence * Globals.module_width
@@ -100,6 +96,7 @@ func serve_customers():
 		
 		if needs_finished >= serves_needs.size():
 			remove_customer(customer)
+			print("%s %s exiting %s module" % [customer.firstname, customer.lastname, type]) 
 			customer.exit_customer_module()
 		pass
 

@@ -41,12 +41,16 @@ func add_module(type : String, position : int):
 	newModule.set_sequence(position)
 	
 	if modules[position] != null:
+		newModule.customers  = modules[position].customers
+		newModule.workers  = modules[position].workers
+		newModule.customers 
 		remove_module(position)
 	modules[position] = newModule
 
 func remove_module(position: int):
 	var mod_to_remove = modules[position]
-	mod_to_remove.cleanup()
+	mod_to_remove.set_type("empty")
+	modules[position] == null
 	mod_to_remove.queue_free()
 
 func get_type_map(need_type_to_find : String) -> Array:
