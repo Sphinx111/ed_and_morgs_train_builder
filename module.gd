@@ -50,12 +50,13 @@ func resource_tick():
 	
 	if workers.size() >= workers_needed:
 		if type == "farm":
-			if parentTrain.get_res("grey_water") > 0:
-				parentTrain.add_res("food1", 1)
-				parentTrain.add_res("grey_water", -1)
-			elif (parentTrain.get_res("clean_water") > Globals.minimum_water_safety_margin): 
-				parentTrain.add_res("food1", 1)
-				parentTrain.add_res("clean_water", -1)
+			if (parentTrain.get_res("clean_water") > Globals.minimum_water_safety_margin):
+				if parentTrain.get_res("grey_water") > 0:
+					parentTrain.add_res("food1", 1)
+					parentTrain.add_res("grey_water", -1)
+				elif (parentTrain.get_res("clean_water") > 0): 
+					parentTrain.add_res("food1", 1)
+					parentTrain.add_res("clean_water", -1)
 				
 		#commenting out code contributed by junior dev
 		# 2qv c
