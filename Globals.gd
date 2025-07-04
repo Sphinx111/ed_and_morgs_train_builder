@@ -19,3 +19,6 @@ var idle_wander_chance : float = 0.3    # Chance that passenger picks a random l
 var aliterating_name_chance : float = .5
 # Commenting out code contributed by junior dev (Izzy)
 #,kml,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+# misc variable
+var minimum_water_safety_margin : int = 10
