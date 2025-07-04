@@ -8,12 +8,15 @@ var tick_time : float = 0.0
 var tick_timer : Timer = Timer.new()
 
 @onready
+var worldMap : MapHandler = find_child("WorldMap")
+
+@onready
 var debug_slider : HSlider = find_child("DebugPanel").find_child("DebugSlider")
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
 	resource_panel_update()
-	print("Manual resource tick")
+	worldMap.train_step()
 
 func _ready() -> void:
 	var update_timer : Timer = Timer.new()
@@ -25,7 +28,7 @@ func _ready() -> void:
 	
 	# Setup tick_timer
 	add_child(tick_timer)
-	tick_timer.timeout.connect(selectedTrain.resource_tick)
+	tick_timer.timeout.connect(do_resource_tick)
 	tick_timer.wait_time = 1.0
 	tick_timer.one_shot = false
 
@@ -39,6 +42,7 @@ func resource_panel_update():
 	$ResourcePanel/BlackWater.text = "Black: " + String.num_int64(selectedTrain.get_res("black_water"))
 	$ResourcePanel/MechParts.text = "Parts: " + String.num_int64(selectedTrain.get_res("mech_parts"))
 	$ResourcePanel/Food.text = "Food: " + String.num_int64(selectedTrain.get_res("food1"))
+	$ResourcePanel/Scrap.text = "Scrap: " + String.num_int64(selectedTrain.get_res("scrap"))
 
 func _on_line_edit_text_submitted(_new_text: String) -> void:
 	parse_text_input()
@@ -106,7 +110,8 @@ func parse_text_input():
 		elif words[i] == "black" and words[i+1] == "water":
 			subject = "black_water"
 			wordsRead = 2
-			
+		elif words[i] == "scrap":
+			subject = "scrap_arm"
 		elif words[i] == "farm":
 			subject = "farm"
 		elif words[i] == "food":
@@ -151,9 +156,17 @@ func _on_add_passenger_pressed() -> void:
 
 func _on_debug_tick_slider_ended(value_changed: bool) -> void:
 	if value_changed == true:
-		$DebugPanel/SliderLabel.text = ("%d" % (int(debug_slider.value)))
+		$DebugPanel/SliderLabel.text = ("%d" % (debug_slider.value))
 		tick_time = debug_slider.value
 		if tick_time == 0.0:
 			tick_timer.stop()
 		else:
 			tick_timer.start()
+
+
+func _on_map_toggled(toggled_on: bool) -> void:
+	if toggled_on == true:
+		worldMap.show()
+	else:
+		worldMap.hide()
+	pass # Replace with function body.

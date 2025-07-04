@@ -10,6 +10,7 @@ var tickCount = 0 				#Resource ticks since the train launched
 var CarriageScene = preload("res://Scenes/traincar_base.tscn")
 
 var passengerMap : PassengerMap = null
+var worldMap : MapHandler = null
 var passengerManager : PassengerManager = null
 
 var minXpos : float = 0.0
@@ -35,7 +36,8 @@ var res = {
 	"seeds3" : 0.0,
 	"seeds4" : 0.0,
 	"seeds5" : 0.0,
-	"seeds6" : 0.0
+	"seeds6" : 0.0,
+	"scrap" : 0.0
 }
 
 func _ready() -> void:
@@ -44,6 +46,7 @@ func _ready() -> void:
 	maxXpos = (carriages.size() * (Globals.car_length + Globals.car_separation)) - Globals.car_separation
 	passengerManager = find_child("PassengersManager")
 	init_passenger_map()
+	worldMap = get_parent().find_child("BasicUI").worldMap
 
 func get_res(key : String) -> float:
 	if res.has(key):

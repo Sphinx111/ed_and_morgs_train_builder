@@ -139,7 +139,7 @@ func check_needs():
 			maxNeed = key
 			maxVal = needs[key]
 			if maxVal >= maxNeeds[key]:
-				hit_max_need(key)
+				if hit_max_need(key) == Globals.result_fatal: return
 	if maxVal > Globals.passenger_seeks_threshold:
 		if maxNeed != "" and maxNeed != targetNeed:
 			targetNeed = maxNeed
@@ -151,9 +151,10 @@ func check_for_work():
 	targetWork = "any"
 	check_current_module()
 
-func hit_max_need(needType : String):
+func hit_max_need(needType : String) -> int:
 	print("%s %s: Oh no! I am dying of %s" % [firstname, lastname, needType])
 	manager.remove_passenger(self)
+	return Globals.result_fatal
 
 func pick_direction():
 	# Chance to idly move around if no behaviour

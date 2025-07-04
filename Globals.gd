@@ -22,3 +22,7 @@ var aliterating_name_chance : float = .5
 
 # misc variable
 var minimum_water_safety_margin : int = 10
+
+# manifest values to help with function returns making more sense
+const result_ok = 0
+const result_fatal = 1
