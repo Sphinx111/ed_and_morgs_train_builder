@@ -51,6 +51,13 @@ func resource_tick():
 	if workers.size() >= workers_needed:
 		if type == "farm":
 			parentTrain.add_res("food1", 1)
+			if parentTrain.get_res("grey_water") > 0:
+				parentTrain.add_res("food1", 1)
+				parentTrain.add_res("grey_water", -1)
+			elif (parentTrain.get_res("clean_water") > Globals.minimum_water_safety_margin): 
+				parentTrain.add_res("food1", 1)
+				parentTrain.add_res("clean_water", -1)
+
 		if type == "scrap_arm":
 			var scrap_gathered = parentTrain.worldMap.request_resources("scrap", service_rate)
 			parentTrain.add_res("scrap", scrap_gathered)
@@ -59,14 +66,14 @@ func resource_tick():
 		#re adding 5 lines of code removed by junior dev
 		elif type == "clean_water":
 			# Prioritise black water first
-			if parentTrain.get_res("black_water") >= 3:
-				parentTrain.add_res("black_water", -3)
-				parentTrain.add_res("clean_water", 3)
+			if parentTrain.get_res("black_water") >= 1:
+				parentTrain.add_res("black_water", -1)
+				parentTrain.add_res("grey_water", 1)
 			else:
 				var grey_water = parentTrain.get_res("grey_water")
-				var amount_to_convert = min(grey_water, 5)
+				var amount_to_convert = min(grey_water, 1)
 				if amount_to_convert >= 1:
-					parentTrain.add_res("grey_water", amount_to_convert)
+					parentTrain.add_res("grey_water", (-1 * amount_to_convert))
 					parentTrain.add_res("clean_water", amount_to_convert)
 	serve_customers()
 
@@ -107,16 +114,21 @@ func serve_customers():
 				needs_finished += 1
 			elif amount > 0:
 				var resource_to_use : String = ""
+				var resource_to_produce : String = ""
 				if need == "thirst":
 					resource_to_use = "clean_water"
+					resource_to_produce = "black_water"
 				if need == "hunger":
 					resource_to_use = "food1"
+					resource_to_produce = "black_water"
 				if need == "rest":
-					resource_to_use = "none"
+					resource_to_use = "clean_water"
+					resource_to_produce = "grey_water"
 				
 				if resource_to_use != "none":
 					amount = min(parentTrain.res[resource_to_use], amount)      # Reduce amount if train has less than desired
 					parentTrain.res[resource_to_use] -= amount
+					parentTrain.res[resource_to_produce] += amount
 
 				if customer.adjust_need(need, amount) == 0:                     # Actually adjust the passenger's need, and get amount remaining
 					needs_finished += 1
