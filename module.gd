@@ -51,7 +51,9 @@ func resource_tick():
 	if workers.size() >= workers_needed:
 		if type == "farm":
 			parentTrain.add_res("food1", 1)
-			
+		if type == "scrap_arm":
+			var scrap_gathered = parentTrain.worldMap.request_resources("scrap", service_rate)
+			parentTrain.add_res("scrap", scrap_gathered)
 		#commenting out code contributed by junior dev
 		# 2qv c
 		#re adding 5 lines of code removed by junior dev
@@ -144,4 +146,9 @@ func set_type(newType : String):
 	elif newType == "empty":
 		$Outline.color = Color.GRAY
 		serves_needs = []
+	elif newType == "scrap_arm":
+		$Outline.color = Color.SANDY_BROWN
+		serves_needs = []
+		workers_needed = 0
+		service_rate = 5.0
 	$Label.text = newType
