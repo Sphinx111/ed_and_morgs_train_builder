@@ -46,7 +46,7 @@ func add_passenger():
 	passengers.append(newPass)
 
 func apply_random_name(passenger) -> void:
-	var constrainedNamesList
+	var constrainedNamesList = []
 	passenger.lastname = lastNamesList[randi_range(0, lastNamesList.size()-1)]
 	
 	#randomise odds of an aliterating name
@@ -54,6 +54,8 @@ func apply_random_name(passenger) -> void:
 		constrainedNamesList = firstNamesList.filter(func (string): return string.begins_with(passenger.lastname.left(1)))
 		if constrainedNamesList.size() == 0:
 			constrainedNamesList = firstNamesList
+	else: 
+		constrainedNamesList = firstNamesList
 	passenger.firstname = constrainedNamesList[randi_range(0, constrainedNamesList.size()-1)]
 	
 
