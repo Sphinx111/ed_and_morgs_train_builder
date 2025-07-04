@@ -87,6 +87,8 @@ func parse_text_input():
 			wordsRead = 2
 		elif words[i] == "all" or words[i] == "every":
 			allSubjects = true
+		elif words[i] == "empty":
+			subject = "empty"
 		elif words[i] == "cabin":
 			subject = "cabin"
 		elif words[i] == "greywater" or words[i] == "graywater" or words[i] == "grey_water":

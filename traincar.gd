@@ -50,8 +50,6 @@ func add_module(type : String, position : int):
 func remove_module(position: int):
 	var mod_to_remove = modules[position]
 	mod_to_remove.set_type("empty")
-	modules[position] == null
-	mod_to_remove.queue_free()
 
 func get_type_map(need_type_to_find : String) -> Array:
 	var result = [0,0,0,0]
