@@ -175,8 +175,7 @@ func pick_direction():
 		distanceToTarget= parentTrain.passengerMap.get_direction_from_to(myLocation, targetWork, "work")
 	
 	if distanceToTarget == 9999:
-		thoughts.append("%s %s: This train has no way to fulfil my crushing %s need" % [firstname, lastname, targetNeed])
-		print(thoughts[thoughts.size() - 1])
+		if targetNeed != "": new_thought("This train has no way to fulfil my crushing %s need" % [targetNeed])
 		return
 	if    distanceToTarget > 0: direction = 1
 	elif  distanceToTarget < 0: direction = -1
@@ -187,10 +186,18 @@ func pick_direction():
 	destination.x += (myLocation[1] + 0.5) * Globals.module_width
 	
 	if distanceToTarget > 7:
-		thoughts.append("%s %s: It's a long way to fulfil my %s" %  [firstname, lastname, targetNeed])
-		print(thoughts[thoughts.size()-1])
+		if targetNeed != "": new_thought("It's a long way to fulfil my %s" %  [targetNeed])
+		elif targetWork != "": new_thought("It's a long way to find %s work" %  [targetWork])
 
 # adjust the need, and return the amount remaining
 func adjust_need(type : String, amount : float) -> float:
 	needs[type] = max(needs[type] - amount, 0)
 	return needs[type]
+
+func new_thought(text : String):
+	if thoughts.get(thoughts.size() - 1) == text:
+		return
+	thoughts.append(text)
+	var prefix = ("%s %s: " % [firstname, lastname])
+	text = prefix + text
+	Globals.activeUI.add_thought(text)

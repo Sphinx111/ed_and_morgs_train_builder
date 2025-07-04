@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
-[ext_resource type="PackedScene" path="res://world_map.tscn" id="2_ksonv"]
+[ext_resource type="PackedScene" uid="uid://b3ph64gipnlm5" path="res://world_map.tscn" id="2_ksonv"]
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
 [ext_resource type="PackedScene" uid="uid://cw8ov34j2hlku" path="res://Scenes/passenger.tscn" id="4_d8abk"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
@@ -117,6 +117,9 @@ offset_right = 1145.0
 offset_bottom = 87.0
 text = "Give Order"
 
+[node name="WorldMap" parent="BasicUI" instance=ExtResource("2_ksonv")]
+position = Vector2(851, 460)
+
 [node name="DebugPanel" type="Panel" parent="BasicUI"]
 layout_mode = 0
 offset_top = 568.0
@@ -147,6 +150,7 @@ offset_right = 169.0
 offset_bottom = 73.0
 max_value = 5.0
 step = 0.5
+value = 1.0
 tick_count = 8
 ticks_on_borders = true
 
@@ -160,14 +164,35 @@ text = "0"
 
 [node name="CheckButton" type="CheckButton" parent="BasicUI/DebugPanel"]
 layout_mode = 0
-offset_left = 807.0
-offset_top = 48.0
-offset_right = 851.0
-offset_bottom = 77.0
+offset_left = 1111.0
+offset_top = 53.0
+offset_right = 1155.0
+offset_bottom = 82.0
 button_pressed = true
 
-[node name="WorldMap" parent="BasicUI" instance=ExtResource("2_ksonv")]
-position = Vector2(851, 460)
+[node name="ThoughtsToggle" type="Button" parent="BasicUI/DebugPanel"]
+layout_mode = 0
+offset_left = 119.0
+offset_top = 6.0
+offset_right = 200.0
+offset_bottom = 37.0
+toggle_mode = true
+button_pressed = true
+text = "Thoughts"
+
+[node name="ThoughtsPanel" type="Panel" parent="BasicUI"]
+layout_mode = 0
+offset_left = 227.0
+offset_top = 527.0
+offset_right = 841.0
+offset_bottom = 647.0
+
+[node name="ThoughtsList" type="ItemList" parent="BasicUI/ThoughtsPanel"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 7.0
+offset_right = 608.0
+offset_bottom = 114.0
 
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 274)
@@ -199,3 +224,5 @@ offset = Vector2(576, 324)
 [connection signal="pressed" from="BasicUI/DebugPanel/Button" to="BasicUI" method="_on_add_passenger_pressed"]
 [connection signal="drag_ended" from="BasicUI/DebugPanel/DebugSlider" to="BasicUI" method="_on_debug_tick_slider_ended"]
 [connection signal="toggled" from="BasicUI/DebugPanel/CheckButton" to="BasicUI" method="_on_map_toggled"]
+[connection signal="pressed" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_pressed"]
+[connection signal="toggled" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_toggled"]

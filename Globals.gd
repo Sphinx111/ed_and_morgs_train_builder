@@ -1,5 +1,7 @@
 extends Node
 
+var activeUI : TrainUI = null
+
 # Car variables
 var car_length : int = 200
 var car_height : int = 80

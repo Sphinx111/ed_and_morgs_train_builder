@@ -1,5 +1,7 @@
 extends Control
 
+class_name TrainUI
+
 @onready
 var selectedTrain : Train = get_parent().find_child("Train")
 @onready
@@ -11,6 +13,11 @@ var tick_timer : Timer = Timer.new()
 var worldMap : MapHandler = find_child("WorldMap")
 
 @onready
+var thoughtsPanel : Panel = find_child("ThoughtsPanel")
+@onready
+var thoughtsList : ItemList = thoughtsPanel.find_child("ThoughtsList")
+
+@onready
 var debug_slider : HSlider = find_child("DebugPanel").find_child("DebugSlider")
 
 func do_resource_tick():
@@ -19,6 +26,8 @@ func do_resource_tick():
 	worldMap.train_step()
 
 func _ready() -> void:
+	Globals.activeUI = self
+	
 	var update_timer : Timer = Timer.new()
 	add_child(update_timer)
 	update_timer.wait_time = 0.5
@@ -29,8 +38,9 @@ func _ready() -> void:
 	# Setup tick_timer
 	add_child(tick_timer)
 	tick_timer.timeout.connect(do_resource_tick)
-	tick_timer.wait_time = 1.0
+	tick_timer.wait_time = 2.0
 	tick_timer.one_shot = false
+	tick_timer.start()
 
 
 func resource_panel_update():
@@ -43,6 +53,10 @@ func resource_panel_update():
 	$ResourcePanel/MechParts.text = "Parts: " + String.num_int64(selectedTrain.get_res("mech_parts"))
 	$ResourcePanel/Food.text = "Food: " + String.num_int64(selectedTrain.get_res("food1"))
 	$ResourcePanel/Scrap.text = "Scrap: " + String.num_int64(selectedTrain.get_res("scrap"))
+
+func add_thought(newThought : String):
+	var listPos : int = thoughtsList.add_item(newThought, null, false)
+	thoughtsList.move_item(listPos, 0)
 
 func _on_line_edit_text_submitted(_new_text: String) -> void:
 	parse_text_input()
@@ -142,7 +156,6 @@ func parse_text_input():
 			return
 		elif verb == "deconstruct":
 			selectedTrain.remove_module(location1.to_int(), location2.to_int())
-	
 
 
 func _on_debug_tick_pressed() -> void:
@@ -169,4 +182,11 @@ func _on_map_toggled(toggled_on: bool) -> void:
 		worldMap.show()
 	else:
 		worldMap.hide()
+	pass # Replace with function body.
+
+func _on_thoughts_toggle_toggled(toggled_on: bool) -> void:
+	if toggled_on == true:
+		thoughtsPanel.show()
+	else:
+		thoughtsPanel.hide()
 	pass # Replace with function body.

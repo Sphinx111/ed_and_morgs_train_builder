@@ -25,8 +25,9 @@ curve = SubResource("Curve2D_deu6t")
 position = Vector2(1, 56)
 
 [node name="Rect" type="ColorRect" parent="MainRoute/TrainMarker"]
-offset_right = 3.0
-offset_bottom = 3.0
+offset_top = 1.0
+offset_right = 5.0
+offset_bottom = 5.0
 
 [node name="ResourceSpot" type="PathFollow2D" parent="MainRoute"]
 position = Vector2(1, 56)

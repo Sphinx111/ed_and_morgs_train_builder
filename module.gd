@@ -106,7 +106,9 @@ func serve_customers():
 	for customer in customers:
 		# For each need served here, check how much the customer wants
 		# Then consume resources to fulfill the need
-		
+		# Customer may have died from reaching maxNeeds before this function is called. If yes, return early
+		if is_instance_valid(customer) == false:
+			return
 		# track how many needs have been satisfied out of total available, so customer will leave when needs are met
 		var needs_finished : int = 0
 		for need in serves_needs:
