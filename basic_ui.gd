@@ -4,7 +4,11 @@ extends Control
 var selectedTrain : Train = get_parent().find_child("Train")
 @onready
 var textbox : LineEdit = find_child("LineEdit")
-var time_since_update : float = 0.0
+var tick_time : float = 0.0
+var tick_timer : Timer = Timer.new()
+
+@onready
+var debug_slider : HSlider = find_child("DebugPanel").find_child("DebugSlider")
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
@@ -18,6 +22,12 @@ func _ready() -> void:
 	update_timer.one_shot = false
 	update_timer.timeout.connect(resource_panel_update)
 	update_timer.start()
+	
+	# Setup tick_timer
+	add_child(tick_timer)
+	tick_timer.timeout.connect(selectedTrain.resource_tick)
+	tick_timer.wait_time = 1.0
+	tick_timer.one_shot = false
 
 
 func resource_panel_update():
@@ -135,3 +145,13 @@ func _on_debug_tick_pressed() -> void:
 func _on_add_passenger_pressed() -> void:
 	selectedTrain.add_passenger_debug()
 	pass # Replace with function body.
+
+
+func _on_debug_tick_slider_ended(value_changed: bool) -> void:
+	if value_changed == true:
+		$DebugPanel/SliderLabel.text = ("%d" % (int(debug_slider.value)))
+		tick_time = debug_slider.value
+		if tick_time == 0.0:
+			tick_timer.stop()
+		else:
+			tick_timer.start()

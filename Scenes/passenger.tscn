@@ -9,3 +9,27 @@ script = ExtResource("1_lyrvh")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 position = Vector2(0, -25)
 texture = ExtResource("2_uumvl")
+
+[node name="DebugThirst" type="ColorRect" parent="."]
+visible = false
+offset_left = -13.0
+offset_top = -72.0
+offset_right = -7.0
+offset_bottom = -52.0
+color = Color(0.2, 1, 1, 1)
+
+[node name="DebugHunger" type="ColorRect" parent="."]
+visible = false
+offset_left = -3.0
+offset_top = -72.0
+offset_right = 3.0
+offset_bottom = -52.0
+color = Color(0.0576789, 0.637473, 1.92523e-07, 1)
+
+[node name="DebugRest" type="ColorRect" parent="."]
+visible = false
+offset_left = 7.0
+offset_top = -72.0
+offset_right = 13.0
+offset_bottom = -52.0
+color = Color(0.916171, 0.2, 0.396461, 1)

@@ -17,6 +17,7 @@ var direction : int = 0
 var home_cabin = null
 var destination : Vector2 = self.position
 var is_in_module : bool = false
+var is_working : bool = false
 
 # Foodtypes and last tick they were eaten on (to track food variety)
 var foodsEaten = {
@@ -26,7 +27,7 @@ var foodsEaten = {
 var targetNeed = ""
 var needs = {
 	"thirst" : 0.0,
-	"hunger" : 0.78,
+	"hunger" : 0.65,
 	"rest" : 0.0
 }
 const maxNeeds = {
@@ -35,6 +36,7 @@ const maxNeeds = {
 	"rest" : 2.0
 }
 
+var targetWork : String = ""
 var skills = {
 	"strength" : randf() / 2,
 	"intelligence" : randf() / 2
@@ -46,6 +48,13 @@ var thoughts : PackedStringArray = []
 func _ready():
 	manager = get_parent()
 	parentTrain = manager.get_parent()
+	_ready_debug_displays()
+
+func _ready_debug_displays():
+	if Globals.passenger_debug == true:
+		$DebugThirst.show()
+		$DebugHunger.show()
+		$DebugRest.show()
 
 func _process(delta) -> void:
 	if is_in_module == false:
@@ -69,30 +78,58 @@ func update_module_positions():
 	next_module_pos = parentTrain.get_xpos_from_trainpos(nextLocation)
 	check_current_module()
 
+func update_needs_debug():
+	$DebugThirst.size.y = (20 * needs["thirst"])
+	$DebugHunger.size.y = (20 * needs["hunger"])
+	$DebugRest.size.y   = (20 * needs["rest"])
 
 # If my needs have just changed, check whether the module I am in serves what I need
 func check_current_module():
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
-	if current_module.can_serve_need(targetNeed):
-		enter_customer_module(current_module, 1)
-
+	if targetNeed != "":
+		if current_module.can_serve_need(targetNeed):
+			enter_customer_module(current_module, 1)
+	elif targetWork != "":
+		if current_module.needs_worker(targetWork):
+			enter_worker_module(current_module, 1)
 
 func enter_customer_module(target : ModuleBase, attemptNo : int):
 	if target.can_enter(self):
 		target.add_customer(self)
 		self.hide()
 		is_in_module = true
+		#current_module = target
+
+func enter_worker_module(target : ModuleBase, attemptNo : int):
+	if target.worker_can_enter(self):
+		target.add_worker(self)
+		self.hide()
+		is_in_module = true
+		is_working = true
+		#current_module = target
 
 func exit_customer_module():
 	self.show()
 	targetNeed = ""
 	is_in_module = false
+	current_module.remove_customer(self)
+
+func exit_worker_module():
+	self.show()
+	targetWork = ""
+	is_in_module = false
+	is_working = false
+	current_module.remove_worker(self)
 
 func resource_tick():
 	for key in needs.keys():
 		needs[key] += 0.01
 	check_needs()
+	
+	check_for_work()
+	if Globals.passenger_debug == true:
+		update_needs_debug()
 
 func check_needs():
 	var maxVal : float = 0.0
@@ -107,6 +144,12 @@ func check_needs():
 		if maxNeed != "" and maxNeed != targetNeed:
 			targetNeed = maxNeed
 			check_current_module()
+			if is_working and is_in_module:
+				exit_worker_module()
+
+func check_for_work():
+	targetWork = "any"
+	check_current_module()
 
 func hit_max_need(needType : String):
 	print("%s %s: Oh no! My %s need hit max, I'm gonna die now" % [firstname, lastname, needType])
@@ -114,7 +157,7 @@ func hit_max_need(needType : String):
 
 func pick_direction():
 	# Chance to idly move around if no behaviour
-	if targetNeed == "":
+	if targetNeed == "" and targetWork == "":
 		if randf() < Globals.idle_wander_chance:
 			destination = self.position
 			var offset : float = randi_range(-200, 200)
@@ -124,9 +167,15 @@ func pick_direction():
 		return	# End early if no target
 	
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
-	var distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed)
+	var distanceToTarget = 0
+	if targetNeed != "":
+		distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed, "need")
+	elif targetWork != "":
+		distanceToTarget= parentTrain.passengerMap.get_direction_from_to(myLocation, targetWork, "work")
+	
 	if distanceToTarget == 9999:
 		thoughts.append("This train has no way to help with %s" % targetNeed)
+		print(thoughts[thoughts.size() - 1])
 		return
 	if    distanceToTarget > 0: direction = 1
 	elif  distanceToTarget < 0: direction = -1

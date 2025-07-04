@@ -10,10 +10,20 @@ var needsLocations = {
 	"rest"      : [[]],
 }
 
+# 1d location map
 var needsMaps = {
-	"thirst"    : [[]],
-	"hunger"    : [[]],
-	"rest"      : [[]]
+	"thirst"    : [],
+	"hunger"    : [],
+	"rest"      : []
+}
+
+var workLocations = {
+	"any" : [[]]
+}
+
+# 1d location array
+var workMaps = {
+	"any" : []
 }
 
 func set_train(newTrain : Train):
@@ -22,19 +32,26 @@ func set_train(newTrain : Train):
 func init_maps():
 	for key in needsLocations.keys():
 		needsLocations[key] = train.get_location_map_for_type(key)
-		calc_direction_weights(key)
+		calc_direction_weights(needsLocations, key, needsMaps)
+	for key in workLocations.keys():
+		workLocations[key] = train.get_work_location_map_for_type(key)
+		calc_direction_weights(workLocations, key, workMaps)
 
 func update_single_type_map(needs_type_to_update):
 	needsLocations[needs_type_to_update] = train.get_location_map_for_type(needs_type_to_update)
-	calc_direction_weights(needs_type_to_update)
+	calc_direction_weights(needsLocations, needs_type_to_update, needsMaps)
 
-func calc_direction_weights(needType : String):
+func update_single_work_type_map(work_type_to_update):
+	workLocations[work_type_to_update] = train.get_work_location_map_for_type(work_type_to_update)
+	calc_direction_weights(workLocations, work_type_to_update, workMaps)
+
+func calc_direction_weights(locationsMap : Dictionary, mapType : String, outputDict : Dictionary):
 	# Reads the type map, and builds a vector diagram for each position on the train
 	# telling passengers whether to go left or right, to get to a module of the desired type
 	var flat_map : Array = []
 	
 	# Start by converting 2D array into a 1D array
-	for carriage in needsLocations[needType]:
+	for carriage in locationsMap[mapType]:
 		for module in carriage:
 			flat_map.append(module)
 	
@@ -50,7 +67,7 @@ func calc_direction_weights(needType : String):
 			# Found module for the first time, set scanner head back to 0
 			if flat_map[scanner_position] == 1:
 				lastFoundPos = scanner_position
-				print_debug("found type at position: " + String.num_int64(scanner_position))
+				#print_debug("found type at position: " + String.num_int64(scanner_position))
 				scanner_position = 0
 			# keep looking for first instance of module
 			else:
@@ -73,13 +90,17 @@ func calc_direction_weights(needType : String):
 				scanner_position += 1
 	
 	# Finally, save the directionsMap back
-	needsMaps[needType] = directionsMap.duplicate()
+	outputDict[mapType] = directionsMap.duplicate()
 	pass
 
-func get_direction_from_to(position : Array[int], type : String) -> int:
+func get_direction_from_to(position : Array[int], type : String, mapToUse: String) -> int:
 	var index = -1
 	index = position[0] * 4 + position[1]
-	if needsMaps.has(type):
-		return needsMaps[type][index]
-	else:
-		return 0
+	
+	if mapToUse == "need":
+		if needsMaps.has(type):
+			return needsMaps[type][index]
+	elif mapToUse == "work":
+		if workMaps.has(type):
+			return workMaps[type][index]
+	return 0

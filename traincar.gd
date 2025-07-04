@@ -18,7 +18,7 @@ func _ready():
 	$Outline.size.y = Globals.car_height
 	
 	for i in range(4):
-		add_module("cabin", i)
+		add_module("empty", i)
 
 func set_sequence(newSequence : int):
 	sequence = newSequence
@@ -57,5 +57,12 @@ func get_type_map(need_type_to_find : String) -> Array:
 	var result = [0,0,0,0]
 	for i in range(4):
 		if modules[i].can_serve_need(need_type_to_find):
+			result[i] = 1
+	return result
+
+func get_work_map(work_type_to_find : String) -> Array:
+	var result = [0,0,0,0]
+	for i in range(4):
+		if modules[i].needs_worker(work_type_to_find):
 			result[i] = 1
 	return result

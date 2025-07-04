@@ -25,9 +25,20 @@ func _ready():
 func can_enter(myPassenger : Passenger) -> bool:
 	return true
 
+func worker_can_enter(newWorker : Passenger) -> bool:
+	if enabled == false or workers.size() >= workers_needed:
+		return false
+	return true
+
 func can_serve_need(testType : String) -> bool:
-	if enabled == true and workers.size() >= workers_needed and serves_needs.has(testType):
+	if enabled == true and serves_needs.has(testType):
 		return true
+	return false
+
+func needs_worker(work_type : String) -> bool:
+	if enabled == true:
+		if work_type == "any" and (workers_needed - workers.size()) > 0:
+			return true
 	return false
 
 # For modules which produce or consume resources unrelated to presence of customers
@@ -35,25 +46,26 @@ func resource_tick():
 	if enabled == false:
 		return
 	elif type == "empty":
-		pass
-		
-	elif type == "farm":
-		parentTrain.add_res("food1", 1)
-		
-#commenting out code contributed by junior dev
-#	2qv c
-#re adding 5 lines of code removed by junior dev
-	elif type == "clean_water":
-		# Prioritise black water first
-		if parentTrain.get_res("black_water") >= 3:
-			parentTrain.add_res("black_water", -3)
-			parentTrain.add_res("clean_water", 3)
-		else:
-			var grey_water = parentTrain.get_res("grey_water")
-			var amount_to_convert = min(grey_water, 5)
-			if amount_to_convert >= 1:
-				parentTrain.add_res("grey_water", amount_to_convert)
-				parentTrain.add_res("clean_water", amount_to_convert)
+		return
+	
+	if workers.size() >= workers_needed:
+		if type == "farm":
+			parentTrain.add_res("food1", 1)
+			
+		#commenting out code contributed by junior dev
+		# 2qv c
+		#re adding 5 lines of code removed by junior dev
+		elif type == "clean_water":
+			# Prioritise black water first
+			if parentTrain.get_res("black_water") >= 3:
+				parentTrain.add_res("black_water", -3)
+				parentTrain.add_res("clean_water", 3)
+			else:
+				var grey_water = parentTrain.get_res("grey_water")
+				var amount_to_convert = min(grey_water, 5)
+				if amount_to_convert >= 1:
+					parentTrain.add_res("grey_water", amount_to_convert)
+					parentTrain.add_res("clean_water", amount_to_convert)
 	serve_customers()
 
 func set_sequence(newSequence : int):
@@ -63,11 +75,24 @@ func set_sequence(newSequence : int):
 func add_customer(newCustomer : Passenger):
 	if customers.has(newCustomer) == false:
 		customers.append(newCustomer)
+		$DebugCustomerCount.text = "" + String.num_int64(customers.size())
 
 func remove_customer(currentCustomer : Passenger):
 	customers.erase(currentCustomer)
+	$DebugCustomerCount.text = "" + String.num_int64(customers.size())
+
+func add_worker(newWorker : Passenger):
+	if workers.has(newWorker) == false:
+		workers.append(newWorker)
+		$DebugWorkerCount.text = "" + String.num_int64(workers.size())
+
+func remove_worker(newWorker : Passenger):
+	workers.erase(newWorker)
+	$DebugWorkerCount.text = "" + String.num_int64(workers.size())
 
 func serve_customers():
+	if customers.size() == 0:
+		return
 	for customer in customers:
 		# For each need served here, check how much the customer wants
 		# Then consume resources to fulfill the need
@@ -105,6 +130,7 @@ func set_type(newType : String):
 	if newType == "clean_water":
 		$Outline.color = Color.AQUA
 		serves_needs = ["thirst"]
+		workers_needed = 1
 	elif newType == "cabin":
 		$Outline.color = Color.BROWN
 		serves_needs = ["rest"]
@@ -114,4 +140,8 @@ func set_type(newType : String):
 	elif newType == "farm":
 		$Outline.color = Color.SEA_GREEN
 		serves_needs = ["hunger"]
+		workers_needed = 1
+	elif newType == "empty":
+		$Outline.color = Color.GRAY
+		serves_needs = []
 	$Label.text = newType

@@ -12,6 +12,7 @@ var module_height : int = 50
 
 
 # Passenger Variables
+var passenger_debug : bool = true
 var passenger_consume_threshold : float = 0.6
 var passenger_seeks_threshold : float = 0.65
 var idle_wander_chance : float = 0.3                                            # Chance that passenger picks a random location to move to if they have no targetNeed

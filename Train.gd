@@ -70,7 +70,9 @@ func add_module(type: String, carNum : int, position : int):
 	for needType in carriages[carNum].modules[position].serves_needs:
 		passengerMap.update_single_type_map(needType)                         # Update the passenger nav map for this type
 	for needsType in typesToRemove:
-		passengerMap.update_single_type_map(needsType)      
+		passengerMap.update_single_type_map(needsType)  
+	
+	passengerMap.update_single_work_type_map("any")
 
 func remove_module(carNum : int, position : int):
 	if carriages.size() <= position or carriages[carNum] == null:
@@ -79,6 +81,8 @@ func remove_module(carNum : int, position : int):
 	carriages[carNum].remove_module(position)
 	for needsType in typesToRemove:
 		passengerMap.update_single_type_map(needsType)                         # Update the passenger nav map for this type
+
+	passengerMap.update_single_work_type_map("any")
 
 func add_carriage(sequence : int):
 	var newCarriage = CarriageScene.instantiate()
@@ -103,6 +107,13 @@ func get_location_map_for_type(need_type_to_find : String) -> Array:
 	
 	for i in range(carriages.size()):
 		result.append(carriages[i].get_type_map(need_type_to_find))
+	
+	return result
+
+func get_work_location_map_for_type(work_type_to_find : String) -> Array:
+	var result = []
+	for i in range(carriages.size()):
+		result.append(carriages[i].get_work_map(work_type_to_find))
 	
 	return result
 
