@@ -109,7 +109,7 @@ func check_needs():
 			check_current_module()
 
 func hit_max_need(needType : String):
-	print("%s %s: Oh no! My %s need hit max, I'm gonna die now" % [firstname, lastname, needType])
+	print("%s %s: Oh no! I am dying of %s" % [firstname, lastname, needType])
 	manager.remove_passenger(self)
 
 func pick_direction():
@@ -126,7 +126,7 @@ func pick_direction():
 	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
 	var distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed)
 	if distanceToTarget == 9999:
-		thoughts.append("This train has no way to help with %s" % targetNeed)
+		thoughts.append("%s %s: This train has no way to fulfil my crushing %s need" % [firstname, lastname, targetNeed])
 		return
 	if    distanceToTarget > 0: direction = 1
 	elif  distanceToTarget < 0: direction = -1
@@ -137,7 +137,7 @@ func pick_direction():
 	destination.x += (myLocation[1] + 0.5) * Globals.module_width
 	
 	if distanceToTarget > 7:
-		thoughts.append("It's a long way to " + targetNeed)
+		thoughts.append("%s %s: It's a long way to fulfil my %s" %  [firstname, lastname, targetNeed])
 		print(thoughts[thoughts.size()-1])
 
 # adjust the need, and return the amount remaining
