@@ -66,8 +66,9 @@ func resource_tick():
 	passengerManager.resource_tick()
 
 func add_module(type: String, carNum : int, position : int):
-	if carriages.size() <= position or carriages[carNum] == null:
-		print_debug("Error: attempting to add module to nonexistent car: " + String.num_int64(carNum))
+	if carNum >= carriages.size() or position >= Globals.modules_per_car or carriages[carNum] == null:
+		print_debug("Error: Invalid Build position: " + String.num_int64(carNum) + ":" + String.num_int64(position))
+		return
 	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
 	carriages[carNum].add_module(type, position)
 	for needType in carriages[carNum].modules[position].serves_needs:

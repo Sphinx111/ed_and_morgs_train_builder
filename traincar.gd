@@ -18,7 +18,7 @@ func _ready():
 	$Outline.size.y = Globals.car_height
 	
 	for i in range(4):
-		add_module("empty", i)
+		init_module("empty", i)
 
 func set_sequence(newSequence : int):
 	sequence = newSequence
@@ -29,13 +29,10 @@ func resource_tick():
 		if module != null:
 			module.resource_tick()
 
-func add_module(type : String, position : int):
+func init_module(type : String, position : int):
 	#Todo: Instance a new Module scene
 	var newModule = ModuleScene.instantiate()
 	self.add_child(newModule)
-	
-	if position > 3:
-		position = 3
 	
 	newModule.set_type(type)
 	newModule.set_sequence(position)
@@ -47,9 +44,11 @@ func add_module(type : String, position : int):
 		remove_module(position)
 	modules[position] = newModule
 
+func add_module(type : String, position : int):
+	modules[position].set_type(type)
+
 func remove_module(position: int):
-	var mod_to_remove = modules[position]
-	mod_to_remove.set_type("empty")
+	modules[position].set_type("empty")
 
 func get_type_map(need_type_to_find : String) -> Array:
 	var result = [0,0,0,0]

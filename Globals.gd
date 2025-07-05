@@ -12,6 +12,8 @@ var modules_per_car : int = 4
 var module_width : int = 50
 var module_height : int = 50
 
+# Production ratios
+var scrap_to_mech_ratio : float = 0.2 # 5 Scrap to make 1 mech parts
 
 # Passenger Variables
 var passenger_debug : bool = true
@@ -26,5 +28,7 @@ var aliterating_name_chance : float = .5
 var minimum_water_safety_margin : int = 10
 
 # manifest values to help with function returns making more sense
-const result_ok = 0
-const result_fatal = 1
+const RESULT_OK = 0
+const RESULT_FATAL = 1
+const SERVICE_FINISHED = 2
+const NO_RESOURCES = 3

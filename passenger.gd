@@ -131,6 +131,11 @@ func resource_tick():
 	if Globals.passenger_debug == true:
 		update_needs_debug()
 
+func wants_need(type : String) -> float:
+	if needs.has(type):
+		return (1.0 - needs[type])
+	return 0.0
+
 func check_needs():
 	var maxVal : float = 0.0
 	var maxNeed : String = ""
@@ -154,7 +159,7 @@ func check_for_work():
 func hit_max_need(needType : String) -> int:
 	print("%s %s: Oh no! I am dying of %s" % [firstname, lastname, needType])
 	manager.remove_passenger(self)
-	return Globals.result_fatal
+	return Globals.RESULT_FATAL
 
 func pick_direction():
 	# Chance to idly move around if no behaviour
@@ -195,7 +200,7 @@ func adjust_need(type : String, amount : float) -> float:
 	return needs[type]
 
 func new_thought(text : String):
-	if thoughts.get(thoughts.size() - 1) == text:
+	if thoughts.size() > 0 and thoughts.get(thoughts.size() - 1) == text:
 		return
 	thoughts.append(text)
 	var prefix = ("%s %s: " % [firstname, lastname])
