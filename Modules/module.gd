@@ -17,11 +17,13 @@ var service_speed_modifier = 1.0
 
 
 # Production Variables
+var producers : Array[ProductionProvider] = [] 
 var workers_needed : int = 0
 var ticks_to_produce : int = 1    # How many ticks needed to finish production
 var production_rate = 1.0
 var progress : float = 0.0    # For modules that take more than one tick to produce a material
 var workers : Array[Passenger] = []
+var workType : String = "any"
 
 
 # All modules should know their parents and set position
@@ -54,64 +56,14 @@ func resource_tick():
 	if enabled == false:
 		return
 	elif type == "empty":
-		if customers.size() > 0:
-			serve_customers()	# Will kick out customers as no needs to be fulfilled
 		return
 	
-	# Producing materials requires workers
-	if workers.size() >= workers_needed:
-		if type == "farm":
-			if (parentTrain.get_res("clean_water") > Globals.minimum_water_safety_margin):
-				if parentTrain.get_res("grey_water") > 0:
-					parentTrain.add_res("food1", 1)
-					parentTrain.add_res("grey_water", -1)
-				elif (parentTrain.get_res("clean_water") > 0): 
-					parentTrain.add_res("food1", 1)
-					parentTrain.add_res("clean_water", -1)
-				
-
-		if type == "scrap_arm":
-			var scrap_gathered = parentTrain.worldMap.request_resources("scrap", production_rate)
-			parentTrain.add_res("scrap", scrap_gathered)
-		#commenting out code contributed by junior dev
-		# 2qv c
-		#re adding 5 lines of code removed by junior dev
-		elif type == "clean_water":
-			# Prioritise black water first
-			if parentTrain.get_res("black_water") >= 1:
-				parentTrain.add_res("black_water", -1)
-				parentTrain.add_res("grey_water", 1)
-			else:
-				var grey_water = parentTrain.get_res("grey_water")
-				var amount_to_convert = min(grey_water, 1)
-				if amount_to_convert >= 1:
-					parentTrain.add_res("grey_water", (-1 * amount_to_convert))
-					parentTrain.add_res("clean_water", amount_to_convert)
-		elif type == "mech_parts":
-			# Production has not started yet:
-			var scrap = parentTrain.get_res("scrap")
-			# multi-tick production
-			if ticks_to_produce > 0:
-				if progress == 0.0:
-					if scrap >= 5:
-						parentTrain.add_res("scrap", -5)
-						progress = progress + (1.0 / ticks_to_produce)
-				else:
-					progress = progress + (1.0 / ticks_to_produce)
-
-				# Complete production
-				if progress >= 1.0:
-					var amount_to_produce = 5 * Globals.scrap_to_mech_ratio
-					parentTrain.add_res("mech_parts", amount_to_produce)
-					progress = 0.0
-
-			else:
-				if scrap >= 5:
-					parentTrain.add_res("scrap", -5)
-					var amount_to_produce = 5 * Globals.scrap_to_mech_ratio
-					parentTrain.add_res("mech_parts", amount_to_produce)
-	if serves_needs.size() > 0:
+	if services.size() > 0:
 		serve_customers()
+	
+	if producers.size() > 0:
+		produce_resources()
+		return
 
 func set_sequence(newSequence : int):
 	sequence = newSequence
@@ -125,7 +77,13 @@ func add_customer(newCustomer : Passenger):
 			if service.trigger_once == true:
 				service.serve_customer(newCustomer, parentTrain, self)
 
-func remove_customer(currentCustomer : Passenger):
+## Used by module to remove its own passengers
+func _eject_customer(currentCustomer : Passenger):
+	notify_remove_customer(currentCustomer)
+	currentCustomer.exit_customer_module()
+
+## Used by external classes telling module to remove
+func notify_remove_customer(currentCustomer : Passenger):
 	customers.erase(currentCustomer)
 	$DebugCustomerCount.text = "" + String.num_int64(customers.size())
 
@@ -133,15 +91,31 @@ func add_worker(newWorker : Passenger):
 	if workers.has(newWorker) == false:
 		workers.append(newWorker)
 		$DebugWorkerCount.text = "" + String.num_int64(workers.size())
+		if workers.size() == workers_needed:
+			parentTrain.update_work_map(workType)
 
 func remove_worker(newWorker : Passenger):
+	if workers.size() == workers_needed:
+		parentTrain.update_work_map(workType)
 	workers.erase(newWorker)
 	$DebugWorkerCount.text = "" + String.num_int64(workers.size())
+	
 
 func add_service(newProvider : ServiceProvider):
 	newProvider.init()	# Setup its initial variables
 	services.append(newProvider)
 	serves_needs.append(newProvider.outputType)
+
+func add_producer(newProducer : ProductionProvider):
+	newProducer.init()	# Setup initial variables
+	producers.append(newProducer)
+
+## Cycle through producers and run their production cycle
+func produce_resources():
+	# Producing materials requires workers
+	if workers.size() >= workers_needed:
+		for producer in producers:
+			producer.produce(parentTrain)
 
 ## For each customer in the module, run through the repeatable services and attempt to provide them
 func serve_customers():
@@ -157,9 +131,8 @@ func serve_customers():
 					services_finished += 1 # Trigger-once services shouldn't count against total
 			
 			if services_finished >= services.size():
-				remove_customer(customer)
-				print("%s %s exiting %s module" % [customer.firstname, customer.lastname, type]) 
-				customer.exit_customer_module()
+				_eject_customer(customer)
+				print("%s %s exiting %s module" % [customer.firstname, customer.lastname, type])
 
 func reset_module():
 	services = []
@@ -168,6 +141,10 @@ func reset_module():
 	progress = 0.0
 	ticks_to_produce = 1
 	$Outline.color = Color.GRAY
+	
+	# Kick out any customers when module type changes
+	for customer in customers:
+		_eject_customer(customer)
 
 func set_type(newType : String):
 	self.type = newType
@@ -176,7 +153,12 @@ func set_type(newType : String):
 		$Outline.color = Color.AQUA
 		var basicWaterProvider = BasicWaterProvider.new()
 		add_service(basicWaterProvider)
+		
+		# Setup production
+		var basicCleanWaterProducer = BasicCleanWaterProducer.new()
+		add_producer(basicCleanWaterProducer)
 		workers_needed = 1
+
 	elif newType == "cabin":
 		$Outline.color = Color.BROWN
 		var showerProvider = ShowerProvider.new()
@@ -193,12 +175,19 @@ func set_type(newType : String):
 		$Outline.color = Color.SEA_GREEN
 		var basicFoodProvider = BasicFoodProvider.new()
 		add_service(basicFoodProvider)
+		
+		# Setup production
+		var food1Producer = BasicFood1Producer.new()
+		add_producer(food1Producer)
 		workers_needed = 1
 	elif newType == "scrap_arm":
 		$Outline.color = Color.SANDY_BROWN
+		var scrapCollector = BasicScrapCollector.new()
+		add_producer(scrapCollector)
 		production_rate = 5.0
 	elif newType == "mech_parts":
 		$Outline.color = Color.SANDY_BROWN
+		var partsProducer = ScrapToMechProducer.new()
+		add_producer(partsProducer)
 		workers_needed = 1
-		ticks_to_produce = 2
 	$Label.text = newType

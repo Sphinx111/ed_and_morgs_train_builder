@@ -105,6 +105,11 @@ func init_passenger_map():
 	passengerMap.set_train(self)
 	passengerMap.init_maps()
 
+func update_work_map(workType : String):
+	passengerMap.update_single_work_type_map("any")
+	if workType != "" and workType != "any":
+		passengerMap.update_single_work_type_map(workType)
+
 # Return a simple array of where each type of need can be met for passengers
 func get_location_map_for_type(need_type_to_find : String) -> Array:
 	var result = []

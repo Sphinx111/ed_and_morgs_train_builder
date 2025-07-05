@@ -43,9 +43,16 @@ func update_trainPos(progress : float):
 func train_step():
 	trainMarker.progress_ratio += step_percent
 
-func request_resources(wantedType : String, maxWanted : float) -> float:
+func request_resources(wantedType : String) -> float:
 	for spot in resources:
 		if spot.resource_type == wantedType and abs(spot.progress_ratio - trainMarker.progress_ratio) <= collection_margin: 
-			return min(spot.quantity, maxWanted)
-	
+			return spot.quantity
 	return 0
+
+func gather_resource(wantedType : String, amount : float) -> int:
+	for spot in resources:
+		if spot.resource_type == wantedType and abs(spot.progress_ratio - trainMarker.progress_ratio) <= collection_margin: 
+			if spot.quantity >= amount:
+				spot.quantity -= amount
+				return Globals.RESULT_OK
+	return Globals.NO_RESOURCES

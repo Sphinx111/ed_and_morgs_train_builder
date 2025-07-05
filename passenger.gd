@@ -109,11 +109,17 @@ func enter_worker_module(target : ModuleBase, attemptNo : int):
 		is_working = true
 		#current_module = target
 
+## Used by passenger to tell module they're leaving
 func exit_customer_module():
+	ejected_from_module()
+	current_module.notify_remove_customer(self)
+
+## Used by modules to eject a passenger
+func ejected_from_module():
 	self.show()
 	targetNeed = ""
 	is_in_module = false
-	current_module.remove_customer(self)
+	is_working = false
 
 func exit_worker_module():
 	self.show()
@@ -124,7 +130,7 @@ func exit_worker_module():
 
 func resource_tick():
 	for key in needs.keys():
-		needs[key] += 0.01
+		needs[key] += Globals.need_growth_rates[key]
 	check_needs()
 	
 	check_for_work()

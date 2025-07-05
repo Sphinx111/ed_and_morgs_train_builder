@@ -21,14 +21,24 @@ var passenger_consume_threshold : float = 0.6
 var passenger_seeks_threshold : float = 0.65
 var idle_wander_chance : float = 0.3    # Chance that passenger picks a random location to move to if they have no targetNeed
 var aliterating_name_chance : float = .5
+var need_growth_rates : Dictionary[String, float] = {
+	"thirst" : 0.01,
+	"hunger" : 0.005,
+	"rest"   : 0.005
+}
 # Commenting out code contributed by junior dev (Izzy)
 #,kml,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-# misc variable
-var minimum_water_safety_margin : int = 10
+# Minimum values to leave when doing production cycles
+var safety_margins : Dictionary[String, float] = {
+	"clean_water" : 10.0
+}
 
 # manifest values to help with function returns making more sense
 const RESULT_OK = 0
 const RESULT_FATAL = 1
 const SERVICE_FINISHED = 2
 const NO_RESOURCES = 3
+const SAFETY_CUTOFF = 4
+const USE_BOTH = 5
+const USE_EITHER = 6
