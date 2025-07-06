@@ -41,7 +41,7 @@ func update_trainPos(progress : float):
 	trainMarker.progress_ratio = progress
 
 func train_step():
-	trainMarker.progress_ratio += step_percent
+	trainMarker.progress_ratio -= step_percent
 
 func request_resources(wantedType : String) -> float:
 	for spot in resources:

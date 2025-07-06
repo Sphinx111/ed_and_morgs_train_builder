@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=7 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
 [ext_resource type="PackedScene" uid="uid://b3ph64gipnlm5" path="res://world_map.tscn" id="2_ksonv"]
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
 [ext_resource type="PackedScene" uid="uid://cw8ov34j2hlku" path="res://Scenes/passenger.tscn" id="4_d8abk"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
+[ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://Scenes/BackgroundHandler.gd" id="6_mscei"]
 
 [node name="SceneRoot" type="Control"]
 layout_mode = 3
@@ -199,6 +200,8 @@ position = Vector2(51, 340)
 script = ExtResource("1_rq5f1")
 
 [node name="PassengersManager" type="Node2D" parent="Train"]
+z_index = 1
+position = Vector2(0, 78)
 script = ExtResource("3_ksonv")
 
 [node name="Passenger" parent="Train/PassengersManager" instance=ExtResource("4_d8abk")]
@@ -217,6 +220,17 @@ default_color = Color(0.596078, 1, 1, 1)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(576, 324)
+
+[node name="Background" type="Node2D" parent="."]
+script = ExtResource("6_mscei")
+
+[node name="ForegroundLayer" type="Node2D" parent="Background"]
+z_index = 1
+position = Vector2(2, 415)
+
+[node name="BackgroundLayer" type="Node2D" parent="Background"]
+z_index = -1
+position = Vector2(0, 288)
 
 [connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="BasicUI/Button" to="BasicUI" method="_on_textinput_press"]

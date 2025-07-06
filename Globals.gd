@@ -2,6 +2,9 @@ extends Node
 
 var activeUI : TrainUI = null
 
+var display_width = 1152
+var display_height = 648
+
 # Car variables
 var car_length : int = 200
 var car_height : int = 80
