@@ -50,7 +50,7 @@ func start_cycle_both(train : Train) -> int:
 			result = Helpers.exceeds_safety_margin(inputType1, input1_avail - input1_needed)
 			if input1_avail < input1_needed:
 				result = Globals.NO_RESOURCES
-				if inputType2 != "":
+				if result == Globals.RESULT_OK and inputType2 != "":
 					var input2_avail = train.get_res(inputType2)
 					result = Helpers.exceeds_safety_margin(inputType2, input2_avail - input2_needed)
 					if input2_avail < input2_needed:

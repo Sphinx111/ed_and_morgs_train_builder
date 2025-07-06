@@ -53,6 +53,13 @@ func get_res(key : String) -> float:
 		return res.get(key)
 	return 0
 
+## Function to consume amount if available, returns a status code
+func gather_res(key : String, amount : float) -> int:
+	if res.has(key) and res[key] >= amount:
+		add_res(key, -amount)
+		return Globals.RESULT_OK
+	return Globals.NO_RESOURCES
+
 func add_res(key : String, amount : float):
 	if res.has(key):
 		res[key] = res[key] + amount
@@ -69,6 +76,11 @@ func add_module(type: String, carNum : int, position : int):
 	if carNum >= carriages.size() or position >= Globals.modules_per_car or carriages[carNum] == null:
 		print_debug("Error: Invalid Build position: " + String.num_int64(carNum) + ":" + String.num_int64(position))
 		return
+	
+	var cost : float = ModuleBase.build_cost[type]
+	if gather_res("mech_parts", cost) == Globals.NO_RESOURCES:
+		return
+	
 	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
 	carriages[carNum].add_module(type, position)
 	for needType in carriages[carNum].modules[position].serves_needs:
@@ -82,7 +94,12 @@ func remove_module(carNum : int, position : int):
 	if carriages.size() <= position or carriages[carNum] == null:
 		print_debug("Error: attempting to remove module from nonexistent car: " + String.num_int64(carNum))
 	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
+	var modType = carriages[carNum].modules[position].type
+	var refund : float = ModuleBase.build_cost[modType] * Globals.refund_module_fraction
+	add_res("mech_parts", refund)
+	
 	carriages[carNum].remove_module(position)
+
 	for needsType in typesToRemove:
 		passengerMap.update_single_type_map(needsType)                         # Update the passenger nav map for this type
 

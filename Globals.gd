@@ -11,6 +11,7 @@ var modules_per_car : int = 4
 # Module Variables
 var module_width : int = 50
 var module_height : int = 50
+var module_refund_percentage : float = 0.5
 
 # Production ratios
 var scrap_to_mech_ratio : float = 0.2 # 5 Scrap to make 1 mech parts
@@ -31,7 +32,7 @@ var need_growth_rates : Dictionary[String, float] = {
 
 # Minimum values to leave when doing production cycles
 var safety_margins : Dictionary[String, float] = {
-	"clean_water" : 10.0
+	"clean_water" : 50.0
 }
 
 # manifest values to help with function returns making more sense

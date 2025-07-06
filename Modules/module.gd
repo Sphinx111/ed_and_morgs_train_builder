@@ -9,6 +9,15 @@ var sequence : int = 0
 
 var enabled : bool = true
 
+const build_cost : Dictionary[String, float] = {
+	"clean_water" : 25.0,
+	"mech_parts" : 20.0,
+	"farm" : 10.0,
+	"scrap_arm" : 5.0,
+	"kitchen" : 5.0,
+	"cabin" : 10.0
+}
+
 # Service variables
 var services : Array[ServiceProvider] = []
 var serves_needs : Array[String] = []
@@ -136,6 +145,7 @@ func serve_customers():
 
 func reset_module():
 	services = []
+	producers = []
 	serves_needs = []
 	workers_needed = 0
 	progress = 0.0

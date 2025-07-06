@@ -150,7 +150,7 @@ func check_needs():
 			maxNeed = key
 			maxVal = needs[key]
 			if maxVal >= maxNeeds[key]:
-				if hit_max_need(key) == Globals.result_fatal: return
+				if hit_max_need(key) == Globals.RESULT_FATAL: return
 	if maxVal > Globals.passenger_seeks_threshold:
 		if maxNeed != "" and maxNeed != targetNeed:
 			targetNeed = maxNeed
