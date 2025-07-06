@@ -77,9 +77,10 @@ func add_module(type: String, carNum : int, position : int):
 		print_debug("Error: Invalid Build position: " + String.num_int64(carNum) + ":" + String.num_int64(position))
 		return
 	
-	var cost : float = ModuleBase.build_cost[type]
-	if gather_res("mech_parts", cost) == Globals.NO_RESOURCES:
-		return
+	if type != "empty":
+		var cost : float = ModuleBase.build_cost[type]
+		if gather_res("mech_parts", cost) == Globals.NO_RESOURCES:
+			return
 	
 	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
 	carriages[carNum].add_module(type, position)
@@ -126,6 +127,9 @@ func update_work_map(workType : String):
 	passengerMap.update_single_work_type_map("any")
 	if workType != "" and workType != "any":
 		passengerMap.update_single_work_type_map(workType)
+
+func update_needs_maps(needsArray : Array[String], position : Array[int], newState : int):
+	passengerMap.modify_several_needs_maps(needsArray, position, newState)
 
 # Return a simple array of where each type of need can be met for passengers
 func get_location_map_for_type(need_type_to_find : String) -> Array:

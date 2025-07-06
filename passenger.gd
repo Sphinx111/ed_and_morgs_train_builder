@@ -49,12 +49,17 @@ func _ready():
 	manager = get_parent()
 	parentTrain = manager.get_parent()
 	_ready_debug_displays()
+	_init_random_needs()
 
 func _ready_debug_displays():
 	if Globals.passenger_debug == true:
 		$DebugThirst.show()
 		$DebugHunger.show()
 		$DebugRest.show()
+
+func _init_random_needs():
+	for key in needs:
+		needs[key] = randf_range(0.0, 0.5)
 
 func _process(delta) -> void:
 	if is_in_module == false:

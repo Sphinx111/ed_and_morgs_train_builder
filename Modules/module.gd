@@ -23,14 +23,12 @@ var services : Array[ServiceProvider] = []
 var serves_needs : Array[String] = []
 var customers : Array[Passenger] = []
 var service_speed_modifier = 1.0
+var maxCustomers : int = 0
 
 
 # Production Variables
 var producers : Array[ProductionProvider] = [] 
 var workers_needed : int = 0
-var ticks_to_produce : int = 1    # How many ticks needed to finish production
-var production_rate = 1.0
-var progress : float = 0.0    # For modules that take more than one tick to produce a material
 var workers : Array[Passenger] = []
 var workType : String = "any"
 
@@ -42,7 +40,9 @@ func _ready():
 	position.x = sequence * Globals.module_width
 
 func can_enter(myPassenger : Passenger) -> bool:
-	return true
+	if maxCustomers == 0 or customers.size() < maxCustomers:
+		return true
+	return false
 
 func worker_can_enter(newWorker : Passenger) -> bool:
 	if enabled == false or workers.size() >= workers_needed:
@@ -82,6 +82,8 @@ func add_customer(newCustomer : Passenger):
 	if customers.has(newCustomer) == false:
 		customers.append(newCustomer)
 		$DebugCustomerCount.text = "" + String.num_int64(customers.size())
+		if customers.size() == maxCustomers:
+			parentCar.update_needs_maps(serves_needs, sequence, Globals.CUSTOMERS_FULL)
 		for service in services:
 			if service.trigger_once == true:
 				service.serve_customer(newCustomer, parentTrain, self)
@@ -93,6 +95,8 @@ func _eject_customer(currentCustomer : Passenger):
 
 ## Used by external classes telling module to remove
 func notify_remove_customer(currentCustomer : Passenger):
+	if customers.size() == maxCustomers:
+		parentCar.update_needs_maps(serves_needs, sequence, Globals.CUSTOMERS_HAS_SPACE)
 	customers.erase(currentCustomer)
 	$DebugCustomerCount.text = "" + String.num_int64(customers.size())
 
@@ -148,8 +152,6 @@ func reset_module():
 	producers = []
 	serves_needs = []
 	workers_needed = 0
-	progress = 0.0
-	ticks_to_produce = 1
 	$Outline.color = Color.GRAY
 	
 	# Kick out any customers when module type changes
@@ -163,6 +165,7 @@ func set_type(newType : String):
 		$Outline.color = Color.AQUA
 		var basicWaterProvider = BasicWaterProvider.new()
 		add_service(basicWaterProvider)
+		maxCustomers = 4
 		
 		# Setup production
 		var basicCleanWaterProducer = BasicCleanWaterProducer.new()
@@ -175,16 +178,19 @@ func set_type(newType : String):
 		var basicBedProvider = BasicBedProvider.new()
 		add_service(showerProvider)
 		add_service(basicBedProvider)
+		maxCustomers = 4
 	elif newType == "kitchen":
 		$Outline.color = Color.BISQUE
 		var basicFoodProvider = BasicFoodProvider.new()
 		var basicWaterProvider = BasicWaterProvider.new()
 		add_service(basicFoodProvider)
 		add_service(basicWaterProvider)
+		maxCustomers = 10
 	elif newType == "farm":
 		$Outline.color = Color.SEA_GREEN
 		var basicFoodProvider = BasicFoodProvider.new()
 		add_service(basicFoodProvider)
+		maxCustomers = 5
 		
 		# Setup production
 		var food1Producer = BasicFood1Producer.new()
@@ -194,7 +200,6 @@ func set_type(newType : String):
 		$Outline.color = Color.SANDY_BROWN
 		var scrapCollector = BasicScrapCollector.new()
 		add_producer(scrapCollector)
-		production_rate = 5.0
 	elif newType == "mech_parts":
 		$Outline.color = Color.SANDY_BROWN
 		var partsProducer = ScrapToMechProducer.new()

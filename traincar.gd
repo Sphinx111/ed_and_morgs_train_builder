@@ -4,6 +4,7 @@ class_name TraincarBase
 
 # The car's position in the train
 var sequence : int = 0
+var parentTrain : Train = null
 
 # helper variable to hold the current luxury level of the car
 var luxury : float = 0.0
@@ -16,6 +17,7 @@ func _ready():
 	position.x = sequence * (Globals.car_length + Globals.car_separation)
 	$Outline.size.x = Globals.car_length
 	$Outline.size.y = Globals.car_height
+	parentTrain = get_parent()
 	
 	for i in range(4):
 		init_module("empty", i)
@@ -63,3 +65,6 @@ func get_work_map(work_type_to_find : String) -> Array:
 		if modules[i].needs_worker(work_type_to_find):
 			result[i] = 1
 	return result
+
+func update_needs_maps(needsArray : Array[String], modulePos : int, newState : int):
+	parentTrain.update_needs_maps(needsArray, [sequence, modulePos], newState)

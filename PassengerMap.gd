@@ -93,6 +93,87 @@ func calc_direction_weights(locationsMap : Dictionary, mapType : String, outputD
 	outputDict[mapType] = directionsMap.duplicate()
 	pass
 
+func modify_several_needs_maps(needsArray : Array[String], trainPos : Array[int], newState : int):
+	for need in needsArray:
+		update_map_segment(needsLocations, need, needsMaps, trainPos, newState)
+
+func update_map_segment(locationsMap, mapType : String, outputDict, position2d : Array, newState : int):
+	# Placeholder - Just recalculate the entire map until this function works properly
+	calc_direction_weights(locationsMap, mapType, outputDict)
+	
+	# Update the directions map, limited to the slice of array affected by the changed position
+	var changed_index = Helpers.coords_to_index(position2d)
+	var isLeftmost : bool = false
+	var isRightmost : bool = true
+	var outputMap : Array[int] = outputDict[mapType]
+
+	# Identify whether this module is the only one, or first/last on the train
+	#TODO: Need a custom find left/right function here, builtin finds don't work right
+	var findRight = outputDict[mapType].rfind(0, 0)
+	var findLeft = outputDict[mapType].find(0, 0)
+	
+	if findRight < changed_index or findRight == -1:
+		isRightmost = true
+	elif findLeft > changed_index or findLeft == -1:
+		isLeftmost = true
+	
+	# Update the location map for this one position only
+	locationsMap[mapType][position2d[0]][position2d[1]] = newState
+	
+	# REMOVING a module from map
+	if newState == Globals.CUSTOMERS_FULL:
+		# If this was the only module of its kind
+		if isLeftmost and isRightmost:
+			outputDict[mapType].fill(9999)
+			return
+		
+		var i : int = 0
+		
+		# If the module is the leftmost, updating is easy
+		# Start from start of map, and update forwards until you find a pointer to the next module
+		if isLeftmost:
+			var nextVal = 0 - findRight
+			while i < findRight:
+				# If we reach an existing pointer to next module, stop updating
+				if i > changed_index and outputMap[i] > 0:
+					return
+				outputDict[mapType][i] = nextVal
+				nextVal -= 1
+				i += 1
+			return
+		
+		# Similarly, if module is rightmost, updating is easy
+		# Start at the end of map, and update backwards until you find a pointer to the previous module
+		if isRightmost:
+			i = outputMap.size()-1
+			var nextVal = findLeft - i
+			while i > findLeft:
+				if i < changed_index and outputMap[i] < 0:
+					return
+				outputDict[mapType][i] = nextVal
+				nextVal += 1
+				i -= 1
+			return
+		
+		# If we get to this point, we have removed a module that is between two other modules
+		# findLeft holds the position of the module to the left
+		# findRight holds the position of the module to the right
+		# We're just going to iterate through positions between left and right, updating as we go
+		i = findLeft + 1
+		var nextVal = -1
+		var midPoint = findLeft + ((findRight - findLeft) / 2)
+		while i < findRight:
+			if i == midPoint:
+				nextVal = findRight - midPoint
+			outputDict[mapType][i] = nextVal
+			i += 1
+	
+	# ADDING a module in - for now just rebuild the whole map
+	if newState == Globals.CUSTOMERS_HAS_SPACE:
+		calc_direction_weights(locationsMap, mapType, outputDict)
+		pass
+
+
 func get_direction_from_to(position : Array[int], type : String, mapToUse: String) -> int:
 	var index = -1
 	index = position[0] * 4 + position[1]

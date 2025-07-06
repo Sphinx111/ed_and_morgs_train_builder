@@ -11,7 +11,7 @@ var modules_per_car : int = 4
 # Module Variables
 var module_width : int = 50
 var module_height : int = 50
-var module_refund_percentage : float = 0.5
+var refund_module_fraction : float = 0.5
 
 # Production ratios
 var scrap_to_mech_ratio : float = 0.2 # 5 Scrap to make 1 mech parts
@@ -43,3 +43,5 @@ const NO_RESOURCES = 3
 const SAFETY_CUTOFF = 4
 const USE_BOTH = 5
 const USE_EITHER = 6
+const CUSTOMERS_FULL = 0
+const CUSTOMERS_HAS_SPACE = 1
