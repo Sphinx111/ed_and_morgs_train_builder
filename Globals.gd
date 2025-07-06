@@ -45,3 +45,5 @@ const USE_BOTH = 5
 const USE_EITHER = 6
 const CUSTOMERS_FULL = 0
 const CUSTOMERS_HAS_SPACE = 1
+const MODULE_REMOVED = 0
+const MODULE_ADDED = 1

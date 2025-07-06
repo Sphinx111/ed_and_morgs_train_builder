@@ -99,29 +99,28 @@ func modify_several_needs_maps(needsArray : Array[String], trainPos : Array[int]
 
 func update_map_segment(locationsMap, mapType : String, outputDict, position2d : Array, newState : int):
 	# Placeholder - Just recalculate the entire map until this function works properly
-	calc_direction_weights(locationsMap, mapType, outputDict)
+	#calc_direction_weights(locationsMap, mapType, outputDict)
 	
 	# Update the directions map, limited to the slice of array affected by the changed position
 	var changed_index = Helpers.coords_to_index(position2d)
 	var isLeftmost : bool = false
-	var isRightmost : bool = true
+	var isRightmost : bool = false
 	var outputMap : Array[int] = outputDict[mapType]
 
 	# Identify whether this module is the only one, or first/last on the train
-	#TODO: Need a custom find left/right function here, builtin finds don't work right
-	var findRight = outputDict[mapType].rfind(0, 0)
-	var findLeft = outputDict[mapType].find(0, 0)
+	var findRight : int = find_next_existing(outputMap, 1, changed_index)
+	var findLeft : int = find_next_existing(outputMap, -1, changed_index)
 	
-	if findRight < changed_index or findRight == -1:
+	if findRight == -1:
 		isRightmost = true
-	elif findLeft > changed_index or findLeft == -1:
+	if findLeft == -1:
 		isLeftmost = true
 	
 	# Update the location map for this one position only
 	locationsMap[mapType][position2d[0]][position2d[1]] = newState
 	
 	# REMOVING a module from map
-	if newState == Globals.CUSTOMERS_FULL:
+	if newState == Globals.CUSTOMERS_FULL or newState == Globals.MODULE_REMOVED:
 		# If this was the only module of its kind
 		if isLeftmost and isRightmost:
 			outputDict[mapType].fill(9999)
@@ -167,11 +166,52 @@ func update_map_segment(locationsMap, mapType : String, outputDict, position2d :
 				nextVal = findRight - midPoint
 			outputDict[mapType][i] = nextVal
 			i += 1
+			nextVal -= 1
 	
 	# ADDING a module in - for now just rebuild the whole map
-	if newState == Globals.CUSTOMERS_HAS_SPACE:
-		calc_direction_weights(locationsMap, mapType, outputDict)
+	if newState == Globals.CUSTOMERS_HAS_SPACE or newState == Globals.MODULE_ADDED:
+		# If this is the only module, just do a rebuild, re-use existing code
+		if isLeftmost and isRightmost:
+			calc_direction_weights(locationsMap, mapType, outputDict)
+			return
+		
+		var startWriteAt : int = 0
+		var endWriteAt : int = 0
+		var startValue : int = 0
+		
+		# If we are inserting a new module on the furthest left
+		if isLeftmost:
+			startWriteAt = 0
+			endWriteAt = changed_index + ((findRight - changed_index) / 2)      # midpoint between this and next existing module
+			startValue = changed_index
+		# If we are inserting a module on the furthest right
+		elif isRightmost:
+			startWriteAt = findLeft + ((changed_index - findLeft) / 2) + 1          # midpoint between last existing module and this
+			endWriteAt = outputMap.size()
+			startValue = changed_index - startWriteAt
+		# If the module being inserted is in the middle of two others, recalculate from midpointLeft to midpointRight
+		else:
+			startWriteAt = findLeft + ((changed_index - findLeft) / 2) + 1         # midpoint between last existing module and this
+			endWriteAt = changed_index + ((findRight - changed_index) / 2)      # midpoint between this and next existing module
+			startValue = changed_index - startWriteAt
+
+		var i : int = startWriteAt
+		var nextVal : int = startValue
+		while i < endWriteAt:               # iterate from last midpoint to next midpoint
+				outputDict[mapType][i] = nextVal             # Save new value to map
+				i += 1                                       # increment variables
+				nextVal -= 1
+		
 		pass
+
+## Find the next instance of module in map array
+func find_next_existing(map_to_search: Array, direction : int, start_index : int) -> int:
+	var i : int = start_index + direction
+	while i > 0 and i < map_to_search.size():
+		if map_to_search[i] == 0:
+			return i
+		i += direction
+	return -1
 
 
 func get_direction_from_to(position : Array[int], type : String, mapToUse: String) -> int:

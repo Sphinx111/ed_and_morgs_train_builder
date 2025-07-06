@@ -84,10 +84,9 @@ func add_module(type: String, carNum : int, position : int):
 	
 	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
 	carriages[carNum].add_module(type, position)
-	for needType in carriages[carNum].modules[position].serves_needs:
-		passengerMap.update_single_type_map(needType)                         # Update the passenger nav map for this type
-	for needsType in typesToRemove:
-		passengerMap.update_single_type_map(needsType)  
+	
+	update_needs_maps(carriages[carNum].modules[position].serves_needs,[carNum, position],Globals.MODULE_ADDED)
+	update_needs_maps(typesToRemove,[carNum, position],Globals.MODULE_ADDED)
 	
 	passengerMap.update_single_work_type_map("any")
 
@@ -101,8 +100,7 @@ func remove_module(carNum : int, position : int):
 	
 	carriages[carNum].remove_module(position)
 
-	for needsType in typesToRemove:
-		passengerMap.update_single_type_map(needsType)                         # Update the passenger nav map for this type
+	update_needs_maps(typesToRemove,[carNum, position],Globals.MODULE_REMOVED)
 
 	passengerMap.update_single_work_type_map("any")
 
