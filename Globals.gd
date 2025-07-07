@@ -5,15 +5,19 @@ var activeUI : TrainUI = null
 var display_width = 1152
 var display_height = 648
 
+
 # Car variables
-var car_length : int = 200
-var car_height : int = 80
-var car_separation: int = 5
+var car_length : float = 200
+var car_height : float = 80
+var car_separation: float = 5
 var modules_per_car : int = 4
 
+var train_origin_x = display_width - car_length
+var train_direction = 1
+
 # Module Variables
-var module_width : int = 50
-var module_height : int = 50
+var module_width : float = 50
+var module_height : float = 50
 var refund_module_fraction : float = 0.5
 
 # Production ratios

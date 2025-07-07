@@ -20,3 +20,22 @@ func index_to_coords(index : int) -> Array[int]:
 	var modulePos : int = index % Globals.modules_per_car
 	var carPos : int = index / Globals.modules_per_car
 	return [carPos, modulePos]
+
+## Get relative xpos from train coords
+func get_xpos_from_trainpos(trainPos: Array) -> float:
+	var result : float = (trainPos[0] * (Globals.car_length + Globals.car_separation))
+	result = result + (trainPos[1] * Globals.module_width)
+	# If train front is to the right, xPos is trainStart - distance from start
+	if Globals.train_direction > 0: result = result * -1
+	return result
+
+## get a trainpost [carNum, moduleNum] from a local position (Vector2)
+func get_trainpos_from_coords(localPos : Vector2) -> Array[int]:
+	var offset_from_start : float = 0
+	offset_from_start = localPos.x
+	if Globals.train_direction > 0:
+		offset_from_start = offset_from_start * -1
+	var carIndex : int = floor(offset_from_start / (Globals.car_length + Globals.car_separation) )
+	var posInCar : int = floor(fmod(offset_from_start, (Globals.car_length + Globals.car_separation)) )
+	var moduleIndex : int = floor(min((posInCar / Globals.module_width), (Globals.modules_per_car - 1)))
+	return [carIndex,moduleIndex]
