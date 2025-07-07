@@ -41,10 +41,20 @@ var res = {
 }
 
 func _ready() -> void:
+	self.position.x = Globals.train_origin_x
 	for i in range(0,3):
 		add_carriage(i)
-	maxXpos = (carriages.size() * (Globals.car_length + Globals.car_separation)) - Globals.car_separation
 	passengerManager = find_child("PassengersManager")
+	passengerManager.position.x -= Globals.car_length + Globals.car_separation
+	
+	if Globals.train_direction < 0:
+		maxXpos = (carriages.size() * (Globals.car_length + Globals.car_separation)) - Globals.car_separation
+		minXpos = 0
+	else:
+		#position.x = Globals.train_origin_x
+		maxXpos = 0
+		minXpos = -1 * ((carriages.size() * (Globals.car_length + Globals.car_separation)) - Globals.car_separation)
+	
 	init_passenger_map()
 	worldMap = get_parent().find_child("BasicUI").worldMap
 
@@ -143,15 +153,4 @@ func get_work_location_map_for_type(work_type_to_find : String) -> Array:
 	for i in range(carriages.size()):
 		result.append(carriages[i].get_work_map(work_type_to_find))
 	
-	return result
-
-func get_trainpos_from_coords(localPos : Vector2) -> Array[int]:
-	var carIndex : int = floor(localPos.x / (Globals.car_length + Globals.car_separation) )
-	var posInCar : int = (localPos.x - carriages[carIndex].position.x)
-	var moduleIndex : int = floor(min((posInCar / Globals.module_width), (Globals.modules_per_car - 1)))
-	return [carIndex,moduleIndex]
-
-func get_xpos_from_trainpos(trainPos: Array) -> float:
-	var result : float = (trainPos[0] * (Globals.car_length + Globals.car_separation))
-	result = result + (trainPos[1] * Globals.module_width)
 	return result

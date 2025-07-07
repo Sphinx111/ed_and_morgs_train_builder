@@ -37,7 +37,10 @@ var workType : String = "any"
 func _ready():
 	parentCar = get_parent()
 	parentTrain = parentCar.get_parent()
-	position.x = sequence * Globals.module_width
+	if Globals.train_direction < 0:
+		position.x = sequence * Globals.module_width
+	else:
+		position.x = Globals.car_length - ((sequence + 1) * Globals.module_width)
 
 func can_enter(myPassenger : Passenger) -> bool:
 	if maxCustomers == 0 or customers.size() < maxCustomers:
@@ -76,7 +79,10 @@ func resource_tick():
 
 func set_sequence(newSequence : int):
 	sequence = newSequence
-	position.x = sequence * Globals.module_width
+	if Globals.train_direction < 0:
+		position.x = sequence * Globals.module_width
+	else:
+		position.x = Globals.car_length - ((sequence + 1) * Globals.module_width)
 
 func add_customer(newCustomer : Passenger):
 	if customers.has(newCustomer) == false:

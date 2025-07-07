@@ -14,7 +14,11 @@ var modules = [null, null, null, null]
 var ModuleScene = preload("res://Scenes/module.tscn")
 
 func _ready():
-	position.x = sequence * (Globals.car_length + Globals.car_separation)
+	if Globals.train_direction < 0:
+		position.x = sequence * (Globals.car_length + Globals.car_separation)
+	else:
+		# Pos      = Train origin           - Leftwards for each car in sequence                         - extra because drawing is from the left
+		position.x = 0 - ((sequence + 1) * (Globals.car_length + Globals.car_separation)) - Globals.car_length
 	$Outline.size.x = Globals.car_length
 	$Outline.size.y = Globals.car_height
 	parentTrain = get_parent()
@@ -24,8 +28,10 @@ func _ready():
 
 func set_sequence(newSequence : int):
 	sequence = newSequence
-	position.x = sequence * (Globals.car_length + Globals.car_separation)
-
+	if Globals.train_direction < 0:
+		position.x = sequence * (Globals.car_length + Globals.car_separation)
+	else: 
+		position.x = 0 - ((sequence + 1) * (Globals.car_length + Globals.car_separation)) - Globals.car_length
 func resource_tick():
 	for module in modules:
 		if module != null:

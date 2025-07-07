@@ -66,21 +66,25 @@ func _process(delta) -> void:
 		destination.x = max(destination.x, parentTrain.minXpos)
 		destination.x = min(destination.x, parentTrain.maxXpos)
 		position = position.move_toward(destination, movespeed * delta)
+		if position.x < parentTrain.minXpos:
+			position.x = parentTrain.minXpos
+		if position.x > parentTrain.maxXpos:
+			position.x = parentTrain.maxXpos
 		if (direction > 0 and position.x > next_module_pos) or (direction < 0 and position.x < last_module_pos):
 			update_module_positions()
 
 # Once at outset, or per module moved, confirm position on train and which module we are at
 # set thresholds to re-check module next
 func update_module_positions():
-	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
-	last_module_pos = parentTrain.get_xpos_from_trainpos(myLocation)
+	var myLocation = Helpers.get_trainpos_from_coords(self.position)
+	last_module_pos = Helpers.get_xpos_from_trainpos(myLocation)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
 	var nextLocation = myLocation
 	nextLocation[1] = nextLocation[1] + 1
 	if nextLocation[1] == Globals.modules_per_car:
 		nextLocation[0] = nextLocation[0] + 1
 		nextLocation[1] = 0
-	next_module_pos = parentTrain.get_xpos_from_trainpos(nextLocation)
+	next_module_pos = Helpers.get_xpos_from_trainpos(nextLocation)
 	check_current_module()
 
 func update_needs_debug():
@@ -90,7 +94,7 @@ func update_needs_debug():
 
 # If my needs have just changed, check whether the module I am in serves what I need
 func check_current_module():
-	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
+	var myLocation = Helpers.get_trainpos_from_coords(self.position)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
 	if targetNeed != "":
 		if current_module.can_serve_need(targetNeed):
@@ -172,18 +176,25 @@ func hit_max_need(needType : String) -> int:
 	manager.remove_passenger(self)
 	return Globals.RESULT_FATAL
 
+func pick_idle_move():
+	if randf() < Globals.idle_wander_chance:
+		destination = self.position
+		var offset : float = randi_range(-200, 200)
+		if offset >= 0: direction = 1
+		else: direction = -1
+		destination.x += offset
+		constrain_destination()
+
+func constrain_destination():
+	clamp(destination.x, parentTrain.minXpos, parentTrain.maxXpos)
+
 func pick_direction():
 	# Chance to idly move around if no behaviour
 	if targetNeed == "" and targetWork == "":
-		if randf() < Globals.idle_wander_chance:
-			destination = self.position
-			var offset : float = randi_range(-200, 200)
-			if offset >= 0: direction = 1
-			else: direction = -1
-			destination.x += offset
+		pick_idle_move()
 		return	# End early if no target
 	
-	var myLocation = parentTrain.get_trainpos_from_coords(self.position)
+	var myLocation = Helpers.get_trainpos_from_coords(self.position)
 	var distanceToTarget = 0
 	if targetNeed != "":
 		distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed, "need")
@@ -191,16 +202,20 @@ func pick_direction():
 		distanceToTarget= parentTrain.passengerMap.get_direction_from_to(myLocation, targetWork, "work")
 	
 	if distanceToTarget == 9999:
-		if targetNeed != "": new_thought("This train has no way to fulfil my crushing %s need" % [targetNeed])
+		if targetNeed != "": new_thought("I can't find anywhere to fulfil my crushing %s need!" % [targetNeed])
+		pick_idle_move()
 		return
 	if    distanceToTarget > 0: direction = 1
 	elif  distanceToTarget < 0: direction = -1
 	else: direction = 0
+	if Globals.train_direction > 0:
+		direction = direction * -1
 	myLocation[0] += floor(distanceToTarget / Globals.modules_per_car) 
 	myLocation[1] += distanceToTarget % Globals.modules_per_car
 	destination = parentTrain.carriages[myLocation[0]].position
-	destination.x += (myLocation[1] + 0.5) * Globals.module_width
-	
+	if Globals.train_direction < 0: destination.x += (myLocation[1] + 0.5) * Globals.module_width
+	elif Globals.train_direction > 0: destination.x += Globals.car_length - ((myLocation[1] + 0.5) * Globals.module_width)
+	constrain_destination()
 	if distanceToTarget > 7:
 		if targetNeed != "": new_thought("It's a long way to fulfil my %s" %  [targetNeed])
 		elif targetWork != "": new_thought("It's a long way to find %s work" %  [targetWork])
