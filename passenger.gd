@@ -194,7 +194,7 @@ func pick_direction():
 		pick_idle_move()
 		return	# End early if no target
 	
-	var myLocation = Helpers.get_trainpos_from_coords(self.position)
+	var myLocation : Array[int] = Helpers.get_trainpos_from_coords(self.position)
 	var distanceToTarget = 0
 	if targetNeed != "":
 		distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed, "need")
@@ -212,9 +212,9 @@ func pick_direction():
 		direction = direction * -1
 	myLocation[0] += floor(distanceToTarget / Globals.modules_per_car) 
 	myLocation[1] += distanceToTarget % Globals.modules_per_car
-	destination = parentTrain.carriages[myLocation[0]].position
-	if Globals.train_direction < 0: destination.x += (myLocation[1] + 0.5) * Globals.module_width
-	elif Globals.train_direction > 0: destination.x += Globals.car_length - ((myLocation[1] + 0.5) * Globals.module_width)
+	destination.x = Helpers.get_xpos_from_trainpos(myLocation)
+	if Globals.train_direction < 0: destination.x += 0.5 * Globals.module_width
+	elif Globals.train_direction > 0: destination.x -= 0.5 * Globals.module_width
 	constrain_destination()
 	if distanceToTarget > 7:
 		if targetNeed != "": new_thought("It's a long way to fulfil my %s" %  [targetNeed])
