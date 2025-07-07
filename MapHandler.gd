@@ -42,7 +42,7 @@ func generate_random_resources(count : int):
 		var randPos = randf()
 		mainRoute.add_child(newSpot)
 		newSpot.progress_ratio = randPos
-		newSpot.set_stats("pop", 20)
+		newSpot.set_stats("pop", randi_range(2,9))
 		resources.append(newSpot)
 
 func update_trainPos(progress : float):
@@ -62,5 +62,8 @@ func gather_resource(wantedType : String, amount : float) -> int:
 		if abs(spot.progress_ratio - trainMarker.progress_ratio) <= collection_margin:
 			if spot.resource_type == wantedType and spot.quantity >= amount:
 				spot.quantity -= amount
+				if spot.quantity < 1:
+					resources.erase(spot)
+					spot.queue_free()
 				return Globals.RESULT_OK
 	return Globals.NO_RESOURCES
