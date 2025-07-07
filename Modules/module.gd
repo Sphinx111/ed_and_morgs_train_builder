@@ -15,7 +15,8 @@ const build_cost : Dictionary[String, float] = {
 	"farm" : 10.0,
 	"scrap_arm" : 5.0,
 	"kitchen" : 5.0,
-	"cabin" : 10.0
+	"cabin" : 10.0,
+	"passenger_door" : 5.0
 }
 
 # Service variables
@@ -211,4 +212,8 @@ func set_type(newType : String):
 		var partsProducer = ScrapToMechProducer.new()
 		add_producer(partsProducer)
 		workers_needed = 1
+	elif newType == "passenger_door":
+		$Outline.color = Color.CORNFLOWER_BLUE
+		var passengerCollector = BasicPassengerCollector.new()
+		add_producer(passengerCollector)
 	$Label.text = newType

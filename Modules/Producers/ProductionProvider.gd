@@ -56,7 +56,7 @@ func start_cycle_both(train : Train) -> int:
 					if input2_avail < input2_needed:
 						result = Globals.NO_RESOURCES
 		elif input1_from_map == true:       # if input1 is from the map, it consumes it at this step
-			result = train.worldMap.gather_resource("scrap", input1_needed)
+			result = train.worldMap.gather_resource(inputType1, input1_needed)
 
 	if result == Globals.RESULT_OK:
 		if input1_from_map == false and inputType1 != "":
@@ -78,7 +78,7 @@ func start_cycle_either(train : Train) -> int:
 			if input1_avail < input1_needed:
 				result = Globals.NO_RESOURCES
 		elif input1_from_map == true:       # if input1 is from the map, it consumes it at this step
-			result = train.worldMap.gather_resources("scrap", input1_needed)
+			result = train.worldMap.gather_resources(inputType1, input1_needed)
 
 	if result == Globals.RESULT_OK:
 		if input1_from_map == false and inputType1 != "":
@@ -109,6 +109,9 @@ func make_progress():
 func finish_cycle(train : Train):
 	progress = 0.0
 	if outputType1 != "":
+		if outputType1 == "pop":
+			train.passengerManager.add_passenger()
+			return
 		train.add_res(outputType1, output1_amount)
 		if outputType2 != "":
 			train.add_res(outputType2, output2_amount)

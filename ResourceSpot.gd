@@ -11,7 +11,7 @@ var myColor : Color = Color.SANDY_BROWN
 var parentRoute : Path2D = get_parent()
 var relative_pos : float = 0.1
 var visual_scale : float = 1
-var offset : Vector2 = Vector2(1,2)
+var offset : Vector2 = Vector2(0,2)
 
 func _ready():
 	colorRect = ColorRect.new()
@@ -21,3 +21,11 @@ func _ready():
 	colorRect.position += offset
 	
 	progress_ratio = relative_pos
+
+func set_stats(newType : String, newQty : float):
+	resource_type = newType
+	quantity = newQty
+	
+	if resource_type == "pop":
+		myColor = Color.PURPLE
+		colorRect.color = myColor
