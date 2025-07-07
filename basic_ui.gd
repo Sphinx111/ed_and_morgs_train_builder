@@ -128,7 +128,7 @@ func parse_text_input():
 			subject = "scrap_arm"
 		elif words[i] == "farm":
 			subject = "farm"
-		elif words[i] == "food":
+		elif words[i] == "food" or  words[i] == "kitchen":
 			subject = "kitchen"
 		elif words[i] == "water":
 			subject = "clean_water"
