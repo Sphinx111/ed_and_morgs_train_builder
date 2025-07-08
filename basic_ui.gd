@@ -2,31 +2,28 @@ extends Control
 
 class_name TrainUI
 
-@onready
-var selectedTrain : Train = get_parent().find_child("Train")
-@onready
-var textbox : LineEdit = find_child("LineEdit")
+@onready var selectedTrain : Train = get_parent().find_child("Train")
+@onready var textbox : LineEdit = find_child("LineEdit")
 var tick_time : float = 0.0
 var tick_timer : Timer = Timer.new()
 
-@onready
-var worldMap : MapHandler = find_child("WorldMap")
+@onready var worldMap : MapHandler = find_child("WorldMap")
 
-@onready
-var thoughtsPanel : Panel = find_child("ThoughtsPanel")
-@onready
-var thoughtsList : ItemList = thoughtsPanel.find_child("ThoughtsList")
+@onready var thoughtsPanel : Panel = find_child("ThoughtsPanel")
+@onready var thoughtsList : ItemList = thoughtsPanel.find_child("ThoughtsList")
 
-@onready
-var debug_slider : HSlider = find_child("DebugPanel").find_child("DebugSlider")
+@onready var debug_slider : HSlider = find_child("DebugPanel").find_child("DebugSlider")
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
 	resource_panel_update()
 	worldMap.train_step()
+	Globals.game_tick += 1
 
 func _ready() -> void:
 	Globals.activeUI = self
+	
+	worldMap.select_new_train(get_parent().find_child("Train"))
 	
 	var update_timer : Timer = Timer.new()
 	add_child(update_timer)
@@ -171,8 +168,10 @@ func _on_add_passenger_pressed() -> void:
 
 func _on_debug_tick_slider_ended(value_changed: bool) -> void:
 	if value_changed == true:
-		$DebugPanel/SliderLabel.text = ("%d" % (debug_slider.value))
-		tick_time = debug_slider.value
+		$DebugPanel/SliderLabel.text = ("%f" % (debug_slider.value))
+		tick_time = 1.0 / debug_slider.value
+		tick_timer.wait_time = tick_time
+		Globals.time_factor = debug_slider.value
 		if tick_time == 0.0:
 			tick_timer.stop()
 		else:

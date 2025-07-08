@@ -1,0 +1,149 @@
+[gd_scene load_steps=13 format=3 uid="uid://b3ph64gipnlm5"]
+
+[ext_resource type="Script" uid="uid://bywwc888bn2bf" path="res://MapHandler.gd" id="1_deu6t"]
+[ext_resource type="Texture2D" uid="uid://dve3f2r47q48u" path="res://images/Pixel_world_map.jpg" id="2_4ojr4"]
+[ext_resource type="PackedScene" uid="uid://d0rv1tppk484j" path="res://Scenes/route.tscn" id="3_g8h5j"]
+[ext_resource type="PackedScene" uid="uid://6q5oa1s1n37c" path="res://Scenes/junction.tscn" id="4_g8h5j"]
+
+[sub_resource type="Curve2D" id="Curve2D_67byq"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 30.6283, 35.0785, 0, 0, 0, 0, 38.4817, 35.0785, 0, 0, 0, 0, 43.9791, 36.6492, 0, 0, 0, 0, 50, 41.623, 0, 0, 0, 0, 51.5707, 48.6911, 0, 0, 0, 0, 59.6859, 52.6178, 0, 0, 0, 0, 68.8482, 49.7382, 0, 0, 0, 0, 73.2984, 55.2356, 0, 0, 0, 0, 78.534, 56.8063, 0, 0, 0, 0, 82.7225, 57.0681, 0, 0, 0, 0, 82.7225, 57.0681)
+}
+point_count = 11
+
+[sub_resource type="Curve2D" id="Curve2D_ikf48"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 30.3665, 34.8168, 0, 0, 0, 0, 36.911, 30.1047, 0, 0, 0, 0, 45.8115, 27.2251, 0, 0, 0, 0, 54.1885, 26.4398, 0, 0, 0, 0, 59.1623, 29.3194, 0, 0, 0, 0, 64.3979, 33.7696, 0, 0, 0, 0, 73.2984, 35.0785, 0, 0, 0, 0, 75.9162, 37.6963, 0, 0, 0, 0, 80.6283, 41.3613, 0, 0, 0, 0, 83.7696, 49.4764, 0, 0, 0, 0, 82.9843, 56.8063)
+}
+point_count = 11
+
+[sub_resource type="Curve2D" id="Curve2D_ecn11"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 250, 31.4136, 0, 0, 0, 0, 264.66, 34.2932, 0, 0, 0, 0, 269.634, 44.5026, 0, 0, 0, 0, 281.414, 45.8115, 0, 0, 0, 0, 296.335, 43.7173, 0, 0, 0, 0, 301.309, 41.623)
+}
+point_count = 6
+
+[sub_resource type="Curve2D" id="Curve2D_3jykw"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 148.691, 78.0105, 0, 0, 0, 0, 157.853, 85.0785, 0, 0, 0, 0, 174.084, 83.7696, 0, 0, 0, 0, 181.675, 76.7016, 0, 0, 0, 0, 196.335, 76.4398, 0, 0, 0, 0, 202.094, 62.3037, 0, 0, 0, 0, 213.351, 56.0209, 0, 0, 0, 0, 225.654, 60.2094, 0, 0, 0, 0, 232.199, 54.712, 0, 0, 0, 0, 238.22, 44.5026, 0, 0, 0, 0, 246.597, 36.911, 0, 0, 0, 0, 249.215, 32.4607)
+}
+point_count = 12
+
+[sub_resource type="Curve2D" id="Curve2D_w1i7g"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 194.764, 37.6963, 0, 0, 0, 0, 207.33, 33.5079, 0, 0, 0, 0, 218.848, 26.9634, 0, 0, 0, 0, 232.199, 25.6545, 0, 0, 0, 0, 242.147, 26.4398, 0, 0, 0, 0, 248.953, 31.4136)
+}
+point_count = 6
+
+[sub_resource type="Curve2D" id="Curve2D_g8h5j"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 82.9843, 56.2827, 0, 0, 0, 0, 91.623, 53.4031, 0, 0, 0, 0, 108.115, 42.6702, 0, 0, 0, 0, 117.277, 34.8168, 0, 0, 0, 0, 124.346, 36.1257, 0, 0, 0, 0, 130.105, 42.9319, 0, 0, 0, 0, 150.524, 50, 0, 0, 0, 0, 161.257, 50.2618, 0, 0, 0, 0, 168.848, 53.6649, 0, 0, 0, 0, 174.869, 52.0942, 0, 0, 0, 0, 182.723, 43.4555, 0, 0, 0, 0, 184.555, 38.2199, 0, 0, 0, 0, 193.979, 37.4346)
+}
+point_count = 13
+
+[sub_resource type="Curve2D" id="Curve2D_cwbjy"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 148.691, 77.2251, 0, 0, 0, 0, 157.592, 73.5602, 0, 0, 0, 0, 164.136, 66.4921, 0, 0, 0, 0, 171.99, 62.0419, 0, 0, 0, 0, 183.77, 60.9948, 0, 0, 0, 0, 190.576, 50.5236, 0, 0, 0, 0, 193.717, 37.6963)
+}
+point_count = 7
+
+[sub_resource type="Curve2D" id="Curve2D_pykxj"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 82.7225, 56.8063, 0, 0, 0, 0, 87.4346, 64.1361, 0, 0, 0, 0, 91.0995, 67.2775, 0, 0, 0, 0, 98.6911, 75.1309, 0, 0, 0, 0, 110.995, 79.8429, 0, 0, 0, 0, 124.607, 82.199, 0, 0, 0, 0, 138.22, 80.3665, 0, 0, 0, 0, 147.906, 78.0105)
+}
+point_count = 8
+
+[node name="WorldMap" type="Node2D"]
+script = ExtResource("1_deu6t")
+
+[node name="Background" type="Sprite2D" parent="."]
+position = Vector2(-2, -39)
+scale = Vector2(1.925, 1.925)
+texture = ExtResource("2_4ojr4")
+centered = false
+
+[node name="TrainMarker" type="PathFollow2D" parent="."]
+position = Vector2(-3, 177)
+
+[node name="Rect" type="ColorRect" parent="TrainMarker"]
+offset_top = -1.04712
+offset_right = 5.0
+offset_bottom = 2.95288
+
+[node name="MainRoute" parent="." node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+position = Vector2(0, -35)
+next_junction = NodePath("../JunctionsParent/Looper1")
+last_junction = NodePath("../JunctionsParent/Junction1")
+
+[node name="RoutesParent" type="Node2D" parent="."]
+
+[node name="Route2" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+curve = SubResource("Curve2D_67byq")
+next_junction = NodePath("../../JunctionsParent/Junction1")
+last_junction = NodePath("../../JunctionsParent/Junction2")
+
+[node name="Route3" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+curve = SubResource("Curve2D_ikf48")
+next_junction = NodePath("../../JunctionsParent/Junction1")
+last_junction = NodePath("../../JunctionsParent/Junction2")
+
+[node name="Route99" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+curve = SubResource("Curve2D_ecn11")
+next_junction = NodePath("../../JunctionsParent/Junction99")
+last_junction = NodePath("../../JunctionsParent/Looper1")
+
+[node name="Route98" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+curve = SubResource("Curve2D_3jykw")
+next_junction = NodePath("../../JunctionsParent/Junction96")
+last_junction = NodePath("../../JunctionsParent/Junction99")
+
+[node name="Route97" parent="RoutesParent" node_paths=PackedStringArray("next_junction") instance=ExtResource("3_g8h5j")]
+curve = SubResource("Curve2D_w1i7g")
+next_junction = NodePath("../../JunctionsParent/Junction97")
+
+[node name="Route96" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+curve = SubResource("Curve2D_g8h5j")
+next_junction = NodePath("../../JunctionsParent/Junction2")
+last_junction = NodePath("../../JunctionsParent/Junction98")
+
+[node name="Route95" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+curve = SubResource("Curve2D_cwbjy")
+next_junction = NodePath("../../JunctionsParent/Junction96")
+last_junction = NodePath("../../JunctionsParent/Junction97")
+
+[node name="Route94" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+curve = SubResource("Curve2D_pykxj")
+next_junction = NodePath("../../JunctionsParent/Junction2")
+last_junction = NodePath("../../JunctionsParent/Junction96")
+
+[node name="JunctionsParent" type="Node2D" parent="."]
+
+[node name="Junction2" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
+position = Vector2(316, 218)
+scale = Vector2(0.016657, 0.016657)
+lines = [NodePath("../../RoutesParent/Route2"), NodePath("../../RoutesParent/Route3")]
+
+[node name="Junction1" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
+position = Vector2(116, 134)
+scale = Vector2(0.016657, 0.016657)
+lines = [NodePath("../../MainRoute")]
+
+[node name="Looper1" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
+position = Vector2(0, 177)
+lines = [NodePath("../../RoutesParent/Route99")]
+
+[node name="Junction99" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
+position = Vector2(952, 122)
+lines = [NodePath("../../RoutesParent/Route98"), NodePath("../../RoutesParent/Route97")]
+
+[node name="Junction98" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
+position = Vector2(741, 144)
+lines = [NodePath("../../RoutesParent/Route96"), NodePath("../../RoutesParent/Route95")]
+
+[node name="Junction97" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
+position = Vector2(741, 144)
+lines = [NodePath("../../RoutesParent/Route96"), NodePath("../../RoutesParent/Route95")]
+
+[node name="Junction96" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
+position = Vector2(567, 298)
+lines = [NodePath("../../RoutesParent/Route94")]

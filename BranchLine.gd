@@ -1,0 +1,86 @@
+extends Path2D
+
+class_name BranchLine
+
+var resources : Array[ResourceSpot] = []                 ## Array of resource spots
+var line : Line2D = null
+var trainMarker : PathFollow2D = null
+
+@export var next_junction : Junction = null
+@export var last_junction : Junction = null
+
+func _ready():
+	draw_routes()
+
+func init_line(origin_point : Vector2):
+	position = origin_point
+
+## Move train on by number of pixels
+func update_trainPos(progress : float):
+	trainMarker.progress = trainMarker.progress - (progress * Globals.train_direction)
+	if Globals.train_direction < 0 and trainMarker.progress_ratio >= 1.0: last_junction.transfer_train(trainMarker)
+	elif Globals.train_direction > 0 and trainMarker.progress_ratio <= 0.0: next_junction.transfer_train(trainMarker)
+
+## Reparent a train to this branch
+func add_train(marker : PathFollow2D):
+	trainMarker = marker
+	trainMarker.get_parent().remove_child(trainMarker)
+	add_child(trainMarker)
+	if Globals.train_direction < 0 : trainMarker.progress_ratio = 0.0
+	elif Globals.train_direction > 0 : trainMarker.progress_ratio = 1.0
+
+func add_next_junction(newJunction : Junction):
+	next_junction = newJunction
+
+func add_last_junction(newJunction : Junction):
+	last_junction = newJunction
+
+func draw_routes():
+	line = Line2D.new()
+	line.default_color = Color(0.4,0.4,0.4, 0.4)
+	line.width = 2
+	for point in curve.get_baked_points():
+		line.add_point(point)
+	add_child(line)
+	
+	generate_random_resources(2)
+
+func highlight_route(toggled : bool):
+	if toggled:
+		line.default_color = Color(0.7, 0.7, 0.7, 0.9)
+	else:
+		line.default_color = Color(0.4, 0.4, 0.4, 0.4)
+	
+
+func generate_random_resources(count : int):
+	for i in range(count):
+		var newSpot = ResourceSpot.new()
+		var randPos = randf()
+		add_child(newSpot)
+		newSpot.progress_ratio = randPos
+		newSpot.set_stats("scrap", 200)
+		resources.append(newSpot)
+	for i in range(2):
+		var newSpot = ResourceSpot.new()
+		var randPos = randf()
+		add_child(newSpot)
+		newSpot.progress_ratio = randPos
+		newSpot.set_stats("pop", randi_range(2,9))
+		resources.append(newSpot)
+
+func request_resources(wantedType : String, collection_margin : float) -> float:
+	for spot in resources:
+		if spot.resource_type == wantedType and abs(spot.progress_ratio - trainMarker.progress_ratio) <= collection_margin: 
+			return spot.quantity
+	return 0
+
+func gather_resource(wantedType : String, amount : float, collection_margin : float) -> int:
+	for spot in resources:
+		if abs(spot.progress_ratio - trainMarker.progress_ratio) <= collection_margin:
+			if spot.resource_type == wantedType and spot.quantity >= amount:
+				spot.quantity -= amount
+				if spot.quantity < 1:
+					resources.erase(spot)
+					spot.queue_free()
+				return Globals.RESULT_OK
+	return Globals.NO_RESOURCES

@@ -28,7 +28,7 @@ var res = {
 	"grey_water" : 0.0,
 	"black_water" : 0.0,
 	"mech_parts" : 100.0,
-	"speed" : 50.0,
+	"speed" : 150.0,
 	"fuel" : 100.0,
 	"fertiliser" : 10.0,
 	"seeds1" : 10.0,

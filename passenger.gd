@@ -65,7 +65,7 @@ func _process(delta) -> void:
 	if is_in_module == false:
 		destination.x = max(destination.x, parentTrain.minXpos)
 		destination.x = min(destination.x, parentTrain.maxXpos)
-		position = position.move_toward(destination, movespeed * delta)
+		position = position.move_toward(destination, movespeed * delta * Globals.time_factor)
 		if position.x < parentTrain.minXpos:
 			position.x = parentTrain.minXpos
 		if position.x > parentTrain.maxXpos:

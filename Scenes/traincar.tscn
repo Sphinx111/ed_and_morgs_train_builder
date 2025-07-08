@@ -1,22 +1,24 @@
 [gd_scene load_steps=7 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
-[ext_resource type="PackedScene" uid="uid://b3ph64gipnlm5" path="res://world_map.tscn" id="2_ksonv"]
+[ext_resource type="PackedScene" uid="uid://b3ph64gipnlm5" path="res://Scenes/world_map.tscn" id="2_ksonv"]
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
 [ext_resource type="PackedScene" uid="uid://cw8ov34j2hlku" path="res://Scenes/passenger.tscn" id="4_d8abk"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
-[ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://Scenes/BackgroundHandler.gd" id="6_mscei"]
+[ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://BackgroundHandler.gd" id="6_mscei"]
 
 [node name="SceneRoot" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 1
 
 [node name="BasicUI" type="Control" parent="."]
 anchors_preset = 0
 offset_right = 1153.0
 offset_bottom = 648.0
+mouse_filter = 1
 script = ExtResource("4_fqnf8")
 
 [node name="ResourcePanel" type="Panel" parent="BasicUI"]
@@ -119,35 +121,42 @@ offset_bottom = 87.0
 text = "Give Order"
 
 [node name="WorldMap" parent="BasicUI" instance=ExtResource("2_ksonv")]
-position = Vector2(851, 460)
+position = Vector2(829, 459)
+scale = Vector2(0.28, 0.28)
+
+[node name="ThoughtsPanel" type="Panel" parent="BasicUI"]
+layout_mode = 0
+offset_left = 215.0
+offset_top = 527.0
+offset_right = 825.0
+offset_bottom = 647.0
+
+[node name="ThoughtsList" type="ItemList" parent="BasicUI/ThoughtsPanel"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 7.0
+offset_right = 605.0
+offset_bottom = 114.0
 
 [node name="DebugPanel" type="Panel" parent="BasicUI"]
 layout_mode = 0
 offset_top = 568.0
-offset_right = 215.0
+offset_right = 206.0
 offset_bottom = 647.0
-
-[node name="Button2" type="Button" parent="BasicUI/DebugPanel"]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 44.0
-offset_bottom = 36.0
-text = "Tick"
 
 [node name="Button" type="Button" parent="BasicUI/DebugPanel"]
 layout_mode = 0
-offset_left = 50.0
-offset_top = 5.0
-offset_right = 110.0
-offset_bottom = 36.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 67.0
+offset_bottom = 37.0
 text = "Pass++"
 
 [node name="DebugSlider" type="HSlider" parent="BasicUI/DebugPanel"]
 layout_mode = 0
 offset_left = 9.0
 offset_top = 43.0
-offset_right = 169.0
+offset_right = 167.0
 offset_bottom = 73.0
 max_value = 5.0
 step = 0.5
@@ -157,11 +166,12 @@ ticks_on_borders = true
 
 [node name="SliderLabel" type="Label" parent="BasicUI/DebugPanel"]
 layout_mode = 0
-offset_left = 180.0
-offset_top = 46.0
-offset_right = 220.0
-offset_bottom = 69.0
-text = "0"
+offset_left = 176.0
+offset_top = 47.0
+offset_right = 200.0
+offset_bottom = 70.0
+text = "1"
+clip_text = true
 
 [node name="CheckButton" type="CheckButton" parent="BasicUI/DebugPanel"]
 layout_mode = 0
@@ -171,29 +181,13 @@ offset_right = 1155.0
 offset_bottom = 82.0
 button_pressed = true
 
-[node name="ThoughtsToggle" type="Button" parent="BasicUI/DebugPanel"]
+[node name="ThoughtsToggle" type="CheckButton" parent="BasicUI/DebugPanel"]
 layout_mode = 0
-offset_left = 119.0
-offset_top = 6.0
-offset_right = 200.0
-offset_bottom = 37.0
-toggle_mode = true
+offset_left = 767.0
+offset_top = 42.0
+offset_right = 811.0
+offset_bottom = 73.0
 button_pressed = true
-text = "Thoughts"
-
-[node name="ThoughtsPanel" type="Panel" parent="BasicUI"]
-layout_mode = 0
-offset_left = 227.0
-offset_top = 527.0
-offset_right = 841.0
-offset_bottom = 647.0
-
-[node name="ThoughtsList" type="ItemList" parent="BasicUI/ThoughtsPanel"]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 7.0
-offset_right = 608.0
-offset_bottom = 114.0
 
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 340)
@@ -234,9 +228,7 @@ position = Vector2(0, 288)
 
 [connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="BasicUI/Button" to="BasicUI" method="_on_textinput_press"]
-[connection signal="pressed" from="BasicUI/DebugPanel/Button2" to="BasicUI" method="_on_debug_tick_pressed"]
 [connection signal="pressed" from="BasicUI/DebugPanel/Button" to="BasicUI" method="_on_add_passenger_pressed"]
 [connection signal="drag_ended" from="BasicUI/DebugPanel/DebugSlider" to="BasicUI" method="_on_debug_tick_slider_ended"]
 [connection signal="toggled" from="BasicUI/DebugPanel/CheckButton" to="BasicUI" method="_on_map_toggled"]
-[connection signal="pressed" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_pressed"]
 [connection signal="toggled" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_toggled"]

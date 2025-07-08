@@ -4,7 +4,9 @@ var activeUI : TrainUI = null
 
 var display_width = 1152
 var display_height = 648
+var game_tick : int = 0
 
+var time_factor : float = 1.0
 
 # Car variables
 var car_length : float = 200

@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://6q5oa1s1n37c"]
+
+[ext_resource type="Texture2D" uid="uid://b86lv8hwxa5pn" path="res://images/junction_icon_placeholder.jpg" id="1_je7mr"]
+[ext_resource type="Script" uid="uid://bglyum5ik214v" path="res://Scenes/junction.gd" id="2_xqfnk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_67byq"]
+size = Vector2(1080.63, 1080.63)
+
+[node name="Junction" type="Sprite2D"]
+scale = Vector2(0.016657, 0.016657)
+texture = ExtResource("1_je7mr")
+script = ExtResource("2_xqfnk")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+input_pickable = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("RectangleShape2D_67byq")
+
+[connection signal="input_event" from="StaticBody2D" to="." method="switch"]

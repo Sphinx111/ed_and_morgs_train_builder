@@ -36,13 +36,13 @@ func _ready():
 
 func _process(delta : float):
 	for rock in rocks_b:
-		rock.position.x = rock.position.x - (Globals.train_direction * (delta * 120))
+		rock.position.x = rock.position.x - (Globals.train_direction * (delta * 120) * Globals.time_factor)
 		if rock.position.x < -20 or rock.position.x > Globals.display_width + 120:
 			if Globals.train_direction > 0: rock.position.x = Globals.display_width + randf_range(50, 120)
 			elif Globals.train_direction < 0: rock.position.x = 0 - randf_range(50, 120)
 	
 	for rock in rocks_f:
-		rock.position.x = rock.position.x - (Globals.train_direction * (delta * 160))
+		rock.position.x = rock.position.x - (Globals.train_direction * (delta * 160) * Globals.time_factor)
 		if rock.position.x < -20 or rock.position.x > Globals.display_width + 120:
 			if Globals.train_direction > 0: rock.position.x = Globals.display_width + randf_range(50, 110)
 			elif Globals.train_direction < 0: rock.position.x = 0 - randf_range(50, 120)

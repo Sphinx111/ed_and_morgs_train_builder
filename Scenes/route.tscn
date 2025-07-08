@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://d0rv1tppk484j"]
+
+[ext_resource type="Script" uid="uid://bbys01qiie0ir" path="res://BranchLine.gd" id="1_lqt2d"]
+
+[sub_resource type="Curve2D" id="Curve2D_deu6t"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, -0.78534, 55.4974, 0, 0, 0, 0, 9.94764, 55.4974, 0, 0, 0, 0, 21.2042, 50.5236, 0, 0, 0, 0, 30.3665, 44.5026)
+}
+point_count = 4
+
+[node name="MainRoute" type="Path2D"]
+scale = Vector2(3.82, 3.82)
+curve = SubResource("Curve2D_deu6t")
+script = ExtResource("1_lqt2d")
