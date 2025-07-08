@@ -5,12 +5,20 @@ class_name BranchLine
 var resources : Array[ResourceSpot] = []                 ## Array of resource spots
 var line : Line2D = null
 var trainMarker : PathFollow2D = null
+var active : bool = false
 
 @export var next_junction : Junction = null
 @export var last_junction : Junction = null
+@export var scrap_count : int = 0
+@export var pop_count : int = 0
+@export var water_count : int = 0
+var scrap_default : int = 200
+var pop_default : int = 10
+var water_default : int = 300
 
 func _ready():
 	draw_routes()
+	generate_random_resources()
 
 func init_line(origin_point : Vector2):
 	position = origin_point
@@ -42,30 +50,39 @@ func draw_routes():
 	for point in curve.get_baked_points():
 		line.add_point(point)
 	add_child(line)
-	
-	generate_random_resources(2)
 
-func highlight_route(toggled : bool):
+
+func set_active(toggled : bool):
 	if toggled:
 		line.default_color = Color(0.7, 0.7, 0.7, 0.9)
+		active = true
 	else:
 		line.default_color = Color(0.4, 0.4, 0.4, 0.4)
+		active = false
 	
 
-func generate_random_resources(count : int):
-	for i in range(count):
+func generate_random_resources():
+	# Scrap
+	for i in range(scrap_count):
 		var newSpot = ResourceSpot.new()
 		var randPos = randf_range(0.1, 0.9)
 		add_child(newSpot)
 		newSpot.progress_ratio = randPos
-		newSpot.set_stats("scrap", 200)
+		newSpot.set_stats("scrap", scrap_default)
 		resources.append(newSpot)
-	for i in range(2):
+	for i in range(pop_count):
 		var newSpot = ResourceSpot.new()
 		var randPos = randf()
 		add_child(newSpot)
 		newSpot.progress_ratio = randPos
-		newSpot.set_stats("pop", randi_range(2,9))
+		newSpot.set_stats("pop", randi_range(2,pop_default))
+		resources.append(newSpot)
+	for i in range(water_count):
+		var newSpot = ResourceSpot.new()
+		var randPos = randf()
+		add_child(newSpot)
+		newSpot.progress_ratio = randPos
+		newSpot.set_stats("clean_water", water_default)
 		resources.append(newSpot)
 
 func request_resources(wantedType : String, collection_margin : float) -> float:

@@ -57,6 +57,7 @@ point_count = 8
 script = ExtResource("1_deu6t")
 
 [node name="Background" type="Sprite2D" parent="."]
+modulate = Color(0.427493, 0.427493, 0.427493, 1)
 position = Vector2(-2, -39)
 scale = Vector2(1.925, 1.925)
 texture = ExtResource("2_4ojr4")
@@ -75,6 +76,7 @@ offset_bottom = 2.95288
 position = Vector2(0, -35)
 next_junction = NodePath("../JunctionsParent/Looper1")
 last_junction = NodePath("../JunctionsParent/Junction1")
+water_count = 1
 
 [node name="RoutesParent" type="Node2D" parent="."]
 
@@ -82,11 +84,16 @@ last_junction = NodePath("../JunctionsParent/Junction1")
 curve = SubResource("Curve2D_67byq")
 next_junction = NodePath("../../JunctionsParent/Junction1")
 last_junction = NodePath("../../JunctionsParent/Junction2")
+pop_count = 3
+water_count = 1
 
 [node name="Route3" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 curve = SubResource("Curve2D_ikf48")
 next_junction = NodePath("../../JunctionsParent/Junction1")
 last_junction = NodePath("../../JunctionsParent/Junction2")
+scrap_count = 3
+pop_count = 1
+water_count = 1
 
 [node name="Route99" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 curve = SubResource("Curve2D_ecn11")
@@ -97,26 +104,35 @@ last_junction = NodePath("../../JunctionsParent/Looper1")
 curve = SubResource("Curve2D_3jykw")
 next_junction = NodePath("../../JunctionsParent/Junction96")
 last_junction = NodePath("../../JunctionsParent/Junction99")
+scrap_count = 7
+pop_count = 2
+water_count = 1
 
 [node name="Route97" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 curve = SubResource("Curve2D_w1i7g")
 next_junction = NodePath("../../JunctionsParent/Junction97")
 last_junction = NodePath("../../JunctionsParent/Junction99")
+pop_count = 2
+water_count = 1
 
 [node name="Route96" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 curve = SubResource("Curve2D_g8h5j")
 next_junction = NodePath("../../JunctionsParent/Junction2")
 last_junction = NodePath("../../JunctionsParent/Junction98")
+scrap_count = 4
+water_count = 2
 
 [node name="Route95" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 curve = SubResource("Curve2D_cwbjy")
 next_junction = NodePath("../../JunctionsParent/Junction96")
 last_junction = NodePath("../../JunctionsParent/Junction97")
+pop_count = 7
 
 [node name="Route94" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 curve = SubResource("Curve2D_pykxj")
 next_junction = NodePath("../../JunctionsParent/Junction2")
 last_junction = NodePath("../../JunctionsParent/Junction96")
+water_count = 4
 
 [node name="JunctionsParent" type="Node2D" parent="."]
 
