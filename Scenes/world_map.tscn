@@ -19,7 +19,7 @@ point_count = 11
 
 [sub_resource type="Curve2D" id="Curve2D_ecn11"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 250, 31.4136, 0, 0, 0, 0, 264.66, 34.2932, 0, 0, 0, 0, 269.634, 44.5026, 0, 0, 0, 0, 281.414, 45.8115, 0, 0, 0, 0, 296.335, 43.7173, 0, 0, 0, 0, 301.309, 41.623)
+"points": PackedVector2Array(0, 0, 0, 0, 248.953, 32.199, 0, 0, 0, 0, 264.66, 34.2932, 0, 0, 0, 0, 269.634, 44.5026, 0, 0, 0, 0, 281.414, 45.8115, 0, 0, 0, 0, 296.335, 43.7173, 0, 0, 0, 0, 301.571, 41.623)
 }
 point_count = 6
 
@@ -64,6 +64,7 @@ centered = false
 
 [node name="TrainMarker" type="PathFollow2D" parent="."]
 position = Vector2(-3, 177)
+loop = false
 
 [node name="Rect" type="ColorRect" parent="TrainMarker"]
 offset_top = -1.04712
@@ -97,9 +98,10 @@ curve = SubResource("Curve2D_3jykw")
 next_junction = NodePath("../../JunctionsParent/Junction96")
 last_junction = NodePath("../../JunctionsParent/Junction99")
 
-[node name="Route97" parent="RoutesParent" node_paths=PackedStringArray("next_junction") instance=ExtResource("3_g8h5j")]
+[node name="Route97" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 curve = SubResource("Curve2D_w1i7g")
 next_junction = NodePath("../../JunctionsParent/Junction97")
+last_junction = NodePath("../../JunctionsParent/Junction99")
 
 [node name="Route96" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 curve = SubResource("Curve2D_g8h5j")

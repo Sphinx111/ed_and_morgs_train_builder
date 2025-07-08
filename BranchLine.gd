@@ -55,7 +55,7 @@ func highlight_route(toggled : bool):
 func generate_random_resources(count : int):
 	for i in range(count):
 		var newSpot = ResourceSpot.new()
-		var randPos = randf()
+		var randPos = randf_range(0.1, 0.9)
 		add_child(newSpot)
 		newSpot.progress_ratio = randPos
 		newSpot.set_stats("scrap", 200)

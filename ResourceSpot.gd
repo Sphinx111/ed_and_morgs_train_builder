@@ -11,7 +11,7 @@ var myColor : Color = Color.SANDY_BROWN
 var parentRoute : Path2D = get_parent()
 var relative_pos : float = 0.1
 var visual_scale : float = 1
-var offset : Vector2 = Vector2(0,2)
+var offset : Vector2 = Vector2(0,0)
 
 func _ready():
 	colorRect = ColorRect.new()
