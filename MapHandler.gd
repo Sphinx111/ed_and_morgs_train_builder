@@ -25,4 +25,4 @@ func request_resources(wantedType : String) -> float:
 	return mainRoute.request_resources(wantedType, collection_margin)
 
 func gather_resource(wantedType : String, amount : float) -> int:
-	return mainRoute.gather_resources(wantedType, amount, collection_margin)
+	return mainRoute.gather_resource(wantedType, amount, collection_margin)
