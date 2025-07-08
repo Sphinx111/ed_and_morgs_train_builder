@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bglyum5ik214v" path="res://Scenes/junction.gd" id="2_xqfnk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_67byq"]
-size = Vector2(1080.63, 1080.63)
+size = Vector2(1560.91, 1560.91)
 
 [node name="Junction" type="Sprite2D"]
 scale = Vector2(0.016657, 0.016657)
@@ -15,6 +15,8 @@ script = ExtResource("2_xqfnk")
 input_pickable = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(0, 3.57835e-05)
+scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_67byq")
 
 [connection signal="input_event" from="StaticBody2D" to="." method="switch"]
