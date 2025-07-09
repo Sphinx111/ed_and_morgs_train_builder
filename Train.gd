@@ -96,7 +96,7 @@ func add_module(type: String, carNum : int, position : int):
 	carriages[carNum].add_module(type, position)
 	
 	update_needs_maps(carriages[carNum].modules[position].serves_needs,[carNum, position],Globals.MODULE_ADDED)
-	update_needs_maps(typesToRemove,[carNum, position],Globals.MODULE_ADDED)
+	update_needs_maps(typesToRemove,[carNum, position],Globals.MODULE_REMOVED)
 	
 	passengerMap.update_single_work_type_map("any")
 

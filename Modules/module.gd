@@ -163,7 +163,8 @@ func reset_module():
 	
 	# Kick out any customers when module type changes
 	for customer in customers:
-		_eject_customer(customer)
+		if is_instance_valid(customer):
+			_eject_customer(customer)
 
 func set_type(newType : String):
 	self.type = newType

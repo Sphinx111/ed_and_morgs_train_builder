@@ -6,7 +6,7 @@ var mainRoute : BranchLine = null          ## The current branch that the train 
 var trainMarker : PathFollow2D = null      ## A visual marker for the train's position on the route
 var selectedTrain : Train = null           ## A pointer to the player's train
 
-var collection_margin : float = 5   ## Range at which resources can be collected
+var collection_margin : float = 0.005   ## Range at which resources can be collected
 var local_to_global_speed_conversion : float = 0.001     # Multiple train's speed value by this to get worldmap pixels per tick
 
 func _ready():

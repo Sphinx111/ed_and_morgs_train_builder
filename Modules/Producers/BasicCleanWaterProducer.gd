@@ -15,4 +15,4 @@ func init() -> void:
 	outputType1 = "clean_water"
 	output1_amount = 0.5
 	
-	cycleTime = 1
+	cycleTime = 4

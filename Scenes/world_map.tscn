@@ -138,12 +138,10 @@ water_count = 4
 
 [node name="Junction2" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
 position = Vector2(316, 218)
-scale = Vector2(0.016657, 0.016657)
 lines = [NodePath("../../RoutesParent/Route2"), NodePath("../../RoutesParent/Route3")]
 
 [node name="Junction1" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
 position = Vector2(116, 134)
-scale = Vector2(0.016657, 0.016657)
 lines = [NodePath("../../MainRoute")]
 
 [node name="Looper1" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]

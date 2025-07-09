@@ -16,7 +16,6 @@ input_pickable = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 position = Vector2(0, 3.57835e-05)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_67byq")
 
 [connection signal="input_event" from="StaticBody2D" to="." method="switch"]
