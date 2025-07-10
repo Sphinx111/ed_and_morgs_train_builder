@@ -243,3 +243,4 @@ position = Vector2(0, 288)
 [connection signal="toggled" from="BasicUI/DebugPanel/CheckButton" to="BasicUI" method="_on_map_toggled"]
 [connection signal="toggled" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_toggled"]
 [connection signal="position_changed" from="Train/LeverControl" to="Train" method="_on_speed_lever_changed"]
+[connection signal="position_changed" from="Train/LeverControl" to="Background" method="set_temp_multiplier"]

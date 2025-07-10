@@ -27,6 +27,8 @@ func _input(event: InputEvent) -> void:
 			if event.is_action_released("left_click"):
 				isDragged = false
 				if currentStep != lastStep:
+					lastStep = clamp(lastStep, 0, 5)
+					currentStep = clamp(currentStep, 0, 5)
 					var int_to_emit : int = floor(currentStep)
 					position_changed.emit(currentStep)
 		elif event is InputEventMouseMotion:

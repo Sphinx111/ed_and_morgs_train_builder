@@ -16,6 +16,8 @@ var fg = $ForegroundLayer
 @onready
 var bg = $BackgroundLayer
 
+var temp_multiplier = 1
+
 func _ready():
 	for i in range(12):
 		var rock : Sprite2D = Sprite2D.new()
@@ -34,15 +36,18 @@ func _ready():
 			rock.scale = Vector2(0.4, 0.4)
 			rocks_b.append(rock)
 
+func set_temp_multiplier(newVal):
+	temp_multiplier = newVal
+
 func _process(delta : float):
 	for rock in rocks_b:
-		rock.position.x = rock.position.x - (Globals.train_direction * (delta * 120) * Globals.time_factor)
+		rock.position.x = rock.position.x - (Globals.train_direction * (delta * 120) * Globals.time_factor * temp_multiplier)
 		if rock.position.x < -20 or rock.position.x > Globals.display_width + 120:
 			if Globals.train_direction > 0: rock.position.x = Globals.display_width + randf_range(50, 120)
 			elif Globals.train_direction < 0: rock.position.x = 0 - randf_range(50, 120)
 	
 	for rock in rocks_f:
-		rock.position.x = rock.position.x - (Globals.train_direction * (delta * 160) * Globals.time_factor)
+		rock.position.x = rock.position.x - (Globals.train_direction * (delta * 160) * Globals.time_factor * temp_multiplier)
 		if rock.position.x < -20 or rock.position.x > Globals.display_width + 120:
 			if Globals.train_direction > 0: rock.position.x = Globals.display_width + randf_range(50, 110)
 			elif Globals.train_direction < 0: rock.position.x = 0 - randf_range(50, 120)
