@@ -13,10 +13,11 @@ const build_cost : Dictionary[String, float] = {
 	"clean_water" : 25.0,
 	"mech_parts" : 20.0,
 	"farm" : 10.0,
-	"scrap_arm" : 5.0,
+	"scrap_arm" : 10.0,
 	"kitchen" : 5.0,
-	"cabin" : 10.0,
-	"passenger_door" : 5.0
+	"cabin" : 2.0,
+	"passenger_door" : 5.0,
+	"water_collector" : 25.0
 }
 
 # Service variables
@@ -135,7 +136,10 @@ func produce_resources():
 	# Producing materials requires workers
 	if workers.size() >= workers_needed:
 		for producer in producers:
-			producer.produce(parentTrain)
+			var worker_modifier = 1.0
+			if workers_needed > 0:
+				worker_modifier = workers.size() / float(workers_needed)
+			producer.produce(parentTrain, worker_modifier)
 
 ## For each customer in the module, run through the repeatable services and attempt to provide them
 func serve_customers():
@@ -205,11 +209,12 @@ func set_type(newType : String):
 		# Setup production
 		var food1Producer = BasicFood1Producer.new()
 		add_producer(food1Producer)
-		workers_needed = 1
+		workers_needed = 5
 	elif newType == "scrap_arm":
 		$Outline.color = Color.SANDY_BROWN
 		var scrapCollector = BasicScrapCollector.new()
-		add_producer(scrapCollector)
+		add_producer(scrapCollector)#
+		workers_needed = 1
 	elif newType == "mech_parts":
 		$Outline.color = Color.SANDY_BROWN
 		var partsProducer = ScrapToMechProducer.new()
@@ -219,4 +224,9 @@ func set_type(newType : String):
 		$Outline.color = Color.CORNFLOWER_BLUE
 		var passengerCollector = BasicPassengerCollector.new()
 		add_producer(passengerCollector)
+	elif newType == "water_collector":
+		$Outline.color = Color.CADET_BLUE
+		var waterCollector = BasicWaterCollector.new()
+		add_producer(waterCollector)
+		workers_needed = 1
 	$Label.text = newType

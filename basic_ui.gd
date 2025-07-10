@@ -136,6 +136,11 @@ func parse_text_input():
 		elif (words[i] == "mech" or words[i] == "mechanical") and words[i+1] == "parts":
 			subject = "mech_parts"
 			wordsRead = 2
+		elif words[i] == "water"  and words[i+1] == "collector":
+			subject = "water_collector"
+			wordsRead = 2
+		elif words[i] == "water_collector":
+			subject = "water_collector"
 		elif (words[i] == "car" or words[i] == "carriage") and words[i+1].is_valid_int():
 			location1 = words[i+1]
 			wordsRead = 2

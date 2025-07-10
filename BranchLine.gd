@@ -82,7 +82,7 @@ func generate_random_resources():
 		var randPos = randf()
 		add_child(newSpot)
 		newSpot.progress_ratio = randPos
-		newSpot.set_stats("clean_water", water_default)
+		newSpot.set_stats("grey_water", water_default)
 		resources.append(newSpot)
 
 func request_resources(wantedType : String, collection_margin : float) -> float:

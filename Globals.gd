@@ -24,6 +24,7 @@ var refund_module_fraction : float = 0.5
 
 # Production ratios
 var scrap_to_mech_ratio : float = 0.2 # 5 Scrap to make 1 mech parts
+var water_purification_efficiency : float = 0.9
 
 # Passenger Variables
 var passenger_debug : bool = true
@@ -39,6 +40,7 @@ var need_growth_rates : Dictionary[String, float] = {
 # Commenting out code contributed by junior dev (Izzy)
 #,kml,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
+# Resource storage variables
 # Minimum values to leave when doing production cycles
 var safety_margins : Dictionary[String, float] = {
 	"clean_water" : 50.0

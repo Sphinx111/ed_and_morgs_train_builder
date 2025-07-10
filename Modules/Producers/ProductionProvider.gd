@@ -25,23 +25,23 @@ func init() -> void:
 	pass
 
 ## Control function to call each resource tick, must provide MapHandler if resource comes from map
-func produce(train : Train) -> int:
+func produce(train : Train, worker_modifier : float) -> int:
 	var result = Globals.RESULT_OK
-	
+
 	if progress == 0.0:
 		if input_mode == Globals.USE_BOTH:
-			result = start_cycle_both(train)	# Might indicate insufficient resources
+			result = start_cycle_both(train, worker_modifier)	# Might indicate insufficient resources
 		elif input_mode == Globals.USE_EITHER:
-			result = start_cycle_either(train)
+			result = start_cycle_either(train, worker_modifier)
 	if progress > 0.0 and progress < 1.0:
-		make_progress()
+		make_progress(worker_modifier)
 	if progress >= 1.0:
 		finish_cycle(train)
 	
 	return result
 
 ## Consumes resources and starts cycle
-func start_cycle_both(train : Train) -> int:
+func start_cycle_both(train : Train, worker_modifier : float) -> int:
 	var result = Globals.RESULT_OK
 	
 	if inputType1 != "" :
@@ -63,12 +63,12 @@ func start_cycle_both(train : Train) -> int:
 			train.add_res(inputType1, -1 * input1_needed)
 			if inputType2 != "":
 				train.add_res(inputType2, -1 * input2_needed)
-		progress = progress + (1.0 / cycleTime)
+		progress = progress + (worker_modifier / cycleTime)
 	
 	return result
 
 ## Consumes resources and starts cycle
-func start_cycle_either(train : Train) -> int:
+func start_cycle_either(train : Train, worker_modifier : float) -> int:
 	var result = Globals.RESULT_OK
 	
 	if inputType1 != "" :
@@ -97,14 +97,14 @@ func start_cycle_either(train : Train) -> int:
 	if result == Globals.RESULT_OK:
 		if inputType2 != "":
 			train.add_res(inputType2, -1 * input2_needed)
-		progress = progress + (1.0 / cycleTime)
+		progress = progress + (worker_modifier / cycleTime)
 	
 	return result
 
 
 
-func make_progress():
-	progress = progress + (1.0 / cycleTime)
+func make_progress(worker_modifier : float):
+	progress = progress + (worker_modifier / cycleTime)
 
 func finish_cycle(train : Train):
 	progress = 0.0

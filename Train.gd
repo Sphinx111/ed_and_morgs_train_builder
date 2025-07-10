@@ -84,7 +84,15 @@ func resource_tick():
 		if carriage != null:
 			carriage.resource_tick()
 	passengerManager.resource_tick()
-	speed = move_toward(speed,target_speed,acceleration_per_tick)
+	update_speed()
+
+func update_speed():
+	if target_speed > speed:
+		speed = move_toward(speed,target_speed,acceleration_per_tick)
+	elif target_speed < speed:
+		speed = move_toward(speed,target_speed,acceleration_per_tick*1.5)
+	else:
+		return
 
 func add_module(type: String, carNum : int, position : int):
 	if carNum >= carriages.size() or position >= Globals.modules_per_car or carriages[carNum] == null:

@@ -27,5 +27,5 @@ func set_stats(newType : String, newQty : float):
 	quantity = newQty
 	
 	if resource_type == "pop":           myColor = Color.PURPLE
-	elif resource_type == "clean_water": myColor = Color.AQUA
+	elif resource_type == "grey_water": myColor = Color.AQUA
 	colorRect.color = myColor

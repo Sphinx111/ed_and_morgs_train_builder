@@ -23,7 +23,7 @@ texture = ExtResource("1_2pvac")
 curve = SubResource("Curve2D_ftvjd")
 
 [node name="Lever" type="PathFollow2D" parent="LeverPath"]
-position = Vector2(-13.7608, 0.29817)
+position = Vector2(-13.7608, 0.298139)
 rotation = -0.694738
 progress = 12.2827
 loop = false
@@ -34,11 +34,9 @@ rotation = 0.253174
 texture = ExtResource("2_xu0f3")
 
 [node name="Area2D" type="Area2D" parent="LeverPath/Lever"]
-scale = Vector2(1, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LeverPath/Lever/Area2D"]
 position = Vector2(-5.08542, -14.9462)
-scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_qvx28")
 
 [connection signal="input_event" from="LeverPath/Lever/Area2D" to="." method="_on_lever_input_event"]

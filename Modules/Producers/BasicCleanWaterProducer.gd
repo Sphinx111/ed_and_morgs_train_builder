@@ -13,6 +13,6 @@ func init() -> void:
 	input2_needed = 0.5
 	
 	outputType1 = "clean_water"
-	output1_amount = 0.5
+	output1_amount = 0.5 * Globals.water_purification_efficiency
 	
 	cycleTime = 4
