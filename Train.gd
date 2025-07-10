@@ -28,7 +28,6 @@ var res = {
 	"grey_water" : 0.0,
 	"black_water" : 0.0,
 	"mech_parts" : 100.0,
-	"speed" : 500.0,
 	"fuel" : 100.0,
 	"fertiliser" : 10.0,
 	"seeds1" : 10.0,
@@ -39,6 +38,10 @@ var res = {
 	"seeds6" : 0.0,
 	"scrap" : 0.0
 }
+
+var speed : float = 200.0
+var target_speed : float = 200.00
+var acceleration_per_tick : float = 10.0
 
 func _ready() -> void:
 	self.position.x = Globals.train_origin_x
@@ -81,6 +84,7 @@ func resource_tick():
 		if carriage != null:
 			carriage.resource_tick()
 	passengerManager.resource_tick()
+	speed = move_toward(speed,target_speed,acceleration_per_tick)
 
 func add_module(type: String, carNum : int, position : int):
 	if carNum >= carriages.size() or position >= Globals.modules_per_car or carriages[carNum] == null:
@@ -157,6 +161,5 @@ func get_work_location_map_for_type(work_type_to_find : String) -> Array:
 
 
 func _on_speed_lever_changed(new_position: int) -> void:
-	print("Speed lever positon changed to: " + String.num_int64(new_position))
-	res["speed"] = 100.0 * new_position
+	target_speed = 100.0 * new_position
 	pass # Replace with function body.

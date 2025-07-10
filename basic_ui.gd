@@ -41,7 +41,7 @@ func _ready() -> void:
 
 
 func resource_panel_update():
-	$ResourcePanel/Speed.text = "Speed: " + String.num_int64(selectedTrain.get_res("speed"))
+	$ResourcePanel/Speed.text = "Speed: " + String.num_int64(selectedTrain.speed)
 	$ResourcePanel/Fuel.text = "Fuel: " + String.num_int64(selectedTrain.get_res("fuel"))
 	$ResourcePanel/Pop.text = "Pop: " + String.num_int64(selectedTrain.passengerManager.passengers.size())
 	$ResourcePanel/CleanWater.text = "Water: " + String.num_int64(selectedTrain.get_res("clean_water"))

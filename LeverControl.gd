@@ -3,15 +3,12 @@ extends Node2D
 class_name LeverControl
 
 @onready var handle : PathFollow2D = get_node("LeverPath/Lever")
-@onready var zeroPos : Vector2 = get_node("RefZero").position
-@onready var maxPos : Vector2 = get_node("RefMax").position
-@onready var fulcrumpoint : Vector2 = get_node("FulcrumPoint").position
 var isDragged : bool = false
 var lastMousePos : Vector2 = Vector2.ZERO
 var distanceToMove : float = 200.0
 var speedSteps : float = 5.0
-var currentStep : float = 0.0
-var lastStep : float = 0.0
+var currentStep : float = 2.0
+var lastStep : float = 2.0
 signal position_changed(new_position : int)
 
 

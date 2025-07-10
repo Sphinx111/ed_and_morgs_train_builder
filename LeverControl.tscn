@@ -23,8 +23,9 @@ texture = ExtResource("1_2pvac")
 curve = SubResource("Curve2D_ftvjd")
 
 [node name="Lever" type="PathFollow2D" parent="LeverPath"]
-position = Vector2(-21, 10)
-rotation = -1.05165
+position = Vector2(-13.7608, 0.29817)
+rotation = -0.694738
+progress = 12.2827
 loop = false
 
 [node name="Sprite2D" type="Sprite2D" parent="LeverPath/Lever"]
@@ -39,14 +40,5 @@ scale = Vector2(1, 1)
 position = Vector2(-5.08542, -14.9462)
 scale = Vector2(1, 1)
 shape = SubResource("RectangleShape2D_qvx28")
-
-[node name="RefZero" type="Node2D" parent="."]
-position = Vector2(-180, 105)
-
-[node name="RefMax" type="Node2D" parent="."]
-position = Vector2(102, -182)
-
-[node name="FulcrumPoint" type="Node2D" parent="."]
-position = Vector2(102, 105)
 
 [connection signal="input_event" from="LeverPath/Lever/Area2D" to="." method="_on_lever_input_event"]

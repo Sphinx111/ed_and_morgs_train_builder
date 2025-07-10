@@ -220,7 +220,7 @@ width = 3.0
 default_color = Color(0.596078, 1, 1, 1)
 
 [node name="LeverControl" parent="Train" instance=ExtResource("6_u0kvb")]
-position = Vector2(-50, -54)
+position = Vector2(-96, 38)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(576, 324)
@@ -234,7 +234,7 @@ position = Vector2(2, 415)
 
 [node name="BackgroundLayer" type="Node2D" parent="Background"]
 z_index = -1
-position = Vector2(0, 288)
+position = Vector2(0, 334)
 
 [connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
 [connection signal="pressed" from="BasicUI/Button" to="BasicUI" method="_on_textinput_press"]

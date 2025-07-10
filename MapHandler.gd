@@ -19,7 +19,7 @@ func select_new_train(newTrain : Train):
 	selectedTrain = newTrain
 
 func train_step():
-	mainRoute.update_trainPos(selectedTrain.res["speed"] * local_to_global_speed_conversion)
+	mainRoute.update_trainPos(selectedTrain.speed * local_to_global_speed_conversion)
 
 func request_resources(wantedType : String) -> float:
 	return mainRoute.request_resources(wantedType, collection_margin)
