@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=8 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
 [ext_resource type="PackedScene" uid="uid://b3ph64gipnlm5" path="res://Scenes/world_map.tscn" id="2_ksonv"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://cw8ov34j2hlku" path="res://Scenes/passenger.tscn" id="4_d8abk"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
 [ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://BackgroundHandler.gd" id="6_mscei"]
+[ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://LeverControl.tscn" id="6_u0kvb"]
 
 [node name="SceneRoot" type="Control"]
 layout_mode = 3
@@ -218,6 +219,9 @@ points = PackedVector2Array(0, 0, 0, -15)
 width = 3.0
 default_color = Color(0.596078, 1, 1, 1)
 
+[node name="LeverControl" parent="Train" instance=ExtResource("6_u0kvb")]
+position = Vector2(-50, -54)
+
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(576, 324)
 
@@ -238,3 +242,4 @@ position = Vector2(0, 288)
 [connection signal="drag_ended" from="BasicUI/DebugPanel/DebugSlider" to="BasicUI" method="_on_debug_tick_slider_ended"]
 [connection signal="toggled" from="BasicUI/DebugPanel/CheckButton" to="BasicUI" method="_on_map_toggled"]
 [connection signal="toggled" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_toggled"]
+[connection signal="position_changed" from="Train/LeverControl" to="Train" method="_on_speed_lever_changed"]

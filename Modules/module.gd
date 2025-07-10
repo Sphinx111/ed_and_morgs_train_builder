@@ -152,7 +152,9 @@ func serve_customers():
 			
 			if services_finished >= services.size():
 				_eject_customer(customer)
-				print("%s %s exiting %s module" % [customer.firstname, customer.lastname, type])
+				#print("%s %s exiting %s module" % [customer.firstname, customer.lastname, type])
+		else:
+			customers.erase(customer)
 
 func reset_module():
 	services = []

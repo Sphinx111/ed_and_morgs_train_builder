@@ -154,3 +154,9 @@ func get_work_location_map_for_type(work_type_to_find : String) -> Array:
 		result.append(carriages[i].get_work_map(work_type_to_find))
 	
 	return result
+
+
+func _on_speed_lever_changed(new_position: int) -> void:
+	print("Speed lever positon changed to: " + String.num_int64(new_position))
+	res["speed"] = 100.0 * new_position
+	pass # Replace with function body.
