@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://b3ph64gipnlm5"]
+[gd_scene load_steps=14 format=3 uid="uid://b3ph64gipnlm5"]
 
 [ext_resource type="Script" uid="uid://bywwc888bn2bf" path="res://MapHandler.gd" id="1_deu6t"]
 [ext_resource type="Texture2D" uid="uid://dve3f2r47q48u" path="res://images/Pixel_world_map.jpg" id="2_4ojr4"]
@@ -52,6 +52,12 @@ _data = {
 "points": PackedVector2Array(0, 0, 0, 0, 82.7225, 56.8063, 0, 0, 0, 0, 87.4346, 64.1361, 0, 0, 0, 0, 91.0995, 67.2775, 0, 0, 0, 0, 98.6911, 75.1309, 0, 0, 0, 0, 110.995, 79.8429, 0, 0, 0, 0, 124.607, 82.199, 0, 0, 0, 0, 138.22, 80.3665, 0, 0, 0, 0, 147.906, 78.0105)
 }
 point_count = 8
+
+[sub_resource type="Curve2D" id="Curve2D_1huhg"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 1447.5, 395, 0, 0, 0, 0, -289.5, 395)
+}
+point_count = 2
 
 [node name="WorldMap" type="Node2D"]
 script = ExtResource("1_deu6t")
@@ -163,3 +169,51 @@ lines = [NodePath("../../RoutesParent/Route96"), NodePath("../../RoutesParent/Ro
 [node name="Junction96" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
 position = Vector2(567, 298)
 lines = [NodePath("../../RoutesParent/Route94")]
+
+[node name="MapMask" type="ColorRect" parent="."]
+clip_children = 1
+offset_left = -2.0
+offset_top = -40.0
+offset_right = 1153.0
+offset_bottom = 683.0
+color = Color(1, 1, 1, 0.329412)
+
+[node name="Sunpath" type="Path2D" parent="MapMask"]
+curve = SubResource("Curve2D_1huhg")
+
+[node name="Sun1" type="PathFollow2D" parent="MapMask/Sunpath"]
+position = Vector2(-0.00278274, 395)
+rotation = 3.14159
+progress = 1447.5
+
+[node name="ColorRect" type="ColorRect" parent="MapMask/Sunpath/Sun1"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -289.0
+offset_top = -381.0
+offset_right = 290.0
+offset_bottom = 427.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 0.423529, 1)
+
+[node name="Sun2" type="PathFollow2D" parent="MapMask/Sunpath"]
+position = Vector2(1447.5, 395)
+rotation = 3.14159
+
+[node name="ColorRect" type="ColorRect" parent="MapMask/Sunpath/Sun2"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -289.0
+offset_top = -343.0
+offset_right = 290.0
+offset_bottom = 405.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 0.423529, 1)

@@ -120,7 +120,9 @@ func remove_worker(newWorker : Passenger):
 		parentTrain.update_work_map(workType)
 	workers.erase(newWorker)
 	$DebugWorkerCount.text = "" + String.num_int64(workers.size())
-	
+
+func _eject_worker(oldWorker : Passenger):
+	oldWorker.worker_ejected_from_module()
 
 func add_service(newProvider : ServiceProvider):
 	newProvider.init()	# Setup its initial variables
@@ -171,10 +173,13 @@ func reset_module():
 	for customer in customers:
 		if is_instance_valid(customer):
 			_eject_customer(customer)
+			_eject_worker(customer)
+	workers = []
+	customers = []
 
 func set_type(newType : String):
-	self.type = newType
 	reset_module()                    # Start from state of an 'empty' module
+	self.type = newType
 	if newType == "clean_water":
 		$Outline.color = Color.AQUA
 		var basicWaterProvider = BasicWaterProvider.new()

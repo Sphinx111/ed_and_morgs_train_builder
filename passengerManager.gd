@@ -3,7 +3,8 @@ extends Node
 class_name PassengerManager
 
 var passengers : Array[Passenger] = []
-var needs_check_timer : Timer = null
+var dying_passengers : Array[Passenger] = []
+var dead : Array[Gravestone] = []
 
 var PassengerScene = preload("res://Scenes/passenger.tscn")
 var debugLeft : Line2D = null
@@ -16,12 +17,6 @@ func _ready():
 	var firstPassenger : Passenger = find_child("Passenger")
 	passengers.append(firstPassenger)
 	apply_random_name(firstPassenger)
-	needs_check_timer = Timer.new()
-	add_child(needs_check_timer)
-	needs_check_timer.wait_time = 1.0
-	needs_check_timer.one_shot = false
-	needs_check_timer.timeout.connect(check_all_needs)
-	needs_check_timer.start()
 	debugLeft = $DebugLeft
 	debugRight = $DebugRight
 
@@ -31,8 +26,20 @@ func _process(delta : float):
 		debugRight.position.x = passengers[0].next_module_pos
 
 func resource_tick():
+	# Tidyup all dying passengers first
+	for passenger : Passenger in dying_passengers:
+		passenger.cleanup()
+		passengers.erase(passenger)
+		var newgrave = Gravestone.new()
+		newgrave.create_gravestone(passenger)
+		dead.append(newgrave)
+		passenger.queue_free()
+	dying_passengers = []
+
 	for passenger in passengers:
 		passenger.resource_tick()
+		if passenger.is_dying == true:
+			dying_passengers.append(passenger)
 
 func check_all_needs():
 	for passenger in passengers:
@@ -57,8 +64,3 @@ func apply_random_name(passenger) -> void:
 	else: 
 		constrainedNamesList = firstNamesList
 	passenger.firstname = constrainedNamesList[randi_range(0, constrainedNamesList.size()-1)]
-	
-
-func remove_passenger(passToRemove : Passenger):
-	passengers.erase(passToRemove)
-	passToRemove.queue_free()

@@ -8,6 +8,7 @@ var parentTrain : Train = null   # Train the passenger is allocated to
 var firstname : String = ""
 var lastname : String = ""
 var movespeed = 30
+var is_dying : bool = false
 
 var current_module : ModuleBase = null
 var next_module_pos : float = Globals.module_width		# If position.x exceeds this, check module
@@ -130,12 +131,20 @@ func ejected_from_module():
 	is_in_module = false
 	is_working = false
 
+## Used by passenger to tell module they're leaving
 func exit_worker_module():
 	self.show()
 	targetWork = ""
 	is_in_module = false
 	is_working = false
 	current_module.remove_worker(self)
+
+## Used by modules to eject a worker
+func worker_ejected_from_module():
+	self.show()
+	targetWork = ""
+	is_in_module = false
+	is_working = false
 
 func resource_tick():
 	for key in needs.keys():
@@ -151,6 +160,13 @@ func wants_need(type : String) -> float:
 		return (1.0 - needs[type])
 	return 0.0
 
+## Called to remove itself from any modules, this passenger is about to die
+func cleanup():
+	if is_working and is_in_module:
+		current_module.remove_worker(self)
+	elif is_in_module:
+		current_module.notify_remove_customer(self)
+
 func check_needs():
 	var maxVal : float = 0.0
 	var maxNeed : String = ""
@@ -159,7 +175,9 @@ func check_needs():
 			maxNeed = key
 			maxVal = needs[key]
 			if maxVal >= maxNeeds[key]:
-				if hit_max_need(key) == Globals.RESULT_FATAL: return
+				if hit_max_need(key) == Globals.RESULT_FATAL:
+					is_dying = true
+					return
 	if maxVal > Globals.passenger_seeks_threshold:
 		if maxNeed != "" and maxNeed != targetNeed:
 			targetNeed = maxNeed
@@ -171,9 +189,9 @@ func check_for_work():
 	targetWork = "any"
 	check_current_module()
 
+## Allows different results from hitting max need. Not all needs will be fatal
 func hit_max_need(needType : String) -> int:
 	print("%s %s: Oh no! I am dying of %s" % [firstname, lastname, needType])
-	manager.remove_passenger(self)
 	return Globals.RESULT_FATAL
 
 func pick_idle_move():

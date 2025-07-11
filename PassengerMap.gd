@@ -172,7 +172,8 @@ func update_map_segment(locationsMap, mapType : String, outputDict, position2d :
 	if newState == Globals.CUSTOMERS_HAS_SPACE or newState == Globals.MODULE_ADDED:
 		# If this is the only module, just do a rebuild, re-use existing code
 		if isLeftmost and isRightmost:
-			calc_direction_weights(locationsMap, mapType, outputDict)
+			for i in range(outputDict[mapType].size()):
+				outputDict[mapType][i] = changed_index - i
 			return
 		
 		var startWriteAt : int = 0
