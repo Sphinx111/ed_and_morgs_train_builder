@@ -35,7 +35,9 @@ var aliterating_name_chance : float = .5
 var need_growth_rates : Dictionary[String, float] = {
 	"thirst" : 0.01,
 	"hunger" : 0.005,
-	"rest"   : 0.005
+	"rest"   : 0.005,
+	"social" : 0.0,
+	"illness" : 0.0
 }
 # Commenting out code contributed by junior dev (Izzy)
 #,kml,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

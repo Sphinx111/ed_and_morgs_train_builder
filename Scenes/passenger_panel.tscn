@@ -1,0 +1,152 @@
+[gd_scene load_steps=2 format=3 uid="uid://b6pw7b7tp11ts"]
+
+[ext_resource type="Script" uid="uid://dyem3a2rqpwgy" path="res://Scenes/PassengerPanel.gd" id="1_il4ao"]
+
+[node name="PassengerPanel" type="Panel"]
+offset_left = 10.0
+offset_top = -137.0
+offset_right = 102.0
+offset_bottom = -49.0
+script = ExtResource("1_il4ao")
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 89.0
+offset_bottom = 26.0
+scale = Vector2(0.4, 0.4)
+text = "Firstname Lastname"
+
+[node name="ActionLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 73.0
+offset_right = 162.0
+offset_bottom = 96.0
+scale = Vector2(0.4, 0.4)
+text = "Drinking in Bar 1"
+
+[node name="ThirstBar2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 16.0
+offset_right = 83.0
+offset_bottom = 24.0
+color = Color(0.381703, 0.381703, 0.381703, 1)
+
+[node name="ThirstBar" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 16.0
+offset_right = 83.0
+offset_bottom = 24.0
+color = Color(0, 0.694118, 0.705882, 1)
+
+[node name="ThirstLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 16.0
+offset_right = 37.0
+offset_bottom = 39.0
+scale = Vector2(0.4, 0.4)
+text = "T"
+
+[node name="HungerBar2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 27.0
+offset_right = 83.0
+offset_bottom = 35.0
+color = Color(0.380392, 0.380392, 0.380392, 1)
+
+[node name="HungerBar" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 27.0
+offset_right = 83.0
+offset_bottom = 35.0
+color = Color(0.203922, 0.603922, 0.0666667, 1)
+
+[node name="HungerLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 27.0
+offset_right = 37.0
+offset_bottom = 50.0
+scale = Vector2(0.4, 0.4)
+text = "H"
+
+[node name="SocialBar2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 38.0
+offset_right = 83.0
+offset_bottom = 46.0
+color = Color(0.380392, 0.380392, 0.380392, 1)
+
+[node name="SocialBar" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 38.0
+offset_right = 83.0
+offset_bottom = 46.0
+color = Color(1, 0.212985, 0.366243, 1)
+
+[node name="SocialLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 38.0
+offset_right = 37.0
+offset_bottom = 61.0
+scale = Vector2(0.4, 0.4)
+text = "S"
+
+[node name="IllnessBar2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 49.0
+offset_right = 83.0
+offset_bottom = 57.0
+color = Color(0.380392, 0.380392, 0.380392, 1)
+
+[node name="IllnessBar" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 49.0
+offset_right = 83.0
+offset_bottom = 57.0
+
+[node name="IllnessLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 49.0
+offset_right = 37.0
+offset_bottom = 72.0
+scale = Vector2(0.4, 0.4)
+text = "I"
+
+[node name="RestBar2" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 60.0
+offset_right = 83.0
+offset_bottom = 68.0
+color = Color(0.380392, 0.380392, 0.380392, 1)
+
+[node name="RestBar" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 27.0
+offset_top = 60.0
+offset_right = 83.0
+offset_bottom = 68.0
+color = Color(0.670251, 0.241597, 0.664486, 1)
+
+[node name="RestLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 60.0
+offset_right = 37.0
+offset_bottom = 83.0
+scale = Vector2(0.4, 0.4)
+text = "R"

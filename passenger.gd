@@ -25,16 +25,23 @@ var foodsEaten = {
 	"food1" : 0
 }
 
+var displayNeeds : bool = false
+var displayNeedsScene : PackedScene = preload("res://Scenes/passenger_panel.tscn")
+var passengerPanel : PassengerPanel = null
 var targetNeed = ""
 var needs = {
 	"thirst" : 0.0,
 	"hunger" : 0.65,
-	"rest" : 0.0
+	"rest" : 0.0,
+	"illness" : 0.0,
+	"social" : 0.0
 }
 const maxNeeds = {
 	"thirst" : 1.0,
 	"hunger" : 1.0,
-	"rest" : 2.0
+	"rest" : 2.0,
+	"illness" : 1.0,
+	"social" : 1.0
 }
 
 var targetWork : String = ""
@@ -154,6 +161,9 @@ func resource_tick():
 	check_for_work()
 	if Globals.passenger_debug == true:
 		update_needs_debug()
+	pick_direction()
+	if passengerPanel != null:
+		passengerPanel.update_step()
 
 func wants_need(type : String) -> float:
 	if needs.has(type):
@@ -250,3 +260,17 @@ func new_thought(text : String):
 	var prefix = ("%s %s: " % [firstname, lastname])
 	text = prefix + text
 	Globals.activeUI.add_thought(text)
+
+func show_passenger_panel():
+	displayNeeds = !displayNeeds
+	if displayNeeds:
+		passengerPanel = displayNeedsScene.instantiate()
+		add_child(passengerPanel)
+		passengerPanel.update_step()
+	else:
+		passengerPanel.queue_free()
+		passengerPanel = null
+
+func _on_area_2d_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
+	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
+		show_passenger_panel()

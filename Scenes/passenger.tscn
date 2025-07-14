@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://cw8ov34j2hlku"]
+[gd_scene load_steps=4 format=3 uid="uid://cw8ov34j2hlku"]
 
 [ext_resource type="Script" uid="uid://cjbbfq5yg0tt8" path="res://passenger.gd" id="1_lyrvh"]
 [ext_resource type="Texture2D" uid="uid://bji3n1mms68fq" path="res://images/capsule.png" id="2_uumvl"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lyrvh"]
+height = 50.0
 
 [node name="Passenger" type="Node2D"]
 script = ExtResource("1_lyrvh")
@@ -25,6 +28,7 @@ offset_top = -72.0
 offset_right = 3.0
 offset_bottom = -52.0
 color = Color(0.0576789, 0.637473, 1.92523e-07, 1)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 
 [node name="DebugRest" type="ColorRect" parent="."]
 visible = false
@@ -33,3 +37,4 @@ offset_top = -72.0
 offset_right = 13.0
 offset_bottom = -52.0
 color = Color(0.916171, 0.2, 0.396461, 1)
+[connection signal="input_event" from="Area2D" to="." method="_on_area_2d_input_event"]

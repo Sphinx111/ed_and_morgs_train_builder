@@ -9,6 +9,7 @@ script = ExtResource("1_w1di8")
 offset_top = 30.0
 offset_right = 50.0
 offset_bottom = 80.0
+mouse_filter = 1
 color = Color(0.733333, 1, 1, 1)
 
 [node name="Label" type="Label" parent="."]
