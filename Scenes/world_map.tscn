@@ -19,21 +19,21 @@ point_count = 11
 
 [sub_resource type="Curve2D" id="Curve2D_ecn11"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 248.953, 32.199, 0, 0, 0, 0, 264.66, 34.2932, 0, 0, 0, 0, 269.634, 44.5026, 0, 0, 0, 0, 281.414, 45.8115, 0, 0, 0, 0, 296.335, 43.7173, 0, 0, 0, 0, 301.571, 41.623)
+"points": PackedVector2Array(0, 0, 0, 0, 236.126, 31.4136, 0, 0, 0, 0, 258.115, 34.555, 0, 0, 0, 0, 267.016, 35.8639)
 }
-point_count = 6
+point_count = 3
 
 [sub_resource type="Curve2D" id="Curve2D_3jykw"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 148.691, 78.0105, 0, 0, 0, 0, 157.853, 85.0785, 0, 0, 0, 0, 174.084, 83.7696, 0, 0, 0, 0, 181.675, 76.7016, 0, 0, 0, 0, 196.335, 76.4398, 0, 0, 0, 0, 202.094, 62.3037, 0, 0, 0, 0, 213.351, 56.0209, 0, 0, 0, 0, 225.654, 60.2094, 0, 0, 0, 0, 232.199, 54.712, 0, 0, 0, 0, 238.22, 44.5026, 0, 0, 0, 0, 246.597, 36.911, 0, 0, 0, 0, 249.215, 32.4607)
+"points": PackedVector2Array(0, 0, 0, 0, 148.691, 78.0105, 0, 0, 0, 0, 157.853, 85.0785, 0, 0, 0, 0, 174.084, 83.7696, 0, 0, 0, 0, 181.675, 76.7016, 0, 0, 0, 0, 196.335, 76.4398, 0, 0, 0, 0, 202.094, 62.3037, 0, 0, 0, 0, 225.654, 60.2094, 0, 0, 0, 0, 234.293, 49.7382, 0, 0, 0, 0, 235.602, 31.9372)
 }
-point_count = 12
+point_count = 9
 
 [sub_resource type="Curve2D" id="Curve2D_w1i7g"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 194.764, 37.6963, 0, 0, 0, 0, 207.33, 33.5079, 0, 0, 0, 0, 218.848, 26.9634, 0, 0, 0, 0, 232.199, 25.6545, 0, 0, 0, 0, 242.147, 26.4398, 0, 0, 0, 0, 248.953, 31.4136)
+"points": PackedVector2Array(0, 0, 0, 0, 194.764, 37.6963, 0, 0, 0, 0, 212.827, 27.4869, 0, 0, 0, 0, 235.602, 31.4136)
 }
-point_count = 6
+point_count = 3
 
 [sub_resource type="Curve2D" id="Curve2D_g8h5j"]
 _data = {
@@ -55,7 +55,7 @@ point_count = 8
 
 [sub_resource type="Curve2D" id="Curve2D_1huhg"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 1447.5, 395, 0, 0, 0, 0, -289.5, 395)
+"points": PackedVector2Array(0, 0, 0, 0, 1536, 395, 0, 0, 0, 0, -512, 395)
 }
 point_count = 2
 
@@ -65,7 +65,7 @@ script = ExtResource("1_deu6t")
 [node name="Background" type="Sprite2D" parent="."]
 modulate = Color(0.427493, 0.427493, 0.427493, 1)
 position = Vector2(-2, -39)
-scale = Vector2(1.925, 1.925)
+scale = Vector2(1.705, 1.925)
 texture = ExtResource("2_4ojr4")
 centered = false
 
@@ -155,7 +155,7 @@ position = Vector2(0, 177)
 lines = [NodePath("../../RoutesParent/Route99")]
 
 [node name="Junction99" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
-position = Vector2(952, 122)
+position = Vector2(900, 120)
 lines = [NodePath("../../RoutesParent/Route98"), NodePath("../../RoutesParent/Route97")]
 
 [node name="Junction98" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
@@ -174,17 +174,17 @@ lines = [NodePath("../../RoutesParent/Route94")]
 clip_children = 1
 offset_left = -2.0
 offset_top = -40.0
-offset_right = 1153.0
+offset_right = 1022.0
 offset_bottom = 683.0
-color = Color(1, 1, 1, 0.329412)
+mouse_filter = 1
+color = Color(1, 1, 1, 0.278431)
 
 [node name="Sunpath" type="Path2D" parent="MapMask"]
 curve = SubResource("Curve2D_1huhg")
 
 [node name="Sun1" type="PathFollow2D" parent="MapMask/Sunpath"]
-position = Vector2(-0.00278274, 395)
+position = Vector2(1536, 395)
 rotation = 3.14159
-progress = 1447.5
 
 [node name="ColorRect" type="ColorRect" parent="MapMask/Sunpath/Sun1"]
 anchors_preset = 8
@@ -192,17 +192,17 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -289.0
 offset_top = -381.0
-offset_right = 290.0
+offset_right = 512.0
 offset_bottom = 427.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 0.423529, 1)
 
 [node name="Sun2" type="PathFollow2D" parent="MapMask/Sunpath"]
-position = Vector2(1447.5, 395)
+position = Vector2(512, 395)
 rotation = 3.14159
+progress = 1024.0
 
 [node name="ColorRect" type="ColorRect" parent="MapMask/Sunpath/Sun2"]
 anchors_preset = 8
@@ -210,9 +210,8 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -289.0
 offset_top = -343.0
-offset_right = 290.0
+offset_right = 512.0
 offset_bottom = 405.0
 grow_horizontal = 2
 grow_vertical = 2

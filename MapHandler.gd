@@ -12,7 +12,7 @@ var local_to_global_speed_conversion : float = 0.005     # Multiple train's spee
 var sun1 : PathFollow2D = null
 var sun2 : PathFollow2D = null
 var sunradius : float = 720.0
-var sunspeed : float = 5
+var sunspeed : float = 1.0
 
 func _ready():
 	mainRoute = get_node("MainRoute")
