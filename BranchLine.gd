@@ -46,7 +46,7 @@ func add_last_junction(newJunction : Junction):
 func draw_routes():
 	line = Line2D.new()
 	line.default_color = Color(0.4,0.4,0.4, 0.4)
-	line.width = 2
+	line.width = 10
 	for point in curve.get_baked_points():
 		line.add_point(point)
 	add_child(line)
@@ -101,3 +101,7 @@ func gather_resource(wantedType : String, amount : float, collection_margin : fl
 					spot.queue_free()
 				return Globals.RESULT_OK
 	return Globals.NO_RESOURCES
+
+func get_leftmost_xPos() -> float:
+	var points = curve.get_baked_points()
+	return position.x + (points[0].x * scale.x)

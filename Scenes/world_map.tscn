@@ -7,55 +7,55 @@
 
 [sub_resource type="Curve2D" id="Curve2D_67byq"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 30.6283, 35.0785, 0, 0, 0, 0, 38.4817, 35.0785, 0, 0, 0, 0, 43.9791, 36.6492, 0, 0, 0, 0, 50, 41.623, 0, 0, 0, 0, 51.5707, 48.6911, 0, 0, 0, 0, 59.6859, 52.6178, 0, 0, 0, 0, 68.8482, 49.7382, 0, 0, 0, 0, 73.2984, 55.2356, 0, 0, 0, 0, 78.534, 56.8063, 0, 0, 0, 0, 82.7225, 57.0681, 0, 0, 0, 0, 82.7225, 57.0681)
+"points": PackedVector2Array(0, 0, 0, 0, 116, 134, 0, 0, 0, 0, 145, 138, 0, 0, 0, 0, 163, 153, 0, 0, 0, 0, 180, 186, 0, 0, 0, 0, 205, 220, 0, 0, 0, 0, 236, 234, 0, 0, 0, 0, 258, 230, 0, 0, 0, 0, 275, 239, 0, 0, 0, 0, 297, 236, 0, 0, 0, 0, 316, 219)
 }
-point_count = 11
+point_count = 10
 
 [sub_resource type="Curve2D" id="Curve2D_ikf48"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 30.3665, 34.8168, 0, 0, 0, 0, 36.911, 30.1047, 0, 0, 0, 0, 45.8115, 27.2251, 0, 0, 0, 0, 54.1885, 26.4398, 0, 0, 0, 0, 59.1623, 29.3194, 0, 0, 0, 0, 64.3979, 33.7696, 0, 0, 0, 0, 73.2984, 35.0785, 0, 0, 0, 0, 75.9162, 37.6963, 0, 0, 0, 0, 80.6283, 41.3613, 0, 0, 0, 0, 83.7696, 49.4764, 0, 0, 0, 0, 82.9843, 56.8063)
+"points": PackedVector2Array(0, 0, 0, 0, 116, 135, 0, 0, 0, 0, 137, 115, 0, 0, 0, 0, 166, 107, 0, 0, 0, 0, 199, 108, 0, 0, 0, 0, 215, 126, 0, 0, 0, 0, 239, 127, 0, 0, 0, 0, 263, 146, 0, 0, 0, 0, 294, 153, 0, 0, 0, 0, 298, 181, 0, 0, 0, 0, 315, 218)
 }
-point_count = 11
+point_count = 10
 
 [sub_resource type="Curve2D" id="Curve2D_ecn11"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 236.126, 31.4136, 0, 0, 0, 0, 258.115, 34.555, 0, 0, 0, 0, 267.016, 35.8639)
+"points": PackedVector2Array(0, 0, 0, 0, 900, 120, 0, 0, 0, 0, 968, 150, 0, 0, 0, 0, 1021, 167)
 }
 point_count = 3
 
 [sub_resource type="Curve2D" id="Curve2D_3jykw"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 148.691, 78.0105, 0, 0, 0, 0, 157.853, 85.0785, 0, 0, 0, 0, 174.084, 83.7696, 0, 0, 0, 0, 181.675, 76.7016, 0, 0, 0, 0, 196.335, 76.4398, 0, 0, 0, 0, 202.094, 62.3037, 0, 0, 0, 0, 225.654, 60.2094, 0, 0, 0, 0, 234.293, 49.7382, 0, 0, 0, 0, 235.602, 31.9372)
+"points": PackedVector2Array(0, 0, 0, 0, 567, 301, 0, 0, 0, 0, 632, 296, 0, 0, 0, 0, 686, 310, 0, 0, 0, 0, 755, 291, 0, 0, 0, 0, 831, 250, 0, 0, 0, 0, 869, 210, 0, 0, 0, 0, 898, 190, 0, 0, 0, 0, 896, 159, 0, 0, 0, 0, 900, 120)
 }
 point_count = 9
 
 [sub_resource type="Curve2D" id="Curve2D_w1i7g"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 194.764, 37.6963, 0, 0, 0, 0, 212.827, 27.4869, 0, 0, 0, 0, 235.602, 31.4136)
+"points": PackedVector2Array(0, 0, 0, 0, 741, 144, 0, 0, 0, 0, 820, 117, 0, 0, 0, 0, 900, 120)
 }
 point_count = 3
 
 [sub_resource type="Curve2D" id="Curve2D_g8h5j"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 82.9843, 56.2827, 0, 0, 0, 0, 91.623, 53.4031, 0, 0, 0, 0, 108.115, 42.6702, 0, 0, 0, 0, 117.277, 34.8168, 0, 0, 0, 0, 124.346, 36.1257, 0, 0, 0, 0, 130.105, 42.9319, 0, 0, 0, 0, 150.524, 50, 0, 0, 0, 0, 161.257, 50.2618, 0, 0, 0, 0, 168.848, 53.6649, 0, 0, 0, 0, 174.869, 52.0942, 0, 0, 0, 0, 182.723, 43.4555, 0, 0, 0, 0, 184.555, 38.2199, 0, 0, 0, 0, 193.979, 37.4346)
+"points": PackedVector2Array(0, 0, 0, 0, 316, 218, 0, 0, 0, 0, 364, 179, 0, 0, 0, 0, 396, 146, 0, 0, 0, 0, 417, 137, 0, 0, 0, 0, 436, 169, 0, 0, 0, 0, 466, 207, 0, 0, 0, 0, 478, 234, 0, 0, 0, 0, 534, 224, 0, 0, 0, 0, 575, 204, 0, 0, 0, 0, 617, 177, 0, 0, 0, 0, 650, 151, 0, 0, 0, 0, 694, 142, 0, 0, 0, 0, 741, 144)
 }
 point_count = 13
 
 [sub_resource type="Curve2D" id="Curve2D_cwbjy"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 148.691, 77.2251, 0, 0, 0, 0, 157.592, 73.5602, 0, 0, 0, 0, 164.136, 66.4921, 0, 0, 0, 0, 171.99, 62.0419, 0, 0, 0, 0, 183.77, 60.9948, 0, 0, 0, 0, 190.576, 50.5236, 0, 0, 0, 0, 193.717, 37.6963)
+"points": PackedVector2Array(0, 0, 0, 0, 567, 299, 0, 0, 0, 0, 601, 279, 0, 0, 0, 0, 607, 244, 0, 0, 0, 0, 646, 233, 0, 0, 0, 0, 677, 207, 0, 0, 0, 0, 722, 189, 0, 0, 0, 0, 741, 144)
 }
 point_count = 7
 
 [sub_resource type="Curve2D" id="Curve2D_pykxj"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 82.7225, 56.8063, 0, 0, 0, 0, 87.4346, 64.1361, 0, 0, 0, 0, 91.0995, 67.2775, 0, 0, 0, 0, 98.6911, 75.1309, 0, 0, 0, 0, 110.995, 79.8429, 0, 0, 0, 0, 124.607, 82.199, 0, 0, 0, 0, 138.22, 80.3665, 0, 0, 0, 0, 147.906, 78.0105)
+"points": PackedVector2Array(0, 0, 0, 0, 316, 218, 0, 0, 0, 0, 339, 253, 0, 0, 0, 0, 374, 277, 0, 0, 0, 0, 414, 292, 0, 0, 0, 0, 458, 303, 0, 0, 0, 0, 504, 322, 0, 0, 0, 0, 551, 323, 0, 0, 0, 0, 567, 298)
 }
 point_count = 8
 
 [sub_resource type="Curve2D" id="Curve2D_1huhg"]
 _data = {
-"points": PackedVector2Array(0, 0, 0, 0, 1536, 395, 0, 0, 0, 0, -512, 395)
+"points": PackedVector2Array(0, 0, 0, 0, -512, 395, 0, 0, 0, 0, 1536, 395)
 }
 point_count = 2
 
@@ -74,12 +74,12 @@ position = Vector2(-3, 177)
 loop = false
 
 [node name="Rect" type="ColorRect" parent="TrainMarker"]
-offset_top = -1.04712
-offset_right = 5.0
-offset_bottom = 2.95288
+offset_top = -14.0
+offset_right = 40.0
+offset_bottom = 18.0
 
 [node name="MainRoute" parent="." node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-position = Vector2(0, -35)
+scale = Vector2(1, 1)
 next_junction = NodePath("../JunctionsParent/Looper1")
 last_junction = NodePath("../JunctionsParent/Junction1")
 water_count = 1
@@ -87,6 +87,7 @@ water_count = 1
 [node name="RoutesParent" type="Node2D" parent="."]
 
 [node name="Route2" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+scale = Vector2(1, 1)
 curve = SubResource("Curve2D_67byq")
 next_junction = NodePath("../../JunctionsParent/Junction1")
 last_junction = NodePath("../../JunctionsParent/Junction2")
@@ -94,6 +95,7 @@ pop_count = 3
 water_count = 1
 
 [node name="Route3" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+scale = Vector2(1, 1)
 curve = SubResource("Curve2D_ikf48")
 next_junction = NodePath("../../JunctionsParent/Junction1")
 last_junction = NodePath("../../JunctionsParent/Junction2")
@@ -102,11 +104,13 @@ pop_count = 1
 water_count = 1
 
 [node name="Route99" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+scale = Vector2(1, 1)
 curve = SubResource("Curve2D_ecn11")
 next_junction = NodePath("../../JunctionsParent/Junction99")
 last_junction = NodePath("../../JunctionsParent/Looper1")
 
 [node name="Route98" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+scale = Vector2(1, 1)
 curve = SubResource("Curve2D_3jykw")
 next_junction = NodePath("../../JunctionsParent/Junction96")
 last_junction = NodePath("../../JunctionsParent/Junction99")
@@ -115,6 +119,7 @@ pop_count = 2
 water_count = 1
 
 [node name="Route97" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+scale = Vector2(1, 1)
 curve = SubResource("Curve2D_w1i7g")
 next_junction = NodePath("../../JunctionsParent/Junction97")
 last_junction = NodePath("../../JunctionsParent/Junction99")
@@ -122,6 +127,7 @@ pop_count = 2
 water_count = 1
 
 [node name="Route96" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+scale = Vector2(1, 1)
 curve = SubResource("Curve2D_g8h5j")
 next_junction = NodePath("../../JunctionsParent/Junction2")
 last_junction = NodePath("../../JunctionsParent/Junction98")
@@ -129,12 +135,14 @@ scrap_count = 4
 water_count = 2
 
 [node name="Route95" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+scale = Vector2(1, 1)
 curve = SubResource("Curve2D_cwbjy")
 next_junction = NodePath("../../JunctionsParent/Junction96")
 last_junction = NodePath("../../JunctionsParent/Junction97")
 pop_count = 7
 
 [node name="Route94" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
+scale = Vector2(1, 1)
 curve = SubResource("Curve2D_pykxj")
 next_junction = NodePath("../../JunctionsParent/Junction2")
 last_junction = NodePath("../../JunctionsParent/Junction96")
@@ -183,8 +191,7 @@ color = Color(1, 1, 1, 0.278431)
 curve = SubResource("Curve2D_1huhg")
 
 [node name="Sun1" type="PathFollow2D" parent="MapMask/Sunpath"]
-position = Vector2(1536, 395)
-rotation = 3.14159
+position = Vector2(-512, 395)
 
 [node name="ColorRect" type="ColorRect" parent="MapMask/Sunpath/Sun1"]
 anchors_preset = 8
@@ -192,16 +199,15 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_top = -381.0
+offset_top = -400.0
 offset_right = 512.0
-offset_bottom = 427.0
+offset_bottom = 408.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 0.423529, 1)
 
 [node name="Sun2" type="PathFollow2D" parent="MapMask/Sunpath"]
-position = Vector2(512, 395)
-rotation = 3.14159
+position = Vector2(512.001, 395)
 progress = 1024.0
 
 [node name="ColorRect" type="ColorRect" parent="MapMask/Sunpath/Sun2"]
@@ -210,9 +216,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_top = -343.0
+offset_top = -400.0
 offset_right = 512.0
-offset_bottom = 405.0
+offset_bottom = 348.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(1, 1, 0.423529, 1)

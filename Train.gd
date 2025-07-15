@@ -85,6 +85,7 @@ func resource_tick():
 			carriage.resource_tick()
 	passengerManager.resource_tick()
 	update_speed()
+	worldMap.is_train_in_sun()
 
 func update_speed():
 	if target_speed > speed:
