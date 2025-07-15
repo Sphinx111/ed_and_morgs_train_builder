@@ -16,7 +16,7 @@ var offset : Vector2 = Vector2(0,0)
 func _ready():
 	colorRect = ColorRect.new()
 	add_child(colorRect)
-	colorRect.size = Vector2(4.0, 4.0) * visual_scale
+	colorRect.size = Vector2(15.0, 15.0) * visual_scale
 	colorRect.color = myColor
 	colorRect.position += offset
 	
