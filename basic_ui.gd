@@ -196,3 +196,7 @@ func _on_thoughts_toggle_toggled(toggled_on: bool) -> void:
 	else:
 		thoughtsPanel.hide()
 	pass # Replace with function body.
+
+
+func _on_car_button_pressed() -> void:
+	selectedTrain.add_car()

@@ -37,6 +37,17 @@ func init_maps():
 		workLocations[key] = train.get_work_location_map_for_type(key)
 		calc_direction_weights(workLocations, key, workMaps)
 
+func resize_maps(change : int):
+	if change > 0:
+		for key in needsLocations.keys():
+			needsLocations[key].append([9999,9999,9999,9999])
+		for key in workLocations.keys():
+			workLocations[key].append([9999,9999,9999,9999])
+	elif change < 0:
+		needsLocations.pop_back()
+		workLocations.pop_back()
+		
+
 func update_single_type_map(needs_type_to_update):
 	needsLocations[needs_type_to_update] = train.get_location_map_for_type(needs_type_to_update)
 	calc_direction_weights(needsLocations, needs_type_to_update, needsMaps)

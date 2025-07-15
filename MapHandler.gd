@@ -21,6 +21,7 @@ func _ready():
 	sun1 = get_node("MapMask/Sunpath/Sun1")
 	sun2 = get_node("MapMask/Sunpath/Sun2")
 	mainRoute.add_train(trainMarker)
+	trainMarker.progress_ratio = 0.5
 
 func select_new_train(newTrain : Train):
 	selectedTrain = newTrain

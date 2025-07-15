@@ -200,7 +200,6 @@ focus_mode = 0
 button_pressed = true
 
 [node name="CarButton" type="Button" parent="BasicUI/DebugPanel"]
-visible = false
 layout_mode = 0
 offset_left = 70.0
 offset_top = 6.0

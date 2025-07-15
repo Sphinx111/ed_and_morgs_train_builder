@@ -112,6 +112,15 @@ func add_module(type: String, carNum : int, position : int):
 	
 	passengerMap.update_single_work_type_map("any")
 
+## Add a new car to the end of the train
+func add_car():
+	add_carriage(carriages.size())
+	passengerMap.resize_maps(1)
+	if Globals.train_direction > 0:
+		minXpos -= Globals.car_length + Globals.car_separation
+	elif Globals.train_direction < 0:
+		maxXpos += Globals.car_length + Globals.car_separation
+
 func remove_module(carNum : int, position : int):
 	if carriages.size() <= position or carriages[carNum] == null:
 		print_debug("Error: attempting to remove module from nonexistent car: " + String.num_int64(carNum))
