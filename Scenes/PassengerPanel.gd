@@ -24,7 +24,7 @@ func _ready() -> void:
 	restBar = get_node("RestBar")
 	bar_width = thirstBar.size.x
 	nameLabel.text = passenger.firstname + " " + passenger.lastname
-	actionLabel.text = " Coding t so the action label is accurate"
+	actionLabel.text = " Coding it so the action label is accurate"
 
 func update_step() -> void:
 	thirstBar.size.x = passenger.needs["thirst"] * bar_width
@@ -32,4 +32,8 @@ func update_step() -> void:
 	socialBar.size.x = passenger.needs["social"] * bar_width
 	illnessBar.size.x = passenger.needs["illness"] * bar_width
 	restBar.size.x = passenger.needs["rest"] * bar_width
+	if passenger.is_in_module:
+		actionLabel.text = ("working at %s" if passenger.is_working else "served by %s") % passenger.current_module.type
+	else:
+		actionLabel.text = passenger.thoughts[-1] if passenger.thoughts.size() > 0 else "Wandering"
 	return
