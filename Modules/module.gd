@@ -27,13 +27,14 @@ var customers : Array[Passenger] = []
 var service_speed_modifier = 1.0
 var maxCustomers : int = 0
 
-
 # Production Variables
 var producers : Array[ProductionProvider] = [] 
 var workers_needed : int = 0
 var workers : Array[Passenger] = []
 var workType : String = "any"
 
+# Storage Variables
+var storages : Array[GenericStorageProvider] = []
 
 # All modules should know their parents and set position
 func _ready():
@@ -176,6 +177,10 @@ func reset_module():
 			_eject_worker(customer)
 	workers = []
 	customers = []
+	
+	# Remove any storage provision from train
+	for storage in storages:
+		storage.remove_storage(parentTrain)
 
 func set_type(newType : String):
 	reset_module()                    # Start from state of an 'empty' module

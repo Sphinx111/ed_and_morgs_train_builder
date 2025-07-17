@@ -3,16 +3,19 @@ extends Node2D
 class_name Train
 
 var train_name : String = ""	#Give it a name?
+var engine : ModuleBase = null
 var players = []				#Which players run the train?
 var carriages = []
 var tickCount = 0 				#Resource ticks since the train launched
 
 var CarriageScene = preload("res://Scenes/traincar_base.tscn")
 
-var passengerMap : PassengerMap = null
+# Pointer to world map so train can track its position in the world
 var worldMap : MapHandler = null
-var passengerManager : PassengerManager = null
 
+# Passenger Navigation Variables
+var passengerMap : PassengerMap = null
+var passengerManager : PassengerManager = null
 var minXpos : float = 0.0
 var maxXpos : float = 0.0
 
@@ -39,12 +42,15 @@ var res = {
 	"scrap" : 0.0
 }
 
+var max_res : Dictionary = {}
+
 var speed : float = 200.0
 var target_speed : float = 200.00
 var acceleration_per_tick : float = 10.0
 
 func _ready() -> void:
 	self.position.x = Globals.train_origin_x
+	setup_engine()
 	for i in range(0,3):
 		add_carriage(i)
 	passengerManager = find_child("PassengersManager")
@@ -61,6 +67,13 @@ func _ready() -> void:
 	init_passenger_map()
 	worldMap = get_parent().find_child("BasicUI").worldMap
 
+## Set up engine variables, placeholder for now
+func setup_engine():
+	engine = ModuleBase.new()
+	var engineStorage = EngineStorageProvider.new()
+	engineStorage.create_storage(self)
+	engine.storages.append(engineStorage)
+
 func get_res(key : String) -> float:
 	if res.has(key):
 		return res.get(key)
@@ -76,8 +89,16 @@ func gather_res(key : String, amount : float) -> int:
 func add_res(key : String, amount : float):
 	if res.has(key):
 		res[key] = res[key] + amount
+		if res[key] > max_res[key]:
+			res[key] = max_res[key]    ## For now, just discard any excess resources produced
 	else:
 		print_debug("adding resource that doesn't exist: " + key)
+
+func amend_storage(type : String, amount : float):
+	if max_res.has(type):
+		max_res[type] = max_res[type] + amount
+	else:
+		max_res[type] = amount
 
 func resource_tick():
 	for carriage in carriages:
