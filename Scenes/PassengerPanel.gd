@@ -23,6 +23,8 @@ func _ready() -> void:
 	illnessBar = get_node("IllnessBar")
 	restBar = get_node("RestBar")
 	bar_width = thirstBar.size.x
+	nameLabel.text = passenger.firstname + " " + passenger.lastname
+	actionLabel.text = " Coding t so the action label is accurate"
 
 func update_step() -> void:
 	thirstBar.size.x = passenger.needs["thirst"] * bar_width
