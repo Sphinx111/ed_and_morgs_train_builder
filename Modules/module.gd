@@ -134,6 +134,14 @@ func add_producer(newProducer : ProductionProvider):
 	newProducer.init()	# Setup initial variables
 	producers.append(newProducer)
 
+func add_custom_storage(storageDict : Dictionary):
+	var newStorage = GenericStorageProvider.new()
+	for key in storageDict:
+		newStorage.add_storage(key, storageDict[key])
+	storages.append(newStorage)
+	newStorage.create_storage(parentTrain)
+	
+
 ## Cycle through producers and run their production cycle
 func produce_resources():
 	# Producing materials requires workers
@@ -196,6 +204,8 @@ func set_type(newType : String):
 		add_producer(basicCleanWaterProducer)
 		workers_needed = 1
 
+		# Setup storagge
+		add_custom_storage({"clean_water" : 25.0,"grey_water" : 25.0, "black_water" : 10.0})
 	elif newType == "cabin":
 		$Outline.color = Color.BROWN
 		var showerProvider = ShowerProvider.new()
@@ -209,6 +219,7 @@ func set_type(newType : String):
 		var basicWaterProvider = BasicWaterProvider.new()
 		add_service(basicFoodProvider)
 		add_service(basicWaterProvider)
+		add_custom_storage({"clean_water" : 20.0,"food1" : 10.0,"food2" : 10.0})
 		maxCustomers = 10
 	elif newType == "farm":
 		$Outline.color = Color.SEA_GREEN
@@ -220,16 +231,21 @@ func set_type(newType : String):
 		var food1Producer = BasicFood1Producer.new()
 		add_producer(food1Producer)
 		workers_needed = 5
+		
+		# Setup storage
+		add_custom_storage({"food1" : 50.0})
 	elif newType == "scrap_arm":
 		$Outline.color = Color.SANDY_BROWN
 		var scrapCollector = BasicScrapCollector.new()
 		add_producer(scrapCollector)#
 		workers_needed = 1
+		add_custom_storage({"scrap" : 50.0})
 	elif newType == "mech_parts":
 		$Outline.color = Color.SANDY_BROWN
 		var partsProducer = ScrapToMechProducer.new()
 		add_producer(partsProducer)
 		workers_needed = 1
+		add_custom_storage({"mech_parts" : 50.0})
 	elif newType == "passenger_door":
 		$Outline.color = Color.CORNFLOWER_BLUE
 		var passengerCollector = BasicPassengerCollector.new()
@@ -239,4 +255,5 @@ func set_type(newType : String):
 		var waterCollector = BasicWaterCollector.new()
 		add_producer(waterCollector)
 		workers_needed = 1
+		add_custom_storage({"grey_water" : 100.0})
 	$Label.text = newType

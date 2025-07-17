@@ -41,3 +41,17 @@ func get_trainpos_from_coords(localPos : Vector2) -> Array[int]:
 	var posInCar : int = floor(fmod(offset_from_start, (Globals.car_length + Globals.car_separation)) )
 	var moduleIndex : int = floor(min((posInCar / Globals.module_width), (Globals.modules_per_car - 1)))
 	return [carIndex,moduleIndex]
+
+## Format text to 2dp or last significant figure
+func pretty_print_float(value :  float) -> String:
+	if  abs(value) < 1000:
+		if fmod(abs(value), 1) == 0:               ## If whole number below 1k, just print it
+			return "%d" % value
+		elif abs(value) < 100:                     ## If fractional number below 100, print to 2dp
+			return "%.2f" % value
+		else:
+			return "%.1f" % value    ## If fractional number below 1000, print to 1dp
+	elif abs(value) < 1000000:
+		return "%.2fk" % (value/1000)  ## If number below 1 million, print it as "1.01k"
+	else:
+		return "%.2fm" % (value/1000000) ## If number 1 million or more, print it as "1.01m"
