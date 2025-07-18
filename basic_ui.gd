@@ -2,17 +2,17 @@ extends Control
 
 class_name TrainUI
 
-@onready var selectedTrain : Train = get_parent().find_child("Train")
+@onready var selectedTrain : Train = get_parent().get_node("Train")
 @onready var textbox : LineEdit = find_child("LineEdit")
 var tick_time : float = 0.0
 var tick_timer : Timer = Timer.new()
 
-@onready var worldMap : MapHandler = find_child("WorldMap")
+@onready var worldMap : MapHandler = get_node("WorldMap")
 
-@onready var thoughtsPanel : Panel = find_child("ThoughtsPanel")
-@onready var thoughtsList : ItemList = thoughtsPanel.find_child("ThoughtsList")
+@onready var thoughtsPanel : Panel = get_node("ThoughtsPanel")
+@onready var thoughtsList : ItemList = thoughtsPanel.get_node("ThoughtsList")
 
-@onready var debug_slider : HSlider = find_child("DebugPanel").find_child("DebugSlider")
+@onready var debug_slider : HSlider = get_node("DebugPanel/DebugSlider")
 
 @onready var resource_detail : Panel = null
 
@@ -25,7 +25,7 @@ func do_resource_tick():
 func _ready() -> void:
 	Globals.activeUI = self
 	
-	worldMap.select_new_train(get_parent().find_child("Train"))
+	worldMap.select_new_train(get_parent().get_node("Train"))
 	
 	var update_timer : Timer = Timer.new()
 	add_child(update_timer)
@@ -72,7 +72,6 @@ func setup_hover_signals():
 	foodNode.mouse_exited.connect(_on_mouse_res_leave.bind())
 	partsNode.mouse_exited.connect(_on_mouse_res_leave.bind())
 	scrapNode.mouse_exited.connect(_on_mouse_res_leave.bind())
-	pass
 
 
 func resource_panel_update():
