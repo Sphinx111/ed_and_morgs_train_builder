@@ -1,0 +1,208 @@
+[gd_scene load_steps=4 format=3 uid="uid://v8bo7eebusim"]
+
+[ext_resource type="Script" uid="uid://b7jacurf882n6" path="res://JobsController.gd" id="1_y6gui"]
+[ext_resource type="Script" uid="uid://bcawyma45hflr" path="res://JobPriorityItem.gd" id="2_k76hm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8ylg8"]
+bg_color = Color(0.202976, 0.242735, 0.340223, 1)
+
+[node name="JobsPanel" type="Panel"]
+offset_left = 8.0
+offset_top = 93.0
+offset_right = 378.0
+offset_bottom = 501.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_8ylg8")
+script = ExtResource("1_y6gui")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = 116.0
+offset_bottom = 28.0
+text = "Job Priorities"
+
+[node name="JobPriorityItem" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 40.0
+offset_right = 362.0
+offset_bottom = 65.0
+script = ExtResource("2_k76hm")
+myType = "clean_water"
+
+[node name="IncreasePriority" type="Button" parent="JobPriorityItem"]
+layout_mode = 0
+offset_left = 138.0
+offset_top = 3.0
+offset_right = 176.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "+"
+
+[node name="ReducePriority" type="Button" parent="JobPriorityItem"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 3.0
+offset_right = 198.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="TypeLabel" type="Label" parent="JobPriorityItem"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = -1.0
+offset_right = 97.0
+offset_bottom = 22.0
+text = "clean_water"
+
+[node name="JobPriorityItem2" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 71.0
+offset_right = 362.0
+offset_bottom = 96.0
+script = ExtResource("2_k76hm")
+myType = "scrap"
+
+[node name="IncreasePriority" type="Button" parent="JobPriorityItem2"]
+layout_mode = 0
+offset_left = 138.0
+offset_top = 3.0
+offset_right = 176.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "+"
+
+[node name="ReducePriority" type="Button" parent="JobPriorityItem2"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 3.0
+offset_right = 198.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="TypeLabel" type="Label" parent="JobPriorityItem2"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = -1.0
+offset_right = 97.0
+offset_bottom = 22.0
+text = "clean_water"
+
+[node name="JobPriorityItem3" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 101.0
+offset_right = 362.0
+offset_bottom = 126.0
+script = ExtResource("2_k76hm")
+myType = "mech_parts"
+
+[node name="IncreasePriority" type="Button" parent="JobPriorityItem3"]
+layout_mode = 0
+offset_left = 138.0
+offset_top = 3.0
+offset_right = 176.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "+"
+
+[node name="ReducePriority" type="Button" parent="JobPriorityItem3"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 3.0
+offset_right = 198.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="TypeLabel" type="Label" parent="JobPriorityItem3"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = -1.0
+offset_right = 97.0
+offset_bottom = 22.0
+text = "clean_water"
+
+[node name="JobPriorityItem4" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 131.0
+offset_right = 362.0
+offset_bottom = 156.0
+script = ExtResource("2_k76hm")
+myType = "food1"
+
+[node name="IncreasePriority" type="Button" parent="JobPriorityItem4"]
+layout_mode = 0
+offset_left = 138.0
+offset_top = 3.0
+offset_right = 176.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "+"
+
+[node name="ReducePriority" type="Button" parent="JobPriorityItem4"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 3.0
+offset_right = 198.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="TypeLabel" type="Label" parent="JobPriorityItem4"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = -1.0
+offset_right = 97.0
+offset_bottom = 22.0
+text = "clean_water"
+
+[node name="JobPriorityItem5" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 161.0
+offset_right = 362.0
+offset_bottom = 186.0
+script = ExtResource("2_k76hm")
+myType = "grey_water"
+
+[node name="IncreasePriority" type="Button" parent="JobPriorityItem5"]
+layout_mode = 0
+offset_left = 138.0
+offset_top = 3.0
+offset_right = 176.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "+"
+
+[node name="ReducePriority" type="Button" parent="JobPriorityItem5"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 3.0
+offset_right = 198.0
+offset_bottom = 41.0
+scale = Vector2(0.5, 0.5)
+theme_override_font_sizes/font_size = 21
+text = "-"
+
+[node name="TypeLabel" type="Label" parent="JobPriorityItem5"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = -1.0
+offset_right = 97.0
+offset_bottom = 22.0
+text = "clean_water"

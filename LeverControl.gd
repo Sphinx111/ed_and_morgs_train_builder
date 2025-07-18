@@ -27,7 +27,7 @@ func _input(event: InputEvent) -> void:
 					lastStep = clamp(lastStep, 0, 5)
 					currentStep = clamp(currentStep, 0, 5)
 					var int_to_emit : int = floor(currentStep)
-					position_changed.emit(currentStep)
+					position_changed.emit(int_to_emit)
 		elif event is InputEventMouseMotion:
 			var move : InputEventMouseMotion = event
 			var deltaVector = (move.position - lastMousePos)

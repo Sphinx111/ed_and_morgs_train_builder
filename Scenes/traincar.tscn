@@ -1,13 +1,13 @@
 [gd_scene load_steps=9 format=3 uid="uid://dvfa2mi1q8kyn"]
 
-[ext_resource type="Script" uid="uid://bq288wrgttmyx" path="res://Scenes/GameManager.gd" id="1_o0k6p"]
+[ext_resource type="Script" uid="uid://bq288wrgttmyx" path="res://GameManager.gd" id="1_o0k6p"]
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
 [ext_resource type="PackedScene" uid="uid://b3ph64gipnlm5" path="res://Scenes/world_map.tscn" id="2_ksonv"]
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
 [ext_resource type="PackedScene" uid="uid://cw8ov34j2hlku" path="res://Scenes/passenger.tscn" id="4_d8abk"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
 [ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://BackgroundHandler.gd" id="6_mscei"]
-[ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://LeverControl.tscn" id="6_u0kvb"]
+[ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://Scenes/LeverControl.tscn" id="6_u0kvb"]
 
 [node name="SceneRoot" type="Control"]
 layout_mode = 3
@@ -145,6 +145,7 @@ offset_top = 7.0
 offset_right = 1144.0
 offset_bottom = 38.0
 focus_mode = 0
+toggle_mode = true
 text = "Workers"
 
 [node name="WorldMap" parent="BasicUI" instance=ExtResource("2_ksonv")]
@@ -273,6 +274,7 @@ z_index = -1
 position = Vector2(0, 334)
 
 [connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
+[connection signal="toggled" from="BasicUI/Button" to="BasicUI" method="_on_JobController_open_toggled"]
 [connection signal="pressed" from="BasicUI/DebugPanel/Button" to="BasicUI" method="_on_add_passenger_pressed"]
 [connection signal="drag_ended" from="BasicUI/DebugPanel/DebugSlider" to="BasicUI" method="_on_debug_tick_slider_ended"]
 [connection signal="toggled" from="BasicUI/DebugPanel/CheckButton" to="BasicUI" method="_on_map_toggled"]

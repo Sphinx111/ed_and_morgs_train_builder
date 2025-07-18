@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://6q5oa1s1n37c"]
 
 [ext_resource type="Texture2D" uid="uid://b86lv8hwxa5pn" path="res://images/junction_icon_placeholder.jpg" id="1_je7mr"]
-[ext_resource type="Script" uid="uid://bglyum5ik214v" path="res://Scenes/junction.gd" id="2_xqfnk"]
+[ext_resource type="Script" uid="uid://bglyum5ik214v" path="res://junction.gd" id="2_xqfnk"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_67byq"]
 size = Vector2(1560.91, 1560.91)

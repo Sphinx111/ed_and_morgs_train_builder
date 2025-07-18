@@ -2,7 +2,7 @@ extends Control
 
 class_name TrainUI
 
-@onready var selectedTrain : Train = get_parent().get_node("Train")
+var selectedTrain : Train = null
 @onready var textbox : LineEdit = find_child("LineEdit")
 var tick_time : float = 0.0
 var tick_timer : Timer = Timer.new()
@@ -15,6 +15,8 @@ var tick_timer : Timer = Timer.new()
 @onready var debug_slider : HSlider = get_node("DebugPanel/DebugSlider")
 
 @onready var resource_detail : Panel = null
+var jobsControllerScene : PackedScene = preload("res://Scenes/JobsController.tscn")
+var jobsController : Panel = null
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
@@ -26,6 +28,7 @@ func _ready() -> void:
 	Globals.activeUI = self
 	
 	worldMap.select_new_train(get_parent().get_node("Train"))
+	selectedTrain = get_parent().get_node("Train")
 	
 	var update_timer : Timer = Timer.new()
 	add_child(update_timer)
@@ -247,3 +250,14 @@ func _on_mouse_res_hover(resource_type : String, xPos : float) -> void:
 
 func _on_mouse_res_leave() -> void:
 	resource_detail.hide()
+
+func _on_JobController_open_toggled(toggled_on: bool) -> void:
+	if toggled_on == true:
+		if jobsController == null:
+			jobsController = jobsControllerScene.instantiate()
+			add_child(jobsController)
+			jobsController.init_control()
+		else:
+			jobsController.show()
+	else:
+		jobsController.hide()

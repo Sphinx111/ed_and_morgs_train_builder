@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b6pw7b7tp11ts"]
 
-[ext_resource type="Script" uid="uid://dyem3a2rqpwgy" path="res://Scenes/PassengerPanel.gd" id="1_il4ao"]
+[ext_resource type="Script" uid="uid://dyem3a2rqpwgy" path="res://PassengerPanel.gd" id="1_il4ao"]
 
 [node name="PassengerPanel" type="Panel"]
 offset_left = 10.0
