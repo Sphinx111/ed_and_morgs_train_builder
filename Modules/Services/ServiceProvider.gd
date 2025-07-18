@@ -19,6 +19,13 @@ var waste1_produced : float = 0.0	## Amount of waste produced for 1 unit of need
 func init() -> void:
 	pass
 
+func get_work_types() -> Array[String]:
+	if inputType1 != "" and inputType2 != "":
+		return [inputType1, inputType2]
+	elif inputType1 != "":
+		return [inputType1]
+	return []
+
 func serve_customer(customer : Passenger, train : Train, module : ModuleBase) -> int:
 	var amount_wanted = 1.0
 

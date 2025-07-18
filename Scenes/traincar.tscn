@@ -140,12 +140,12 @@ placeholder_text = "Type instructions here"
 
 [node name="Button" type="Button" parent="BasicUI"]
 layout_mode = 0
-offset_left = 986.0
-offset_top = 56.0
-offset_right = 1145.0
-offset_bottom = 87.0
+offset_left = 1054.0
+offset_top = 7.0
+offset_right = 1144.0
+offset_bottom = 38.0
 focus_mode = 0
-text = "Give Order"
+text = "Workers"
 
 [node name="WorldMap" parent="BasicUI" instance=ExtResource("2_ksonv")]
 position = Vector2(829, 459)
@@ -273,7 +273,6 @@ z_index = -1
 position = Vector2(0, 334)
 
 [connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
-[connection signal="pressed" from="BasicUI/Button" to="BasicUI" method="_on_textinput_press"]
 [connection signal="pressed" from="BasicUI/DebugPanel/Button" to="BasicUI" method="_on_add_passenger_pressed"]
 [connection signal="drag_ended" from="BasicUI/DebugPanel/DebugSlider" to="BasicUI" method="_on_debug_tick_slider_ended"]
 [connection signal="toggled" from="BasicUI/DebugPanel/CheckButton" to="BasicUI" method="_on_map_toggled"]

@@ -24,6 +24,14 @@ var input2_needed : float = 0.0     ## Amount of input type 2 to begin a product
 func init() -> void:
 	pass
 
+## Return array of Strings representing type of work done in module
+func get_work_types() -> Array[String]:
+	if outputType1 != "" and outputType2 != "":
+		return [outputType1, outputType2]
+	elif outputType1 != "":
+		return [outputType1]
+	return []
+
 ## Control function to call each resource tick, must provide MapHandler if resource comes from map
 func produce(train : Train, worker_modifier : float) -> int:
 	var result = Globals.RESULT_OK

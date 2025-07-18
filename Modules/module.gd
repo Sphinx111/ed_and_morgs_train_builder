@@ -31,7 +31,7 @@ var maxCustomers : int = 0
 var producers : Array[ProductionProvider] = [] 
 var workers_needed : int = 0
 var workers : Array[Passenger] = []
-var workType : String = "any"
+var work_types : Array[String] = ["any"]
 
 # Storage Variables
 var storages : Array[GenericStorageProvider] = []
@@ -62,7 +62,7 @@ func can_serve_need(testType : String) -> bool:
 
 func needs_worker(work_type : String) -> bool:
 	if enabled == true:
-		if work_type == "any" and (workers_needed - workers.size()) > 0:
+		if work_type in work_types and (workers_needed - workers.size()) > 0:
 			return true
 	return false
 
@@ -114,11 +114,13 @@ func add_worker(newWorker : Passenger):
 		workers.append(newWorker)
 		$DebugWorkerCount.text = "" + String.num_int64(workers.size())
 		if workers.size() == workers_needed:
-			parentTrain.update_work_map(workType)
+			for workType in work_types:
+				parentTrain.update_work_map(workType)
 
 func remove_worker(newWorker : Passenger):
 	if workers.size() == workers_needed:
-		parentTrain.update_work_map(workType)
+		for workType in work_types:
+			parentTrain.update_work_map(workType)
 	workers.erase(newWorker)
 	$DebugWorkerCount.text = "" + String.num_int64(workers.size())
 
@@ -129,10 +131,12 @@ func add_service(newProvider : ServiceProvider):
 	newProvider.init()	# Setup its initial variables
 	services.append(newProvider)
 	serves_needs.append(newProvider.outputType)
+	work_types.append_array(newProvider.get_work_types())
 
 func add_producer(newProducer : ProductionProvider):
 	newProducer.init()	# Setup initial variables
 	producers.append(newProducer)
+	work_types.append_array(newProducer.get_work_types())
 
 func add_custom_storage(storageDict : Dictionary):
 	var newStorage = GenericStorageProvider.new()
@@ -175,6 +179,7 @@ func reset_module():
 	services = []
 	producers = []
 	serves_needs = []
+	work_types = ["any"]
 	workers_needed = 0
 	$Outline.color = Color.GRAY
 	
@@ -193,6 +198,8 @@ func reset_module():
 func set_type(newType : String):
 	reset_module()                    # Start from state of an 'empty' module
 	self.type = newType
+	if newType == "empty":
+		return
 	if newType == "clean_water":
 		$Outline.color = Color.AQUA
 		var basicWaterProvider = BasicWaterProvider.new()
@@ -257,3 +264,5 @@ func set_type(newType : String):
 		workers_needed = 1
 		add_custom_storage({"grey_water" : 100.0})
 	$Label.text = newType
+	for workType in work_types:
+		parentTrain.update_work_map(workType)

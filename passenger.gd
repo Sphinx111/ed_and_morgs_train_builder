@@ -2,7 +2,7 @@ extends Node2D
 
 class_name Passenger
 
-var manager = null       # Passenger manager script
+var manager : PassengerManager = null       # Passenger manager script
 var parentTrain : Train = null   # Train the passenger is allocated to
 
 var firstname : String = ""
@@ -203,7 +203,7 @@ func check_needs():
 				exit_worker_module()
 
 func check_for_work():
-	targetWork = "any"
+	targetWork = manager.get_next_work_priority()
 	check_current_module()
 
 ## Allows different results from hitting max need. Not all needs will be fatal

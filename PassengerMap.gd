@@ -46,7 +46,11 @@ func resize_maps(change : int):
 	elif change < 0:
 		needsLocations.pop_back()
 		workLocations.pop_back()
-		
+
+func has_work_for_type(testType : String) -> bool:
+	if workMaps.has(testType) and workMaps[testType][0] != 9999:
+		return true
+	return false
 
 func update_single_type_map(needs_type_to_update):
 	needsLocations[needs_type_to_update] = train.get_location_map_for_type(needs_type_to_update)

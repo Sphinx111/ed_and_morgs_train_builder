@@ -13,6 +13,9 @@ var debugRight : Line2D = null
 const firstNamesList = ["David", "Elias", "Jenny", "Emma", "Sally", "Uzbel", "Dmitri", "Janus", "Elise", "Marie"]
 const lastNamesList  = ["Smith", "Jones", "LeClair", "McGilligan", "Cuttier", "Founderson"]
 
+var available_workers : int = 0
+var work_priorities : Array[String]= ["clean_water", "food1", "grey_water", "scrap", "mech_parts", "any"]
+
 func _ready():
 	var firstPassenger : Passenger = find_child("Passenger")
 	passengers.append(firstPassenger)
@@ -40,6 +43,15 @@ func resource_tick():
 		passenger.resource_tick()
 		if passenger.is_dying == true:
 			dying_passengers.append(passenger)
+
+## Find next work priority in priority order, based on what was last checked
+func get_next_work_priority() -> String:
+	var result = "any"
+	var passengerMap : PassengerMap = get_parent().passengerMap
+	for workType in work_priorities:
+		if passengerMap.has_work_for_type(workType):
+			return workType
+	return result
 
 func check_all_needs():
 	for passenger in passengers:
