@@ -31,7 +31,7 @@ var maxCustomers : int = 0
 var producers : Array[ProductionProvider] = [] 
 var workers_needed : int = 0
 var workers : Array[Passenger] = []
-var work_types : Array[String] = ["any"]
+var work_types : Array[String] = []
 
 # Storage Variables
 var storages : Array[GenericStorageProvider] = []
@@ -62,7 +62,7 @@ func can_serve_need(testType : String) -> bool:
 
 func needs_worker(work_type : String) -> bool:
 	if enabled == true:
-		if work_type in work_types and (workers_needed - workers.size()) > 0:
+		if work_types.has(work_type) and (workers_needed - workers.size()) > 0:
 			return true
 	return false
 
@@ -131,12 +131,16 @@ func add_service(newProvider : ServiceProvider):
 	newProvider.init()	# Setup its initial variables
 	services.append(newProvider)
 	serves_needs.append(newProvider.outputType)
-	work_types.append_array(newProvider.get_work_types())
+	for newType in newProvider.get_work_types():
+		if not work_types.has(newType):
+			work_types.append(newType)
 
 func add_producer(newProducer : ProductionProvider):
 	newProducer.init()	# Setup initial variables
 	producers.append(newProducer)
-	work_types.append_array(newProducer.get_work_types())
+	for newType in newProducer.get_work_types():
+		if not work_types.has(newType):
+			work_types.append(newType)
 
 func add_custom_storage(storageDict : Dictionary):
 	var newStorage = GenericStorageProvider.new()

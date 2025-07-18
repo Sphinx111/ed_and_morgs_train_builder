@@ -43,6 +43,7 @@ func _on_job_increase_pressed(cur_index : int):
 	if cur_index == 0:
 		return
 	
+	# Change the local list and displayed list
 	var new_index = cur_index - 1
 	var node_to_swap = priorities[new_index]
 	var current_node = priorities[cur_index]
@@ -50,11 +51,17 @@ func _on_job_increase_pressed(cur_index : int):
 	priorities[cur_index] = node_to_swap
 	current_node._change_index(new_index)
 	node_to_swap._change_index(cur_index)
-	pass
+	
+	# Change the priority list used by passengers
+	var savedValue = passengerManager.work_priorities[new_index]
+	passengerManager.work_priorities[new_index] = current_node.myType
+	passengerManager.work_priorities[cur_index] = savedValue
 
 func _on_job_decrease_pressed(cur_index : int):
 	if cur_index == priorities.size() - 1:
 		return
+	
+	# Change the local list and displayed list
 	var new_index = cur_index + 1
 	var node_to_swap = priorities[new_index]
 	var current_node = priorities[cur_index]
@@ -62,4 +69,8 @@ func _on_job_decrease_pressed(cur_index : int):
 	priorities[cur_index] = node_to_swap
 	current_node._change_index(new_index)
 	node_to_swap._change_index(cur_index)
-	pass
+	
+		# Change the priority list used by passengers
+	var savedValue = passengerManager.work_priorities[new_index]
+	passengerManager.work_priorities[new_index] = current_node.myType
+	passengerManager.work_priorities[cur_index] = savedValue
