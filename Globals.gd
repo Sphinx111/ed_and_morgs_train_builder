@@ -16,6 +16,7 @@ var modules_per_car : int = 4
 
 var train_origin_x = display_width - car_length
 var train_direction = 1
+var train_initial_carriage_count = 3
 
 # Module Variables
 var module_width : float = 50

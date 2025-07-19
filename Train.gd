@@ -51,20 +51,21 @@ var acceleration_per_tick : float = 10.0
 func _ready() -> void:
 	self.position.x = Globals.train_origin_x
 	setup_engine()
-	for i in range(0,3):
-		add_carriage(i)
 	passengerManager = find_child("PassengersManager")
 	passengerManager.position.x -= Globals.car_length + Globals.car_separation
 	
 	if Globals.train_direction < 0:
-		maxXpos = (carriages.size() * (Globals.car_length + Globals.car_separation)) - Globals.car_separation
+		maxXpos = (Globals.train_initial_carriage_count * (Globals.car_length + Globals.car_separation)) - Globals.car_separation
 		minXpos = 0
 	else:
 		#position.x = Globals.train_origin_x
 		maxXpos = 0
-		minXpos = -1 * ((carriages.size() * (Globals.car_length + Globals.car_separation)) - Globals.car_separation)
+		minXpos = -1 * ((Globals.train_initial_carriage_count * (Globals.car_length + Globals.car_separation)) - Globals.car_separation)
 	
 	init_passenger_map()
+	for i in range(0,Globals.train_initial_carriage_count):
+		add_carriage(i)
+	rebuild_passenger_map()
 	worldMap = get_parent().find_child("BasicUI").worldMap
 
 ## Set up engine variables, placeholder for now
@@ -171,6 +172,9 @@ func init_passenger_map():
 	passengerMap = PassengerMap.new()
 	passengerMap.set_train(self)
 	passengerMap.init_maps()
+
+func rebuild_passenger_map():
+	passengerMap.rebuild_maps()
 
 func update_needs_maps(needsArray : Array[String], position : Array[int], newState : int):
 	passengerMap.modify_several_needs_maps(needsArray, position, newState)

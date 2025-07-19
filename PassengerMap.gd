@@ -41,6 +41,27 @@ func set_train(newTrain : Train):
 	train = newTrain
 
 func init_maps():
+	## Setup a blank typed Array for the Locations maps
+	var locsSource : Array = []
+	var locsArray : Array[int] = [0,0,0,0]	## Typed locations placeholder to represent an empty carriage state
+	for i in range(Globals.train_initial_carriage_count):
+		locsSource.append(locsArray)
+
+	## Setup a blank typed array for the Work and Needs maps
+	var mapsSource : Array[int] = []
+	for i in range(Globals.train_initial_carriage_count * Globals.modules_per_car):
+		mapsSource.append(9999)
+
+	for key in needsLocations.keys():
+		needsLocations[key] = locsSource.duplicate()
+	for key in workLocations.keys():
+		workLocations[key] = locsSource.duplicate()
+	for key in needsMaps.keys():
+		needsMaps[key] = mapsSource.duplicate()
+	for key in workMaps.keys():
+		workMaps[key] = mapsSource.duplicate()
+
+func rebuild_maps():
 	for key in needsLocations.keys():
 		needsLocations[key] = train.get_location_map_for_type(key)
 		calc_direction_weights(needsLocations, key, needsMaps)
