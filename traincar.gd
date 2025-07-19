@@ -12,6 +12,7 @@ var luxury : float = 0.0
 # List of modules in the car
 var modules = [null, null, null, null]
 var ModuleScene = preload("res://Scenes/module.tscn")
+var defaultModuleArray = ["clean_water", "farm", "cabin", "passenger_door"]
 
 func _ready():
 	if Globals.train_direction < 0:
@@ -32,6 +33,10 @@ func set_sequence(newSequence : int):
 		position.x = sequence * (Globals.car_length + Globals.car_separation)
 	else: 
 		position.x = 0 - ((sequence + 1) * (Globals.car_length + Globals.car_separation)) - Globals.car_length
+		
+	if newSequence== 0:
+		for i in range(4):
+			init_module(defaultModuleArray[i], i)
 func resource_tick():
 	for module in modules:
 		if module != null:
