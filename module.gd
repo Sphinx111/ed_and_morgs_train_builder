@@ -153,12 +153,13 @@ func add_custom_storage(storageDict : Dictionary):
 ## Cycle through producers and run their production cycle
 func produce_resources():
 	# Producing materials requires workers
-	if workers.size() >= workers_needed:
+	if workers.size() > 0:
 		for producer in producers:
 			var worker_modifier = 1.0
 			if workers_needed > 0:
-				worker_modifier = workers.size() / float(workers_needed)
+				worker_modifier = float(workers.size()) / float(workers_needed)
 			producer.produce(parentTrain, worker_modifier)
+			$DebugProgress.size.y = 50.0 * producer.progress
 
 ## For each customer in the module, run through the repeatable services and attempt to provide them
 func serve_customers():

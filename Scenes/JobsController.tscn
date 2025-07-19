@@ -10,7 +10,7 @@ bg_color = Color(0.202976, 0.242735, 0.340223, 1)
 offset_left = 8.0
 offset_top = 93.0
 offset_right = 378.0
-offset_bottom = 501.0
+offset_bottom = 353.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_8ylg8")
 script = ExtResource("1_y6gui")
 

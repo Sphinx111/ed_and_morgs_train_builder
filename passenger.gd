@@ -115,7 +115,7 @@ func enter_customer_module(target : ModuleBase, attemptNo : int):
 	if target.can_enter(self):
 		if self.is_in_module==false:
 			target.add_customer(self)
-			self.position.y += Globals.car_height
+			self.position.y = Globals.car_height
 			is_in_module = true
 			
 			if passengerPanel != null:
@@ -126,7 +126,7 @@ func enter_worker_module(target : ModuleBase, attemptNo : int):
 	if self.is_in_module==false:
 		if target.worker_can_enter(self):
 			target.add_worker(self)
-			self.position.y -= Globals.car_height
+			self.position.y = Globals.car_height
 			if passengerPanel != null:
 				passengerPanel.actionLabel.text = "working"
 			is_in_module = true
@@ -140,14 +140,14 @@ func exit_customer_module():
 
 ## Used by modules to eject a passenger
 func ejected_from_module():
-	self.position.y -= Globals.car_height
+	self.position.y = 0
 	targetNeed = ""
 	is_in_module = false
 	is_working = false
 
 ## Used by passenger to tell module they're leaving
 func exit_worker_module():
-	self.position.y += Globals.car_height
+	self.position.y = 0
 	targetWork = ""
 	is_in_module = false
 	is_working = false
@@ -155,7 +155,7 @@ func exit_worker_module():
 
 ## Used by modules to eject a worker
 func worker_ejected_from_module():
-	self.show()
+	self.position.y = 0
 	targetWork = ""
 	is_in_module = false
 	is_working = false

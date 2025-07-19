@@ -55,3 +55,9 @@ func pretty_print_float(value :  float) -> String:
 		return "%.2fk" % (value/1000)  ## If number below 1 million, print it as "1.01k"
 	else:
 		return "%.2fm" % (value/1000000) ## If number 1 million or more, print it as "1.01m"
+
+func seconds_to_mm_ss(seconds_float: float) -> String:
+	var seconds : int = floor(seconds_float)
+	var minutes = seconds / 60
+	var remaining_seconds = seconds % 60
+	return "%02d:%02d" % [minutes, remaining_seconds]
