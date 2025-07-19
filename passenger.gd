@@ -151,7 +151,7 @@ func exit_worker_module():
 	targetWork = ""
 	is_in_module = false
 	is_working = false
-	current_module.remove_worker(self)
+	current_module.notify_remove_worker(self)
 
 ## Used by modules to eject a worker
 func worker_ejected_from_module():
@@ -180,7 +180,7 @@ func wants_need(type : String) -> float:
 ## Called to remove itself from any modules, this passenger is about to die
 func cleanup():
 	if is_working and is_in_module:
-		current_module.remove_worker(self)
+		current_module.notify_remove_worker(self)
 	elif is_in_module:
 		current_module.notify_remove_customer(self)
 

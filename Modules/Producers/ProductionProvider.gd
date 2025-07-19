@@ -16,6 +16,7 @@ var input_mode : int = Globals.USE_BOTH	## Defines whether to use both resources
 var inputType1 : String = ""	## Type of resource required to produce
 var input1_needed : float = 0.0     ## Amount of input type 1 to begin a production cycle
 var input1_from_map : bool = false  ## true if resource is taken from world map instead of train
+var max_speed : float = -1         ## If train speed is above this value, module does not produce
 
 var inputType2 : String = ""	## Only set this if there is an inputType1
 var input2_needed : float = 0.0     ## Amount of input type 2 to begin a production cycle
@@ -42,7 +43,7 @@ func produce(train : Train, worker_modifier : float) -> int:
 		elif input_mode == Globals.USE_EITHER:
 			result = start_cycle_either(train, worker_modifier)
 	if progress > 0.0 and progress < 1.0:
-		make_progress(worker_modifier)
+		make_progress(train, worker_modifier)
 	if progress >= 1.0:
 		finish_cycle(train)
 	
@@ -51,7 +52,10 @@ func produce(train : Train, worker_modifier : float) -> int:
 ## Consumes resources and starts cycle
 func start_cycle_both(train : Train, worker_modifier : float) -> int:
 	var result = Globals.RESULT_OK
-	
+
+	if max_speed >= 0 and train.speed > max_speed:
+		return Globals.EXCEEDS_MAX_SPEED
+
 	if inputType1 != "" :
 		var input1_avail = train.get_res(inputType1)
 		if input1_from_map == false:
@@ -78,6 +82,9 @@ func start_cycle_both(train : Train, worker_modifier : float) -> int:
 ## Consumes resources and starts cycle
 func start_cycle_either(train : Train, worker_modifier : float) -> int:
 	var result = Globals.RESULT_OK
+	
+	if max_speed >= 0 and train.speed > max_speed:
+		return Globals.EXCEEDS_MAX_SPEED
 	
 	if inputType1 != "" :
 		var input1_avail = train.get_res(inputType1)
@@ -111,7 +118,10 @@ func start_cycle_either(train : Train, worker_modifier : float) -> int:
 
 
 
-func make_progress(worker_modifier : float):
+func make_progress(train : Train, worker_modifier : float):
+	# Don't make progress if train is above max speed
+	if max_speed >= 0 and train.speed > max_speed:
+		return
 	progress = progress + (worker_modifier / cycleTime)
 
 func finish_cycle(train : Train):

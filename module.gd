@@ -114,14 +114,12 @@ func add_worker(newWorker : Passenger):
 		workers.append(newWorker)
 		$DebugWorkerCount.text = "" + String.num_int64(workers.size())
 		if workers.size() == workers_needed:
-			for workType in work_types:
-				parentTrain.update_work_map(workType)
+			parentCar.update_work_maps(work_types, sequence, Globals.WORKERS_FULL)
 
-func remove_worker(newWorker : Passenger):
+func notify_remove_worker(oldWorker : Passenger):
 	if workers.size() == workers_needed:
-		for workType in work_types:
-			parentTrain.update_work_map(workType)
-	workers.erase(newWorker)
+		parentCar.update_work_maps(work_types, sequence, Globals.WORKERS_HAS_SPACE)
+	workers.erase(oldWorker)
 	$DebugWorkerCount.text = "" + String.num_int64(workers.size())
 
 func _eject_worker(oldWorker : Passenger):
@@ -269,5 +267,4 @@ func set_type(newType : String):
 		workers_needed = 1
 		add_custom_storage({"grey_water" : 100.0})
 	$Label.text = newType
-	for workType in work_types:
-		parentTrain.update_work_map(workType)
+	parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)

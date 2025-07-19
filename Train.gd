@@ -145,6 +145,7 @@ func remove_module(carNum : int, position : int):
 	if carriages.size() <= position or carriages[carNum] == null:
 		print_debug("Error: attempting to remove module from nonexistent car: " + String.num_int64(carNum))
 	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
+	var workTypesToRemove : Array[String] = carriages[carNum].modules[position].work_types.duplicate()
 	var modType = carriages[carNum].modules[position].type
 	var refund : float = ModuleBase.build_cost[modType] * Globals.refund_module_fraction
 	add_res("mech_parts", refund)
@@ -152,8 +153,7 @@ func remove_module(carNum : int, position : int):
 	carriages[carNum].remove_module(position)
 
 	update_needs_maps(typesToRemove,[carNum, position],Globals.MODULE_REMOVED)
-
-	passengerMap.update_single_work_type_map("any")
+	update_work_maps(workTypesToRemove,[carNum, position],Globals.MODULE_REMOVED)
 
 func add_carriage(sequence : int):
 	var newCarriage = CarriageScene.instantiate()
@@ -172,13 +172,11 @@ func init_passenger_map():
 	passengerMap.set_train(self)
 	passengerMap.init_maps()
 
-func update_work_map(workType : String):
-	passengerMap.update_single_work_type_map("any")
-	if workType != "" and workType != "any":
-		passengerMap.update_single_work_type_map(workType)
-
 func update_needs_maps(needsArray : Array[String], position : Array[int], newState : int):
 	passengerMap.modify_several_needs_maps(needsArray, position, newState)
+
+func update_work_maps(workArray : Array[String], position : Array[int], newState : int):
+	passengerMap.modify_several_work_maps(workArray, position, newState)
 
 # Return a simple array of where each type of need can be met for passengers
 func get_location_map_for_type(need_type_to_find : String) -> Array:

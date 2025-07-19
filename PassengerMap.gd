@@ -18,13 +18,24 @@ var needsMaps = {
 }
 
 var workLocations = {
-	"any" : [[]]
+	"any" : [[]],
+	"clean_water" : [[]],
+	"grey_water" : [[]],
+	"food1" : [[]],
+	"mech_parts" : [[]],
+	"scrap" : [[]]
 }
 
 # 1d location array
 var workMaps = {
-	"any" : []
+	"any" : [],
+	"clean_water" : [],
+	"grey_water" : [],
+	"food1" : [],
+	"mech_parts" : [],
+	"scrap" : []
 }
+var traincars : int = 0
 
 func set_train(newTrain : Train):
 	train = newTrain
@@ -43,22 +54,16 @@ func resize_maps(change : int):
 			needsLocations[key].append([9999,9999,9999,9999])
 		for key in workLocations.keys():
 			workLocations[key].append([9999,9999,9999,9999])
+		traincars += 1
 	elif change < 0:
 		needsLocations.pop_back()
 		workLocations.pop_back()
+		traincars -= 1
 
 func has_work_for_type(testType : String) -> bool:
 	if workMaps.has(testType) and workMaps[testType][0] != 9999:
 		return true
 	return false
-
-func update_single_type_map(needs_type_to_update):
-	needsLocations[needs_type_to_update] = train.get_location_map_for_type(needs_type_to_update)
-	calc_direction_weights(needsLocations, needs_type_to_update, needsMaps)
-
-func update_single_work_type_map(work_type_to_update):
-	workLocations[work_type_to_update] = train.get_work_location_map_for_type(work_type_to_update)
-	calc_direction_weights(workLocations, work_type_to_update, workMaps)
 
 func calc_direction_weights(locationsMap : Dictionary, mapType : String, outputDict : Dictionary):
 	# Reads the type map, and builds a vector diagram for each position on the train
@@ -112,10 +117,12 @@ func modify_several_needs_maps(needsArray : Array[String], trainPos : Array[int]
 	for need in needsArray:
 		update_map_segment(needsLocations, need, needsMaps, trainPos, newState)
 
+func modify_several_work_maps(workArray : Array[String], trainPos : Array[int], newState : int):
+	for work_type in workArray:
+		update_map_segment(workLocations, work_type, workMaps, trainPos, newState)
+
+
 func update_map_segment(locationsMap, mapType : String, outputDict, position2d : Array, newState : int):
-	# Placeholder - Just recalculate the entire map until this function works properly
-	#calc_direction_weights(locationsMap, mapType, outputDict)
-	
 	# Update the directions map, limited to the slice of array affected by the changed position
 	var changed_index = Helpers.coords_to_index(position2d)
 	var isLeftmost : bool = false
@@ -228,7 +235,6 @@ func find_next_existing(map_to_search: Array, direction : int, start_index : int
 			return i
 		i += direction
 	return -1
-
 
 func get_direction_from_to(position : Array[int], type : String, mapToUse: String) -> int:
 	var index = -1

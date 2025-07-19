@@ -74,3 +74,6 @@ func get_work_map(work_type_to_find : String) -> Array:
 
 func update_needs_maps(needsArray : Array[String], modulePos : int, newState : int):
 	parentTrain.update_needs_maps(needsArray, [sequence, modulePos], newState)
+
+func update_work_maps(workArray : Array[String], modulePos : int, newState : int):
+	parentTrain.update_work_maps(workArray, [sequence, modulePos], newState)
