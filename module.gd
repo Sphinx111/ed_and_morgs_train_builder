@@ -267,4 +267,5 @@ func set_type(newType : String):
 		workers_needed = 1
 		add_custom_storage({"grey_water" : 100.0})
 	$Label.text = newType
-	parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)
+	if workers_needed > 0:
+		parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)
