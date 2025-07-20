@@ -19,6 +19,7 @@ var home_cabin = null
 var destination : Vector2 = self.position
 var is_in_module : bool = false
 var is_working : bool = false
+var is_on_expedition : bool = false
 
 # Foodtypes and last tick they were eaten on (to track food variety)
 var foodsEaten = {
@@ -70,7 +71,7 @@ func _init_random_needs():
 		needs[key] = randf_range(0.0, 0.5)
 
 func _process(delta) -> void:
-	if is_in_module == false:
+	if is_in_module == false and is_on_expedition == false:
 		destination.x = max(destination.x, parentTrain.minXpos)
 		destination.x = min(destination.x, parentTrain.maxXpos)
 		position = position.move_toward(destination, movespeed * delta * Globals.time_factor)
@@ -185,6 +186,8 @@ func cleanup():
 		current_module.notify_remove_customer(self)
 
 func check_needs():
+	if is_on_expedition == true:
+		return
 	var maxVal : float = 0.0
 	var maxNeed : String = ""
 	for key in needs.keys():
@@ -201,6 +204,11 @@ func check_needs():
 			check_current_module()
 			if is_working and is_in_module:
 				exit_worker_module()
+
+## Used before passengers are sent on an expedition
+func fix_all_needs():
+	for key in needs.keys():
+		needs[key] = 0.0
 
 func check_for_work():
 	targetWork = manager.get_next_work_priority()

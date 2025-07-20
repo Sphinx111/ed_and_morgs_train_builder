@@ -49,6 +49,9 @@ var safety_margins : Dictionary[String, float] = {
 	"clean_water" : 50.0
 }
 
+# Expedition Variables
+var max_expedition_size = 10      # Maximum passengers who can take part in an expedition
+
 # Common icon textures to use for Sprites
 const water_texture : Texture2D = preload("res://images/Water_Icon.png")
 const food_texture : Texture2D = preload("res://images/food_icon.png")

@@ -17,12 +17,18 @@ var tick_timer : Timer = Timer.new()
 @onready var resource_detail : Panel = null
 var jobsControllerScene : PackedScene = preload("res://Scenes/JobsController.tscn")
 var jobsController : Panel = null
+var expeditionsControllerScene : PackedScene = preload("res://Scenes/expeditions_panel.tscn")
+var expeditionsController : ExpeditionsController = null
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
 	resource_panel_update()
 	worldMap.train_step()
 	Globals.game_tick += 1
+	
+	if expeditionsController != null:
+		print("expeditionsController to tick")
+		expeditionsController.train_tick()
 
 func _ready() -> void:
 	Globals.activeUI = self
@@ -261,3 +267,14 @@ func _on_JobController_open_toggled(toggled_on: bool) -> void:
 			jobsController.show()
 	else:
 		jobsController.hide()
+
+
+func _on_ExpeditionsController_open_toggled(toggled_on: bool) -> void:
+	if toggled_on == true:
+		if expeditionsController == null:
+			expeditionsController = expeditionsControllerScene.instantiate()
+			add_child(expeditionsController)
+		else:
+			expeditionsController.show()
+	else:
+		expeditionsController.hide()

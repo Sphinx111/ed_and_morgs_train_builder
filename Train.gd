@@ -78,6 +78,8 @@ func setup_engine():
 func get_res(key : String) -> float:
 	if res.has(key):
 		return res.get(key)
+	if key == "pop":
+		return passengerManager.passengers.size()
 	return 0
 
 ## Function to consume amount if available, returns a status code
@@ -92,8 +94,17 @@ func add_res(key : String, amount : float):
 		res[key] = res[key] + amount
 		if res[key] > max_res[key]:
 			res[key] = max_res[key]    ## For now, just discard any excess resources produced
+	elif res == "pop":
+		for i in range(floor(amount)):
+			passengerManager.add_passenger()
 	else:
 		print_debug("adding resource that doesn't exist: " + key)
+
+func get_expedition_team(passengers_needed : int) -> Array[Passenger]:
+	return passengerManager.get_expedition_passengers(passengers_needed)
+
+func recover_expedition(teamArray : Array[Passenger]):
+	passengerManager.recover_expedition(teamArray)
 
 func amend_storage(type : String, amount : float):
 	if max_res.has(type):

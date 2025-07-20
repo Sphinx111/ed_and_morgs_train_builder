@@ -1,0 +1,99 @@
+[gd_scene load_steps=5 format=3 uid="uid://dqdek7iu3ur87"]
+
+[ext_resource type="Script" uid="uid://cc75o1wfcrxt7" path="res://Scenes/ActiveExpedition.gd" id="1_cve47"]
+[ext_resource type="Texture2D" uid="uid://bhgh5xiobf8gh" path="res://images/Pop_Icon.png" id="2_1t25s"]
+[ext_resource type="Texture2D" uid="uid://dbqhndenl23nt" path="res://images/scrap_icon.png" id="3_w0bwm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bmukf"]
+bg_color = Color(0.198, 0.33, 0, 1)
+
+[node name="ActiveExpedition" type="Panel"]
+offset_left = 2.0
+offset_top = 3.0
+offset_right = 640.0
+offset_bottom = 34.0
+script = ExtResource("1_cve47")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 575.0
+offset_top = 3.0
+offset_right = 634.0
+offset_bottom = 28.0
+theme_override_font_sizes/font_size = 12
+text = "Recall"
+
+[node name="NameLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 49.0
+offset_bottom = 28.0
+text = "Collect Scrap 1"
+
+[node name="ProgressBackground" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 363.0
+offset_top = 3.0
+offset_right = 563.0
+offset_bottom = 28.0
+
+[node name="ProgressBar" type="Panel" parent="ProgressBackground"]
+layout_mode = 0
+offset_bottom = 25.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bmukf")
+
+[node name="TimeLabel" type="Label" parent="ProgressBackground"]
+layout_mode = 0
+offset_left = 82.0
+offset_right = 123.0
+offset_bottom = 23.0
+text = "01:59"
+
+[node name="FetchPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 131.0
+offset_top = 3.0
+offset_right = 301.0
+offset_bottom = 28.0
+
+[node name="PopLabel" type="Label" parent="FetchPanel"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 1.0
+offset_right = 56.0
+offset_bottom = 24.0
+text = "4"
+
+[node name="PopSprite" type="Sprite2D" parent="FetchPanel"]
+position = Vector2(12, 11)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_1t25s")
+
+[node name="Sprite1" type="Sprite2D" parent="FetchPanel"]
+position = Vector2(59, 13)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_w0bwm")
+
+[node name="Sprite2" type="Sprite2D" parent="FetchPanel"]
+visible = false
+position = Vector2(115, 13)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("3_w0bwm")
+
+[node name="Label1" type="Label" parent="FetchPanel"]
+layout_mode = 0
+offset_left = 69.0
+offset_top = 1.0
+offset_right = 103.0
+offset_bottom = 24.0
+text = "0"
+
+[node name="Label2" type="Label" parent="FetchPanel"]
+visible = false
+layout_mode = 0
+offset_left = 127.0
+offset_top = 1.0
+offset_right = 161.0
+offset_bottom = 24.0
+text = "0"

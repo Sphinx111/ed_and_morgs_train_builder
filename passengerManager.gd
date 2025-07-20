@@ -4,6 +4,7 @@ class_name PassengerManager
 
 var passengers : Array[Passenger] = []
 var dying_passengers : Array[Passenger] = []
+var expedition_passengers : Array[Passenger] = []         ## Temporary storage for passengers being removed to go on expeditions
 var dead : Array[Gravestone] = []
 
 var PassengerScene = preload("res://Scenes/passenger.tscn")
@@ -39,10 +40,16 @@ func resource_tick():
 		passenger.queue_free()
 	dying_passengers = []
 
+	for passenger : Passenger in expedition_passengers:
+		passengers.erase(passenger)
+	expedition_passengers = []
+
 	for passenger in passengers:
 		passenger.resource_tick()
 		if passenger.is_dying == true:
 			dying_passengers.append(passenger)
+		if passenger.is_on_expedition == true:
+			expedition_passengers.append(passenger)
 
 ## Find next work priority in priority order, based on what was last checked
 func get_next_work_priority() -> String:
@@ -63,6 +70,23 @@ func add_passenger():
 	add_child(newPass)
 	apply_random_name(newPass)
 	passengers.append(newPass)
+
+func recover_expedition(returning : Array[Passenger]):
+	for passenger in returning:
+		passenger.is_on_expedition = false
+		passenger.show()
+		passengers.append(passenger)
+
+## Select some passengers, mark them as on an expedition, and return an array containing the passenger references
+func get_expedition_passengers(count : int) -> Array[Passenger]:
+	var result : Array[Passenger] = []
+	for i in range(count):
+		passengers[i].cleanup()
+		passengers[i].is_on_expedition = true
+		passengers[i].hide()
+		passengers[i].fix_all_needs()
+		result.append(passengers[i])
+	return result
 
 func apply_random_name(passenger) -> void:
 	var constrainedNamesList = []
