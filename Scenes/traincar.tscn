@@ -231,6 +231,15 @@ offset_right = 123.0
 offset_bottom = 37.0
 text = "Car++"
 
+[node name="ExpeditionsButton" type="Button" parent="BasicUI"]
+layout_mode = 0
+offset_left = 937.0
+offset_top = 7.0
+offset_right = 1050.0
+offset_bottom = 38.0
+toggle_mode = true
+text = "Expeditions"
+
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 340)
 script = ExtResource("1_rq5f1")
@@ -280,5 +289,6 @@ position = Vector2(0, 334)
 [connection signal="toggled" from="BasicUI/DebugPanel/CheckButton" to="BasicUI" method="_on_map_toggled"]
 [connection signal="toggled" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_toggled"]
 [connection signal="pressed" from="BasicUI/DebugPanel/CarButton" to="BasicUI" method="_on_car_button_pressed"]
+[connection signal="toggled" from="BasicUI/ExpeditionsButton" to="BasicUI" method="_on_ExpeditionsController_open_toggled"]
 [connection signal="position_changed" from="Train/LeverControl" to="Train" method="_on_speed_lever_changed"]
 [connection signal="position_changed" from="Train/LeverControl" to="Background" method="set_temp_multiplier"]
