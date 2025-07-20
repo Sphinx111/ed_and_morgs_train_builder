@@ -49,6 +49,13 @@ var safety_margins : Dictionary[String, float] = {
 	"clean_water" : 50.0
 }
 
+# Common icon textures to use for Sprites
+const water_texture : Texture2D = preload("res://images/Water_Icon.png")
+const food_texture : Texture2D = preload("res://images/food_icon.png")
+const mech_parts_texture : Texture2D = preload("res://images/mech_parts_icon.png")
+const scrap_texture : Texture2D = preload("res://images/scrap_icon.png")
+const pop_texture : Texture2D = preload("res://images/Pop_Icon.png")
+
 # manifest values to help with function returns making more sense
 const RESULT_OK = 0
 const RESULT_FATAL = 1

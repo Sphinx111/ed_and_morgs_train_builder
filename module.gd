@@ -151,7 +151,7 @@ func add_custom_storage(storageDict : Dictionary):
 ## Cycle through producers and run their production cycle
 func produce_resources():
 	# Producing materials requires workers
-	if workers.size() > 0:
+	if workers_needed == 0 or workers.size() > 0:
 		for producer in producers:
 			var worker_modifier = 1.0
 			if workers_needed > 0:

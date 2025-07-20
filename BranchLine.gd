@@ -87,7 +87,7 @@ func generate_random_resources():
 
 func request_resources(wantedType : String, collection_margin : float) -> float:
 	for spot in resources:
-		if spot.resource_type == wantedType and abs(spot.progress_ratio - trainMarker.progress_ratio) <= collection_margin: 
+		if spot.resource_type == wantedType and abs(spot.progress - trainMarker.progress) <= collection_margin: 
 			return spot.quantity
 	return 0
 
