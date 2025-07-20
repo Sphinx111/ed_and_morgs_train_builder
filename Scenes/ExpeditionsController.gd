@@ -42,6 +42,7 @@ func train_tick():
 	for toDelete in expeditions_awaiting_cleanup:
 		expeditions_active.erase(toDelete)
 		toDelete.queue_free()
+	expeditions_awaiting_cleanup = []
 	
 
 func complete_expedition(completed : ActiveExpedition):
