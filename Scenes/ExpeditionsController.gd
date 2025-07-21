@@ -12,6 +12,7 @@ const height_of_option : float = 31.0
 const separation_between_options : float = 4.0
 
 signal expeditions_finished 
+signal expeditions_started
 
 func _ready():
 	active_expeditions_panel = get_node("ActiveExpeditionsPanel")
@@ -28,6 +29,7 @@ func _ready():
 	newOption.position.y = (1 * (height_of_option + separation_between_options)) + separation_between_options
 	
 	expeditions_finished.connect(selectedTrain.receive_expeditions_finished_signal)
+	expeditions_started.connect(selectedTrain.receive_expeditions_started_signal)
 	
 
 func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
@@ -43,6 +45,9 @@ func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
 	
 	if can_launch == false:
 		return Globals.NO_RESOURCES
+	
+	if expeditions_active.size() == 0:
+		expeditions_started.emit()
 	
 	for cost in typeToStart.costs:
 		selectedTrain.add_res(cost[0], -cost[1])
@@ -81,4 +86,6 @@ func complete_expedition(completed : ActiveExpedition):
 
 func abandon_expedition(abandoned : ActiveExpedition):
 	expeditions_active.erase(abandoned)
+	if expeditions_active.size() == 0:
+		expeditions_finished.emit()
 	abandoned.queue_free()

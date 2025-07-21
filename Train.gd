@@ -13,6 +13,8 @@ var CarriageScene = preload("res://Scenes/traincar_base.tscn")
 # Pointer to world map so train can track its position in the world
 var worldMap : MapHandler = null
 
+var expedition_safety_flag : bool = false    ## Prevent train leaving if expeditions have been started
+
 # Passenger Navigation Variables
 var passengerMap : PassengerMap = null
 var passengerManager : PassengerManager = null
@@ -121,12 +123,11 @@ func resource_tick():
 	worldMap.is_train_in_sun()
 
 func update_speed():
-	if target_speed > speed:
-		speed = move_toward(speed,target_speed,acceleration_per_tick)
-	elif target_speed < speed:
-		speed = move_toward(speed,target_speed,acceleration_per_tick*5)
-	else:
-		return
+	if expedition_safety_flag == false:
+		if target_speed > speed:
+			speed = move_toward(speed,target_speed,acceleration_per_tick)
+		elif target_speed < speed:
+			speed = move_toward(speed,target_speed,acceleration_per_tick*5)
 
 func add_module(type: String, carNum : int, slot : int):
 	if carNum >= carriages.size() or slot >= Globals.modules_per_car or carriages[carNum] == null:
@@ -213,6 +214,9 @@ func _on_speed_lever_changed(new_position: int) -> void:
 	target_speed = 100.0 * new_position
 	pass # Replace with function body.
 
+func receive_expeditions_started_signal():
+	expedition_safety_flag = true
+
 func receive_expeditions_finished_signal():
-	print_debug("Train has been told expeditions are finished")
+	expedition_safety_flag = false
 	pass
