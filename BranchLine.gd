@@ -93,7 +93,7 @@ func request_resources(wantedType : String, collection_margin : float) -> float:
 
 func gather_resource(wantedType : String, amount : float, collection_margin : float) -> int:
 	for spot in resources:
-		if abs(spot.progress_ratio - trainMarker.progress_ratio) <= collection_margin:
+		if abs(spot.progress - trainMarker.progress) <= collection_margin:
 			if spot.resource_type == wantedType and spot.quantity >= amount:
 				spot.quantity -= amount
 				if spot.quantity < 1:
@@ -105,3 +105,10 @@ func gather_resource(wantedType : String, amount : float, collection_margin : fl
 func get_leftmost_xPos() -> float:
 	var points = curve.get_baked_points()
 	return position.x + (points[0].x * scale.x)
+
+func query_resources_types(collection_margin : float) -> Array[ResourceSpot]:
+	var result : Array[ResourceSpot] = []
+	for spot in resources:
+		if abs(spot.progress - trainMarker.progress) <= collection_margin:
+			result.append(spot)
+	return result

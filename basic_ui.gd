@@ -275,5 +275,6 @@ func _on_ExpeditionsController_open_toggled(toggled_on: bool) -> void:
 			add_child(expeditionsController)
 		else:
 			expeditionsController.show()
+			expeditionsController.refresh_options()
 	else:
 		expeditionsController.hide()

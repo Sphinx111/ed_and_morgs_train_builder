@@ -158,7 +158,9 @@ func remove_module(carNum : int, slot : int):
 	if carriages.size() <= slot or carriages[carNum] == null:
 		print_debug("Error: attempting to remove module from nonexistent car: " + String.num_int64(carNum))
 	var typesToRemove : Array[String] = carriages[carNum].modules[slot].serves_needs.duplicate()
-	var workTypesToRemove : Array[String] = carriages[carNum].modules[slot].work_types.duplicate()
+	var workTypesToRemove : Array[String] = [] 
+	if carriages[carNum].modules[slot].workers_needed > 0:
+		carriages[carNum].modules[slot].work_types.duplicate()
 	var modType = carriages[carNum].modules[slot].type
 	var refund : float = ModuleBase.build_cost[modType] * Globals.refund_module_fraction
 	add_res("mech_parts", refund)
@@ -166,7 +168,8 @@ func remove_module(carNum : int, slot : int):
 	carriages[carNum].remove_module(slot)
 
 	update_needs_maps(typesToRemove,[carNum, slot],Globals.MODULE_REMOVED)
-	update_work_maps(workTypesToRemove,[carNum, slot],Globals.MODULE_REMOVED)
+	if workTypesToRemove.size() > 0:
+		update_work_maps(workTypesToRemove,[carNum, slot],Globals.MODULE_REMOVED)
 
 func add_carriage(sequence : int):
 	var newCarriage = CarriageScene.instantiate()

@@ -40,6 +40,9 @@ func request_resources(wantedType : String) -> float:
 func gather_resource(wantedType : String, amount : float) -> int:
 	return mainRoute.gather_resource(wantedType, amount, collection_margin)
 
+func query_resource_types() -> Array[ResourceSpot]:
+	return mainRoute.query_resources_types(collection_margin)
+
 func is_train_in_sun() -> bool:
 	#print("trainPos: %f sun1pos: %f sun2pos: %f" % [trainMarker.position.x, sun1.position.x, sun2.position.x])
 	if trainMarker.position.x > sun1.position.x and trainMarker.position.x < sun1.position.x + sunradius:

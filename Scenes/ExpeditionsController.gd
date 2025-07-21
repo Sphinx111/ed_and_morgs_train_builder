@@ -19,18 +19,27 @@ func _ready():
 	available_expeditions_panel = get_node("OptionsPanel")
 	selectedTrain = get_parent().selectedTrain
 	
-	var newOption : ExpeditionOption = ExpeditionOption.new_expedition("Fetch Scrap", "scrap", null)
-	options_available.append(newOption)
-	available_expeditions_panel.add_child(newOption)
-	newOption.position.y = (0 * (height_of_option + separation_between_options)) + separation_between_options
-	newOption = ExpeditionOption.new_expedition("Find survivors", "pop", null)
-	options_available.append(newOption)
-	available_expeditions_panel.add_child(newOption)
-	newOption.position.y = (1 * (height_of_option + separation_between_options)) + separation_between_options
-	
 	expeditions_finished.connect(selectedTrain.receive_expeditions_finished_signal)
 	expeditions_started.connect(selectedTrain.receive_expeditions_started_signal)
 	
+	refresh_options()
+
+func refresh_options():
+	var resources_in_range : Array[ResourceSpot] = selectedTrain.worldMap.query_resource_types()
+	
+	for i in range(resources_in_range.size()):
+		var resourceSpot : ResourceSpot = resources_in_range[i]
+		var expedition_name : String = ""
+		if resourceSpot.resource_type == "pop":
+			expedition_name = "Find Survivors"
+		elif resourceSpot.resource_type == "scrap":
+			expedition_name = "Fetch Scrap"
+		
+		if resourceSpot.resource_type == "pop" or resourceSpot.resource_type == "scrap":
+			var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceSpot.resource_type, resourceSpot)
+			options_available.append(newOption)
+			available_expeditions_panel.add_child(newOption)
+			newOption.position.y = (i * (height_of_option + separation_between_options)) + separation_between_options
 
 func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
 	# an expidition can only be launched when the train is stopped
@@ -65,6 +74,7 @@ func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
 
 func train_tick():
 	var initial_count : int = expeditions_active.size()
+
 	for expedition in expeditions_active:
 		expedition.train_tick()
 		if expedition.time_passed >= expedition.total_duration:
