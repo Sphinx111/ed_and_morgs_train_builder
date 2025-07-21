@@ -53,15 +53,14 @@ func init_module(type : String, position : int):
 	if modules[position] != null:
 		newModule.customers  = modules[position].customers
 		newModule.workers  = modules[position].workers
-		newModule.customers 
 		remove_module(position)
 	modules[position] = newModule
 
-func add_module(type : String, position : int):
-	modules[position].set_type(type)
+func add_module(type : String, slot : int):
+	modules[slot].set_type(type)
 
-func remove_module(position: int):
-	modules[position].set_type("empty")
+func remove_module(slot: int):
+	modules[slot].set_type("empty")
 
 func get_type_map(need_type_to_find : String) -> Array:
 	var result = [0,0,0,0]

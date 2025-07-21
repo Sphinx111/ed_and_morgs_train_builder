@@ -28,7 +28,7 @@ func highlight_selection():
 		else:
 			lines[selector].set_active(false)
 
-func switch(viewport : Node, event : InputEvent, shape_idx : int):
+func switch(_viewport : Node, event : InputEvent, _shape_idx : int):
 	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
 		# prevent change if junction is still cooling down
 		if Globals.game_tick < (last_changed_tick + tick_cooldown):

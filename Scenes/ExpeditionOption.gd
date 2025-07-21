@@ -116,10 +116,6 @@ func _ready():
 	
 	controller = get_parent().get_parent()
 	
-	dispatch_button.pressed.connect(_on_dispatch_button_pressed)
-	increase_button.pressed.connect(_on_add_pop_button_pressed)
-	decrease_button.pressed.connect(_on_remove_pop_button_pressed)
-	
 	update_full_option()
 
 ## Update the display using current cost and gain values

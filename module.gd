@@ -45,12 +45,12 @@ func _ready():
 	else:
 		position.x = Globals.car_length - ((sequence + 1) * Globals.module_width)
 
-func can_enter(myPassenger : Passenger) -> bool:
+func can_enter(_myPassenger : Passenger) -> bool:
 	if maxCustomers == 0 or customers.size() < maxCustomers:
 		return true
 	return false
 
-func worker_can_enter(newWorker : Passenger) -> bool:
+func worker_can_enter(_newWorker : Passenger) -> bool:
 	if enabled == false or workers.size() >= workers_needed:
 		return false
 	return true

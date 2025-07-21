@@ -24,7 +24,7 @@ func _ready():
 	debugLeft = $DebugLeft
 	debugRight = $DebugRight
 
-func _process(delta : float):
+func _process(_delta : float):
 	if passengers.size() > 0:
 		debugLeft.position.x = passengers[0].last_module_pos
 		debugRight.position.x = passengers[0].next_module_pos

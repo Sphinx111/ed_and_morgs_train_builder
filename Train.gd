@@ -128,9 +128,9 @@ func update_speed():
 	else:
 		return
 
-func add_module(type: String, carNum : int, position : int):
-	if carNum >= carriages.size() or position >= Globals.modules_per_car or carriages[carNum] == null:
-		print_debug("Error: Invalid Build position: " + String.num_int64(carNum) + ":" + String.num_int64(position))
+func add_module(type: String, carNum : int, slot : int):
+	if carNum >= carriages.size() or slot >= Globals.modules_per_car or carriages[carNum] == null:
+		print_debug("Error: Invalid Build slot: " + String.num_int64(carNum) + ":" + String.num_int64(slot))
 		return
 	
 	if type != "empty":
@@ -138,11 +138,11 @@ func add_module(type: String, carNum : int, position : int):
 		if gather_res("mech_parts", cost) == Globals.NO_RESOURCES:
 			return
 	
-	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
-	carriages[carNum].add_module(type, position)
+	var typesToRemove : Array[String] = carriages[carNum].modules[slot].serves_needs.duplicate()
+	carriages[carNum].add_module(type, slot)
 	
-	update_needs_maps(carriages[carNum].modules[position].serves_needs,[carNum, position],Globals.MODULE_ADDED)
-	update_needs_maps(typesToRemove,[carNum, position],Globals.MODULE_REMOVED)
+	update_needs_maps(carriages[carNum].modules[slot].serves_needs,[carNum, slot],Globals.MODULE_ADDED)
+	update_needs_maps(typesToRemove,[carNum, slot],Globals.MODULE_REMOVED)
 
 ## Add a new car to the end of the train
 func add_car():
@@ -153,19 +153,19 @@ func add_car():
 	elif Globals.train_direction < 0:
 		maxXpos += Globals.car_length + Globals.car_separation
 
-func remove_module(carNum : int, position : int):
-	if carriages.size() <= position or carriages[carNum] == null:
+func remove_module(carNum : int, slot : int):
+	if carriages.size() <= slot or carriages[carNum] == null:
 		print_debug("Error: attempting to remove module from nonexistent car: " + String.num_int64(carNum))
-	var typesToRemove : Array[String] = carriages[carNum].modules[position].serves_needs.duplicate()
-	var workTypesToRemove : Array[String] = carriages[carNum].modules[position].work_types.duplicate()
-	var modType = carriages[carNum].modules[position].type
+	var typesToRemove : Array[String] = carriages[carNum].modules[slot].serves_needs.duplicate()
+	var workTypesToRemove : Array[String] = carriages[carNum].modules[slot].work_types.duplicate()
+	var modType = carriages[carNum].modules[slot].type
 	var refund : float = ModuleBase.build_cost[modType] * Globals.refund_module_fraction
 	add_res("mech_parts", refund)
 	
-	carriages[carNum].remove_module(position)
+	carriages[carNum].remove_module(slot)
 
-	update_needs_maps(typesToRemove,[carNum, position],Globals.MODULE_REMOVED)
-	update_work_maps(workTypesToRemove,[carNum, position],Globals.MODULE_REMOVED)
+	update_needs_maps(typesToRemove,[carNum, slot],Globals.MODULE_REMOVED)
+	update_work_maps(workTypesToRemove,[carNum, slot],Globals.MODULE_REMOVED)
 
 func add_carriage(sequence : int):
 	var newCarriage = CarriageScene.instantiate()

@@ -112,7 +112,7 @@ func check_current_module():
 		if current_module.needs_worker(targetWork):
 			enter_worker_module(current_module, 1)
 
-func enter_customer_module(target : ModuleBase, attemptNo : int):
+func enter_customer_module(target : ModuleBase, _attemptNo : int):
 	if target.can_enter(self):
 		if self.is_in_module==false:
 			target.add_customer(self)
@@ -123,7 +123,7 @@ func enter_customer_module(target : ModuleBase, attemptNo : int):
 				passengerPanel.actionLabel.text = "being served"
 			#current_module = target
 
-func enter_worker_module(target : ModuleBase, attemptNo : int):
+func enter_worker_module(target : ModuleBase, _attemptNo : int):
 	if self.is_in_module==false:
 		if target.worker_can_enter(self):
 			target.add_worker(self)
@@ -286,6 +286,6 @@ func show_passenger_panel():
 		passengerPanel.queue_free()
 		passengerPanel = null
 
-func _on_area_2d_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
+func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
 		show_passenger_panel()
