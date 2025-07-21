@@ -29,9 +29,9 @@ func select_new_train(newTrain : Train):
 	selectedTrain = newTrain
 
 func train_step():
-	mainRoute.update_trainPos(selectedTrain.speed * local_to_global_speed_conversion * Globals.time_factor)
-	sun1.progress -= sunspeed * Globals.time_factor
-	sun2.progress -= sunspeed * Globals.time_factor
+	mainRoute.update_trainPos(selectedTrain.speed * local_to_global_speed_conversion)
+	sun1.progress -= sunspeed
+	sun2.progress -= sunspeed
 	update_time_to_sun()
 
 func request_resources(wantedType : String) -> float:

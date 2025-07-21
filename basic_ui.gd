@@ -27,7 +27,6 @@ func do_resource_tick():
 	Globals.game_tick += 1
 	
 	if expeditionsController != null:
-		print("expeditionsController to tick")
 		expeditionsController.train_tick()
 
 func _ready() -> void:

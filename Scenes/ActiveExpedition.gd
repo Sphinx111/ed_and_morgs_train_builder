@@ -10,6 +10,7 @@ var total_duration : int = 0
 var travel_time : int = 0
 var time_passed : int = 0
 var collection_time : int = 0
+var resource_spot : ResourceSpot = null
 
 var target_resources : Array = []
 var resources_gathered : Dictionary = {}
@@ -30,6 +31,7 @@ var label1 : Label = null
 var label2 : Label = null
 var time_label : Label = null
 var progress_bar : Panel = null
+var return_button : Button = null
 
 static func new_expedition(index : int, optionSelected : ExpeditionOption, passengersArray : Array[Passenger]):
 	var new_expedition : ActiveExpedition = my_scene.instantiate()
@@ -40,6 +42,7 @@ static func new_expedition(index : int, optionSelected : ExpeditionOption, passe
 	new_expedition.travel_time = optionSelected.travel_time
 	new_expedition.target_resources = optionSelected.max_gain
 	new_expedition.passengers = passengersArray
+	new_expedition.resource_spot = optionSelected.resource_spot
 	return new_expedition
 
 func _ready():
@@ -53,6 +56,8 @@ func _ready():
 	time_label = get_node("ProgressBackground/TimeLabel")
 	progress_bar = get_node("ProgressBackground/ProgressBar")
 	progress_background_width = get_node("ProgressBackground").size.x
+	return_button = get_node("ReturnButton")
+	return_button.pressed.connect(_on_return_button_pressed)
 	collection_time = total_duration - (2 * travel_time)
 	
 	self.name_label.text = "%s %d" % [original_name, index]
@@ -80,7 +85,7 @@ func train_tick():
 	if time_passed >= travel_time and time_passed < (total_duration - travel_time):
 		collect_resources()
 	self.time_label.text = "%s" % Helpers.seconds_to_mm_ss(total_duration - time_passed)
-	progress_bar.size.x += (progress_background_width / total_duration)
+	progress_bar.size.x = (progress_background_width / total_duration * time_passed)
 
 func collect_resources():
 	for i in range(target_resources.size()):
@@ -97,3 +102,12 @@ func collect_resources():
 			label1.text = Helpers.pretty_print_float(resources_gathered[resourceType])
 		elif i == 1:
 			label2.text = Helpers.pretty_print_float(resources_gathered[resourceType])
+
+func _on_return_button_pressed():
+	time_passed = travel_time + collection_time
+	return_button.text = "Abandon"
+	return_button.pressed.disconnect(_on_return_button_pressed)
+	return_button.pressed.connect(_on_abandon_button_pressed)
+
+func _on_abandon_button_pressed():
+	get_parent().get_parent().abandon_expedition(self)

@@ -7,12 +7,34 @@ var expeditions_active : Array[ActiveExpedition] = []
 var expeditions_awaiting_cleanup : Array[ActiveExpedition] = []
 var selectedTrain : Train = null
 var active_expeditions_panel : Panel = null
+var available_expeditions_panel : Panel = null
+const height_of_option : float = 31.0
+const separation_between_options : float = 4.0
+
+signal expeditions_finished 
 
 func _ready():
 	active_expeditions_panel = get_node("ActiveExpeditionsPanel")
+	available_expeditions_panel = get_node("OptionsPanel")
 	selectedTrain = get_parent().selectedTrain
+	
+	var newOption : ExpeditionOption = ExpeditionOption.new_expedition("Fetch Scrap", "scrap", null)
+	options_available.append(newOption)
+	available_expeditions_panel.add_child(newOption)
+	newOption.position.y = (0 * (height_of_option + separation_between_options)) + separation_between_options
+	newOption = ExpeditionOption.new_expedition("Find survivors", "pop", null)
+	options_available.append(newOption)
+	available_expeditions_panel.add_child(newOption)
+	newOption.position.y = (1 * (height_of_option + separation_between_options)) + separation_between_options
+	
+	expeditions_finished.connect(selectedTrain.receive_expeditions_finished_signal)
+	
 
-func dispatch_expedition(typeToStart : ExpeditionOption):
+func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
+	# an expidition can only be launched when the train is stopped
+	if selectedTrain.speed > 0:
+		return Globals.EXCEEDS_MAX_SPEED
+	
 	# Check if there are sufficient resources to launch the expedition
 	var can_launch : bool = true
 	for cost in typeToStart.costs:
@@ -22,6 +44,9 @@ func dispatch_expedition(typeToStart : ExpeditionOption):
 	if can_launch == false:
 		return Globals.NO_RESOURCES
 	
+	for cost in typeToStart.costs:
+		selectedTrain.add_res(cost[0], -cost[1])
+	
 	var index_to_use : int = 1
 	for expedition in expeditions_active:
 		if expedition.original_name == typeToStart.display_name:
@@ -30,9 +55,11 @@ func dispatch_expedition(typeToStart : ExpeditionOption):
 	var new_expedition : ActiveExpedition = ActiveExpedition.new_expedition(index_to_use, typeToStart, passengersArray)
 	expeditions_active.append(new_expedition)
 	active_expeditions_panel.add_child(new_expedition)
+	new_expedition.position.y = ((expeditions_active.size() - 1) * (height_of_option + separation_between_options)) + separation_between_options
 	return Globals.RESULT_OK
 
 func train_tick():
+	var initial_count : int = expeditions_active.size()
 	for expedition in expeditions_active:
 		expedition.train_tick()
 		if expedition.time_passed >= expedition.total_duration:
@@ -44,9 +71,14 @@ func train_tick():
 		toDelete.queue_free()
 	expeditions_awaiting_cleanup = []
 	
+	if initial_count > 0 and expeditions_active.size() == 0:
+		expeditions_finished.emit()              ## If we have just finished all expeditions, emit a signal
 
 func complete_expedition(completed : ActiveExpedition):
 	for key in completed.resources_gathered.keys():
 		selectedTrain.add_res(key, completed.resources_gathered[key])
 	selectedTrain.recover_expedition(completed.passengers)
-	
+
+func abandon_expedition(abandoned : ActiveExpedition):
+	expeditions_active.erase(abandoned)
+	abandoned.queue_free()

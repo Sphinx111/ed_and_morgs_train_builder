@@ -94,7 +94,7 @@ func add_res(key : String, amount : float):
 		res[key] = res[key] + amount
 		if res[key] > max_res[key]:
 			res[key] = max_res[key]    ## For now, just discard any excess resources produced
-	elif res == "pop":
+	elif key == "pop":
 		for i in range(floor(amount)):
 			passengerManager.add_passenger()
 	else:
@@ -209,7 +209,10 @@ func get_work_location_map_for_type(work_type_to_find : String) -> Array:
 	
 	return result
 
-
 func _on_speed_lever_changed(new_position: int) -> void:
 	target_speed = 100.0 * new_position
 	pass # Replace with function body.
+
+func receive_expeditions_finished_signal():
+	print_debug("Train has been told expeditions are finished")
+	pass
