@@ -19,6 +19,7 @@ var jobsControllerScene : PackedScene = preload("res://Scenes/JobsController.tsc
 var jobsController : Panel = null
 var expeditionsControllerScene : PackedScene = preload("res://Scenes/expeditions_panel.tscn")
 var expeditionsController : ExpeditionsController = null
+var backgroundController : BackgroundManager = null
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
@@ -28,6 +29,8 @@ func do_resource_tick():
 	
 	if expeditionsController != null:
 		expeditionsController.train_tick()
+	
+	backgroundController.update_sun_state()
 
 func _ready() -> void:
 	Globals.activeUI = self
@@ -53,6 +56,8 @@ func _ready() -> void:
 	resource_detail = get_node("ResourcePanel/ResourceDetailPanel")
 	resource_detail.hide()
 	setup_hover_signals()
+	
+	backgroundController = get_parent().get_node("Background")
 	
 func setup_hover_signals():
 	var speedNode : RichTextLabel = get_node("ResourcePanel/Speed")

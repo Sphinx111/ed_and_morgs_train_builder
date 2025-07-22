@@ -282,6 +282,14 @@ position = Vector2(2, 415)
 z_index = -1
 position = Vector2(0, 334)
 
+[node name="Sunbeam" type="ColorRect" parent="Background"]
+offset_left = 638.0
+offset_top = 650.0
+offset_right = 678.0
+offset_bottom = 1301.0
+rotation = 3.14159
+color = Color(1, 1, 0, 0.619608)
+
 [connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
 [connection signal="toggled" from="BasicUI/Button" to="BasicUI" method="_on_JobController_open_toggled"]
 [connection signal="pressed" from="BasicUI/DebugPanel/Button" to="BasicUI" method="_on_add_passenger_pressed"]

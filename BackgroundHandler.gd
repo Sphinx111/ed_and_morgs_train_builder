@@ -1,6 +1,6 @@
 extends Node2D
 
-class_name Background
+class_name BackgroundManager
 
 var rockImg = preload("res://images/Rock1.png")
 
@@ -15,6 +15,7 @@ var background_height = $BackgroundLayer.position.y
 var fg = $ForegroundLayer
 @onready
 var bg = $BackgroundLayer
+@onready var sunbeam = $Sunbeam
 
 var reference_speed : float = 100.00
 var train : Train = null
@@ -50,3 +51,12 @@ func _process(delta : float):
 		if rock.position.x < -20 or rock.position.x > Globals.display_width + 120:
 			if Globals.train_direction > 0: rock.position.x = Globals.display_width + randf_range(50, 110)
 			elif Globals.train_direction < 0: rock.position.x = 0 - randf_range(50, 120)
+
+func update_sun_state():
+	var sun_height : float = train.worldMap.get_sun_height_for_train()
+	if sun_height <= -1:
+		sunbeam.hide()
+	else:
+		sunbeam.show()
+		sunbeam.rotation = (1 * PI) - ((0.5 * PI) * sun_height)
+	pass

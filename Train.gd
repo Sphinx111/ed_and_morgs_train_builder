@@ -120,7 +120,6 @@ func resource_tick():
 			carriage.resource_tick()
 	passengerManager.resource_tick()
 	update_speed()
-	worldMap.is_train_in_sun()
 
 func update_speed():
 	if expedition_safety_flag == false:
