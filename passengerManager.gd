@@ -86,6 +86,8 @@ func get_expedition_passengers(count : int) -> Array[Passenger]:
 		passengers[i].hide()
 		passengers[i].fix_all_needs()
 		result.append(passengers[i])
+	for passenger in result:
+		passengers.erase(passenger)
 	return result
 
 func apply_random_name(passenger) -> void:

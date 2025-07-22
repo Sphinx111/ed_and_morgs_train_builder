@@ -180,10 +180,14 @@ func wants_need(type : String) -> float:
 
 ## Called to remove itself from any modules, this passenger is about to die
 func cleanup():
+	position.y = 0
 	if is_working and is_in_module:
 		current_module.notify_remove_worker(self)
+		is_working = false
+		is_in_module = false
 	elif is_in_module:
 		current_module.notify_remove_customer(self)
+		is_in_module = false
 
 func check_needs():
 	if is_on_expedition == true:

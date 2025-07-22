@@ -27,6 +27,10 @@ func _ready():
 func refresh_options():
 	var resources_in_range : Array[ResourceSpot] = selectedTrain.worldMap.query_resource_types()
 	
+	for child in available_expeditions_panel.get_children():
+		if child is ExpeditionOption:
+			child.queue_free()
+	
 	for i in range(resources_in_range.size()):
 		var resourceSpot : ResourceSpot = resources_in_range[i]
 		var expedition_name : String = ""

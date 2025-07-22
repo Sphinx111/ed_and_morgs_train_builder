@@ -283,10 +283,10 @@ z_index = -1
 position = Vector2(0, 334)
 
 [node name="Sunbeam" type="ColorRect" parent="Background"]
-offset_left = 638.0
-offset_top = 650.0
-offset_right = 678.0
-offset_bottom = 1301.0
+offset_left = 618.0
+offset_top = 657.0
+offset_right = 638.0
+offset_bottom = 1625.0
 rotation = 3.14159
 color = Color(1, 1, 0, 0.619608)
 
