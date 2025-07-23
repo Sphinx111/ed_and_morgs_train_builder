@@ -1,10 +1,9 @@
-[gd_scene load_steps=9 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=8 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bq288wrgttmyx" path="res://GameManager.gd" id="1_o0k6p"]
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
 [ext_resource type="PackedScene" uid="uid://b3ph64gipnlm5" path="res://Scenes/world_map.tscn" id="2_ksonv"]
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
-[ext_resource type="PackedScene" uid="uid://cw8ov34j2hlku" path="res://Scenes/passenger.tscn" id="4_d8abk"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
 [ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://BackgroundHandler.gd" id="6_mscei"]
 [ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://Scenes/LeverControl.tscn" id="6_u0kvb"]
@@ -248,8 +247,6 @@ script = ExtResource("1_rq5f1")
 z_index = 1
 position = Vector2(0, 78)
 script = ExtResource("3_ksonv")
-
-[node name="Passenger" parent="Train/PassengersManager" instance=ExtResource("4_d8abk")]
 
 [node name="DebugRight" type="Line2D" parent="Train/PassengersManager"]
 position = Vector2(50, 0)

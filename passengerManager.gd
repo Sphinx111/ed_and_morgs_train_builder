@@ -11,16 +11,15 @@ var PassengerScene = preload("res://Scenes/passenger.tscn")
 var debugLeft : Line2D = null
 var debugRight : Line2D = null
 
-const firstNamesList = ["David", "Elias", "Jenny", "Emma", "Sally", "Uzbel", "Dmitri", "Janus", "Elise", "Marie"]
-const lastNamesList  = ["Smith", "Jones", "LeClair", "McGilligan", "Cuttier", "Founderson"]
+const firstNamesList = ["David", "Elias", "Jenny", "Emma", "Sally", "Uzbel", "Dmitri", "Janus", "Elise", "Marie", "Jonathan", "Bruce", "Eliza"]
+const lastNamesList  = ["Smith", "Jones", "LeClair", "McGilligan", "Cuttier", "Founderson", "Embraer", "Einstein", "Damon", "Cruise"]
 
 var available_workers : int = 0
 var work_priorities : Array[String]= ["clean_water", "food1", "grey_water", "scrap", "mech_parts", "any"]
 
 func _ready():
-	var firstPassenger : Passenger = find_child("Passenger")
-	passengers.append(firstPassenger)
-	apply_random_name(firstPassenger)
+	for i in range(Globals.passengers_initial_count):
+		add_passenger()
 	debugLeft = $DebugLeft
 	debugRight = $DebugRight
 

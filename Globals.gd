@@ -28,6 +28,7 @@ var scrap_to_mech_ratio : float = 0.2 # 5 Scrap to make 1 mech parts
 var water_purification_efficiency : float = 0.9
 
 # Passenger Variables
+var passengers_initial_count : int = 4
 var passenger_debug : bool = true
 var passenger_consume_threshold : float = 0.6
 var passenger_seeks_threshold : float = 0.65
