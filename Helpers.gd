@@ -3,14 +3,29 @@ extends Node
 func round_to_dec(num, digit):
 	return round(num * pow(10.0, digit)) / pow(10.0, digit)
 
-func exceeds_safety_margin(type : String, amount : float = 0.0) -> int:	# compare a resource to the margins and return SAFETY_CUTOFF if amount is below margin
-	if type == "grey_water":
-		type = "clean_water"
-	if Globals.safety_margins.has(type):
-		if amount > Globals.safety_margins.get(type):
+## Check if the proposed spend would break safety cutoff rules for the provided train
+func exceeds_safety_margin(train : Train, consumeType : String, produceType1 : String, produceType2 : String, amount : float = 0.0) -> int:	# compare a resource to the margins and return SAFETY_CUTOFF if amount is below margin
+	# Always allow grey and black water to be purified into clean
+	if produceType1 == "clean_water" or produceType2 == "clean_water":
+		if consumeType == "black_water" or consumeType == "grey_water":
 			return Globals.RESULT_OK
-		else:
+	
+	if train.res.has(consumeType) == false:
+		return Globals.RESULT.OK
+	
+	if Globals.safety_margins.has(consumeType) == true:
+		var trainHas : float = train.get_res(consumeType)
+		if trainHas - amount <= Globals.safety_margins[consumeType]:
 			return Globals.SAFETY_CUTOFF
+
+	# If train is consuming grey water at this point, and so far is ok, also check if there is a shortage of clean water
+	if consumeType == "grey_water":
+		var train_clean_water = train.get_res("clean_water")
+		if train_clean_water - amount <= Globals.safety_margins["clean_water"]:
+			print_debug("Preventing consumption of grey_water, its needed for purification")
+			return Globals.SAFETY_CUTOFF
+		
+
 	return Globals.RESULT_OK
 
 ## Convert a [carPos,modulePos] position into a flat index value

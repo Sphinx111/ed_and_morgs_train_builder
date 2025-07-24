@@ -175,7 +175,7 @@ func resource_tick():
 
 func wants_need(type : String) -> float:
 	if needs.has(type):
-		return (1.0 - needs[type])
+		return (needs[type])
 	return 0.0
 
 ## Called to remove itself from any modules, this passenger is about to die

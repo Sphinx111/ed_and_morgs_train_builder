@@ -59,12 +59,12 @@ func start_cycle_both(train : Train, worker_modifier : float) -> int:
 	if inputType1 != "" :
 		var input1_avail = train.get_res(inputType1)
 		if input1_from_map == false:
-			result = Helpers.exceeds_safety_margin(inputType1, input1_avail - input1_needed)
+			result = Helpers.exceeds_safety_margin(train, inputType1, outputType1, outputType2, input1_needed)
 			if input1_avail < input1_needed:
 				result = Globals.NO_RESOURCES
 				if result == Globals.RESULT_OK and inputType2 != "":
 					var input2_avail = train.get_res(inputType2)
-					result = Helpers.exceeds_safety_margin(inputType2, input2_avail - input2_needed)
+					result = Helpers.exceeds_safety_margin(train, inputType1, outputType1, outputType2, input1_needed)
 					if input2_avail < input2_needed:
 						result = Globals.NO_RESOURCES
 		elif input1_from_map == true:       # if input1 is from the map, it consumes it at this step
@@ -89,7 +89,7 @@ func start_cycle_either(train : Train, worker_modifier : float) -> int:
 	if inputType1 != "" :
 		var input1_avail = train.get_res(inputType1)
 		if input1_from_map == false:
-			result = Helpers.exceeds_safety_margin(inputType1, input1_avail - input1_needed)
+			result = Helpers.exceeds_safety_margin(train, inputType1, outputType1, outputType2, input1_needed)
 			if input1_avail < input1_needed:
 				result = Globals.NO_RESOURCES
 		elif input1_from_map == true:       # if input1 is from the map, it consumes it at this step
@@ -104,10 +104,10 @@ func start_cycle_either(train : Train, worker_modifier : float) -> int:
 	# Only consume resource2 if resource1 is not available
 	if result != Globals.RESULT_OK:
 		if inputType2 != "":
-					var input2_avail = train.get_res(inputType2)
-					result = Helpers.exceeds_safety_margin(inputType2, input2_avail - input2_needed)
-					if input2_avail < input2_needed:
-						result = Globals.NO_RESOURCES
+			result = Helpers.exceeds_safety_margin(train, inputType1, outputType1, outputType2, input1_needed)
+			var input2_avail = train.get_res(inputType2)
+			if input2_avail < input2_needed:
+				result = Globals.NO_RESOURCES
 
 	if result == Globals.RESULT_OK:
 		if inputType2 != "":

@@ -205,9 +205,9 @@ func set_type(newType : String):
 		return
 	if newType == "clean_water":
 		$Outline.color = Color.AQUA
-		var basicWaterProvider = BasicWaterProvider.new()
-		add_service(basicWaterProvider)
-		maxCustomers = 4
+		#var basicWaterProvider = BasicWaterProvider.new()
+		#add_service(basicWaterProvider)
+		#maxCustomers = 4
 		
 		# Setup production
 		var basicCleanWaterProducer = BasicCleanWaterProducer.new()
@@ -226,9 +226,9 @@ func set_type(newType : String):
 	elif newType == "kitchen":
 		$Outline.color = Color.BISQUE
 		var basicFoodProvider = BasicFoodProvider.new()
-		var basicWaterProvider = BasicWaterProvider.new()
+		var fastWaterProvider = FastWaterProvider.new()
 		add_service(basicFoodProvider)
-		add_service(basicWaterProvider)
+		add_service(fastWaterProvider)
 		add_custom_storage({"clean_water" : 20.0,"food1" : 10.0,"food2" : 10.0})
 		maxCustomers = 10
 	elif newType == "farm":

@@ -46,7 +46,7 @@ var need_growth_rates : Dictionary[String, float] = {
 
 # Resource storage variables
 # Minimum values to leave when doing production cycles
-var safety_margins : Dictionary[String, float] = {
+var safety_margins : Dictionary = {
 	"clean_water" : 50.0
 }
 
