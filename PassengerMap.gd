@@ -23,7 +23,8 @@ var workLocations = {
 	"grey_water" : [[]],
 	"food1" : [[]],
 	"mech_parts" : [[]],
-	"scrap" : [[]]
+	"scrap" : [[]],
+	"fuel" : [[]]
 }
 
 # 1d location array
@@ -33,7 +34,8 @@ var workMaps = {
 	"grey_water" : [],
 	"food1" : [],
 	"mech_parts" : [],
-	"scrap" : []
+	"scrap" : [],
+	"fuel" : []
 }
 var traincars : int = 0
 

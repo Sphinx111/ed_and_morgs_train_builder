@@ -17,7 +17,8 @@ const build_cost : Dictionary[String, float] = {
 	"kitchen" : 5.0,
 	"cabin" : 2.0,
 	"passenger_door" : 5.0,
-	"water_collector" : 25.0
+	"water_collector" : 25.0,
+	"fuel_refinery" : 50.0
 }
 
 # Service variables
@@ -266,6 +267,11 @@ func set_type(newType : String):
 		add_producer(waterCollector)
 		workers_needed = 1
 		add_custom_storage({"grey_water" : 100.0})
+	elif newType == "fuel_refinery":
+		$Outline.color = Color.DARK_SLATE_GRAY
+		workers_needed = 8
+		var fuelProducer = BasicFuelProducer.new()
+		add_custom_storage({"oil" : 100.0, "fuel" : 100.0})
 	$Label.text = newType
 	if workers_needed > 0:
 		parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)

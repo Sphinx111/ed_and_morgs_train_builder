@@ -98,6 +98,15 @@ text = "Scrap:
 0"
 fit_content = true
 
+[node name="Oil" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
+layout_mode = 0
+offset_left = 602.0
+offset_right = 638.0
+offset_bottom = 46.0
+text = "Oil:
+0"
+fit_content = true
+
 [node name="Food" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
 layout_mode = 0
 offset_left = 409.0
