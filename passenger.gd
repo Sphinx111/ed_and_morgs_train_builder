@@ -116,7 +116,7 @@ func enter_customer_module(target : ModuleBase, _attemptNo : int):
 	if target.can_enter(self):
 		if self.is_in_module==false:
 			target.add_customer(self)
-			self.position.y = Globals.car_height
+			self.position.y -= 20 + (randf()*30) #Globals.car_height
 			is_in_module = true
 			
 			if passengerPanel != null:
@@ -127,7 +127,7 @@ func enter_worker_module(target : ModuleBase, _attemptNo : int):
 	if self.is_in_module==false:
 		if target.worker_can_enter(self):
 			target.add_worker(self)
-			self.position.y = Globals.car_height
+			self.position.y = 20+ (randf()*30) #Globals.car_height
 			if passengerPanel != null:
 				passengerPanel.actionLabel.text = "working"
 			is_in_module = true
