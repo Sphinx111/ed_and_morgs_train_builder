@@ -93,6 +93,7 @@ next_junction = NodePath("../../JunctionsParent/Junction1")
 last_junction = NodePath("../../JunctionsParent/Junction2")
 pop_count = 3
 water_count = 1
+oil_count = 2
 
 [node name="Route3" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 scale = Vector2(1, 1)
@@ -108,6 +109,7 @@ scale = Vector2(1, 1)
 curve = SubResource("Curve2D_ecn11")
 next_junction = NodePath("../../JunctionsParent/Junction99")
 last_junction = NodePath("../../JunctionsParent/Looper1")
+oil_count = 2
 
 [node name="Route98" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 scale = Vector2(1, 1)
@@ -140,6 +142,7 @@ curve = SubResource("Curve2D_cwbjy")
 next_junction = NodePath("../../JunctionsParent/Junction96")
 last_junction = NodePath("../../JunctionsParent/Junction97")
 pop_count = 7
+oil_count = 4
 
 [node name="Route94" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 scale = Vector2(1, 1)

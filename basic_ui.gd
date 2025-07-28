@@ -69,6 +69,7 @@ func setup_hover_signals():
 	var foodNode : RichTextLabel = get_node("ResourcePanel/Food")
 	var partsNode : RichTextLabel = get_node("ResourcePanel/MechParts")
 	var scrapNode : RichTextLabel = get_node("ResourcePanel/Scrap")
+	var oilNode : RichTextLabel = get_node("ResourcePanel/Oil")
 
 	fuelNode.mouse_entered.connect(_on_mouse_res_hover.bind("fuel",fuelNode.position.x))
 	waterNode.mouse_entered.connect(_on_mouse_res_hover.bind("clean_water",waterNode.position.x))
@@ -77,6 +78,7 @@ func setup_hover_signals():
 	foodNode.mouse_entered.connect(_on_mouse_res_hover.bind("food1",foodNode.position.x))
 	partsNode.mouse_entered.connect(_on_mouse_res_hover.bind("mech_parts",partsNode.position.x))
 	scrapNode.mouse_entered.connect(_on_mouse_res_hover.bind("scrap",scrapNode.position.x))
+	oilNode.mouse_entered.connect(_on_mouse_res_hover.bind("scrap",oilNode.position.x))
 	
 	fuelNode.mouse_exited.connect(_on_mouse_res_leave.bind())
 	waterNode.mouse_exited.connect(_on_mouse_res_leave.bind())
@@ -85,6 +87,7 @@ func setup_hover_signals():
 	foodNode.mouse_exited.connect(_on_mouse_res_leave.bind())
 	partsNode.mouse_exited.connect(_on_mouse_res_leave.bind())
 	scrapNode.mouse_exited.connect(_on_mouse_res_leave.bind())
+	oilNode.mouse_exited.connect(_on_mouse_res_leave.bind())
 
 
 func resource_panel_update():
@@ -97,6 +100,7 @@ func resource_panel_update():
 	$ResourcePanel/MechParts.text = "Parts: " + Helpers.pretty_print_float(selectedTrain.get_res("mech_parts"))
 	$ResourcePanel/Food.text = "Food: " + Helpers.pretty_print_float(selectedTrain.get_res("food1"))
 	$ResourcePanel/Scrap.text = "Scrap: " + Helpers.pretty_print_float(selectedTrain.get_res("scrap"))
+	$ResourcePanel/Oil.text = "Oil: " + Helpers.pretty_print_float(selectedTrain.get_res("oil"))
 
 func add_thought(newThought : String):
 	var listPos : int = thoughtsList.add_item(newThought, null, false)
@@ -188,6 +192,8 @@ func parse_text_input():
 			wordsRead = 2
 		elif words[i] == "water_collector":
 			subject = "water_collector"
+		elif words[i] == "fuel_refinery":
+			subject = "fuel_refinery"
 		elif (words[i] == "car" or words[i] == "carriage") and words[i+1].is_valid_int():
 			location1 = words[i+1]
 			wordsRead = 2

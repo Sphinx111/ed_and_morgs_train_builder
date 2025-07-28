@@ -34,6 +34,7 @@ var res = {
 	"black_water" : 0.0,
 	"mech_parts" : 100.0,
 	"fuel" : 100.0,
+	"oil" : 10.0,
 	"fertiliser" : 10.0,
 	"seeds1" : 10.0,
 	"seeds2" : 10.0,

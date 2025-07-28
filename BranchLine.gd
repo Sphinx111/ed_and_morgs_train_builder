@@ -12,9 +12,11 @@ var active : bool = false
 @export var scrap_count : int = 0
 @export var pop_count : int = 0
 @export var water_count : int = 0
+@export var oil_count : int = 0
 var scrap_default : int = 200
 var pop_default : int = 10
 var water_default : int = 300
+var oil_default : int = 500
 
 func _ready():
 	draw_routes()
@@ -83,6 +85,13 @@ func generate_random_resources():
 		add_child(newSpot)
 		newSpot.progress_ratio = randPos
 		newSpot.set_stats("grey_water", water_default)
+		resources.append(newSpot)
+	for i in range(oil_count):
+		var newSpot = ResourceSpot.new()
+		var randPos = randf()
+		add_child(newSpot)
+		newSpot.progress_ratio = randPos
+		newSpot.set_stats("oil", oil_default)
 		resources.append(newSpot)
 
 func request_resources(wantedType : String, collection_margin : float) -> float:
