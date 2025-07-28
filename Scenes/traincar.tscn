@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=9 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bq288wrgttmyx" path="res://GameManager.gd" id="1_o0k6p"]
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
 [ext_resource type="PackedScene" uid="uid://b3ph64gipnlm5" path="res://Scenes/world_map.tscn" id="2_ksonv"]
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
+[ext_resource type="Script" uid="uid://c841d2swd3ym7" path="res://Scenes/construction_panel.gd" id="4_o0k6p"]
 [ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://BackgroundHandler.gd" id="6_mscei"]
 [ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://Scenes/LeverControl.tscn" id="6_u0kvb"]
 
@@ -248,6 +249,29 @@ offset_bottom = 38.0
 toggle_mode = true
 text = "Expeditions"
 
+[node name="constructionPanel" type="Panel" parent="BasicUI"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 118.0
+offset_right = 971.0
+offset_bottom = 165.0
+script = ExtResource("4_o0k6p")
+
+[node name="Button" type="Button" parent="BasicUI/constructionPanel"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+text = "exist"
+
+[node name="construct" type="Button" parent="BasicUI"]
+layout_mode = 0
+offset_left = 1058.0
+offset_top = 47.0
+offset_right = 1142.0
+offset_bottom = 78.0
+toggle_mode = true
+text = "Construct"
+
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 340)
 script = ExtResource("1_rq5f1")
@@ -304,5 +328,6 @@ color = Color(1, 1, 0, 0.619608)
 [connection signal="toggled" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_toggled"]
 [connection signal="pressed" from="BasicUI/DebugPanel/CarButton" to="BasicUI" method="_on_car_button_pressed"]
 [connection signal="toggled" from="BasicUI/ExpeditionsButton" to="BasicUI" method="_on_ExpeditionsController_open_toggled"]
+[connection signal="toggled" from="BasicUI/construct" to="BasicUI" method="_on_construct_toggled"]
 [connection signal="position_changed" from="Train/LeverControl" to="Train" method="_on_speed_lever_changed"]
 [connection signal="position_changed" from="Train/LeverControl" to="Background" method="set_temp_multiplier"]

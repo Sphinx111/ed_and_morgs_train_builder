@@ -289,3 +289,11 @@ func _on_ExpeditionsController_open_toggled(toggled_on: bool) -> void:
 			expeditionsController.refresh_options()
 	else:
 		expeditionsController.hide()
+
+
+func _on_construct_toggled(toggled_on: bool) -> void:
+	if toggled_on == true :
+		$constructionPanel.show()
+		$constructionPanel.setup()
+	else:
+		$constructionPanel.hide()

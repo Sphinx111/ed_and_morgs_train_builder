@@ -12,7 +12,7 @@ var luxury : float = 0.0
 # List of modules in the car
 var modules = [null, null, null, null]
 var ModuleScene = preload("res://Scenes/module.tscn")
-var defaultModuleArray = ["clean_water", "farm", "cabin", "passenger_door"]
+var defaultModuleArray = ["clean_water", "farm", "cabin", "kitchen"] #passenger_door"]
 
 func _ready():
 	if Globals.train_direction < 0:
