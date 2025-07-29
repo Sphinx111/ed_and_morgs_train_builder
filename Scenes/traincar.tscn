@@ -272,6 +272,13 @@ offset_bottom = 78.0
 toggle_mode = true
 text = "Construct"
 
+[node name="selectCarPanel" type="Panel" parent="BasicUI"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 321.0
+offset_right = 975.0
+offset_bottom = 361.0
+
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 340)
 script = ExtResource("1_rq5f1")
