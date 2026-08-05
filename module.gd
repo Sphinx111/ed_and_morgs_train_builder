@@ -99,12 +99,18 @@ func add_customer(newCustomer : Passenger):
 				service.serve_customer(newCustomer, parentTrain, self)
 
 ## Used by module to remove its own passengers
-func _eject_customer(currentCustomer : Passenger):
+func _eject_customer(currentCustomer : Passenger) -> void:
+	if not is_instance_valid(currentCustomer):
+		return
 	notify_remove_customer(currentCustomer)
-	currentCustomer.exit_customer_module()
+	currentCustomer.ejected_from_module()
 
 ## Used by external classes telling module to remove
-func notify_remove_customer(currentCustomer : Passenger):
+func notify_remove_customer(currentCustomer : Passenger) -> void:
+	if not is_instance_valid(currentCustomer):
+		return
+	if not customers.has(currentCustomer):
+		return
 	if customers.size() == maxCustomers:
 		parentCar.update_needs_maps(serves_needs, sequence, Globals.CUSTOMERS_HAS_SPACE)
 	customers.erase(currentCustomer)
@@ -151,6 +157,7 @@ func add_custom_storage(storageDict : Dictionary):
 
 ## Cycle through producers and run their production cycle
 func produce_resources():
+	_remove_invalid_workers()
 	# Producing materials requires workers
 	if workers_needed == 0 or workers.size() > 0:
 		for producer in producers:
@@ -161,23 +168,34 @@ func produce_resources():
 			$DebugProgress.size.y = 50.0 * producer.progress
 
 ## For each customer in the module, run through the repeatable services and attempt to provide them
-func serve_customers():
-	for customer in customers:
-		if is_instance_valid(customer):
-			var services_finished = 0
-			for service in services:
-				if service.trigger_once == false:
-					var result = service.serve_customer(customer, parentTrain, self)
-					if result == Globals.SERVICE_FINISHED or result == Globals.NO_RESOURCES:
-						services_finished += 1
-				else:
-					services_finished += 1 # Trigger-once services shouldn't count against total
-			
-			if services_finished >= services.size():
-				_eject_customer(customer)
-				#print("%s %s exiting %s module" % [customer.firstname, customer.lastname, type])
-		else:
-			customers.erase(customer)
+func serve_customers() -> void:
+	_remove_invalid_customers()
+	for i in range(customers.size() - 1, -1, -1):
+		var customer: Passenger = customers[i]
+		var services_finished := 0
+		for service in services:
+			if service.trigger_once == false:
+				var result := service.serve_customer(customer, parentTrain, self)
+				if result == Globals.SERVICE_FINISHED or result == Globals.NO_RESOURCES:
+					services_finished += 1
+			else:
+				services_finished += 1
+
+		if services_finished >= services.size():
+			_eject_customer(customer)
+
+
+func _remove_invalid_customers() -> void:
+	for i in range(customers.size() - 1, -1, -1):
+		if not is_instance_valid(customers[i]):
+			customers.remove_at(i)
+			$DebugCustomerCount.text = "" + String.num_int64(customers.size())
+
+func _remove_invalid_workers() -> void:
+	for i in range(workers.size() - 1, -1, -1):
+		if not is_instance_valid(workers[i]):
+			workers.remove_at(i)
+			$DebugWorkerCount.text = "" + String.num_int64(workers.size())
 
 func reset_module():
 	services = []

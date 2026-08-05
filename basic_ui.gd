@@ -14,7 +14,7 @@ var tick_timer : Timer = Timer.new()
 
 @onready var debug_slider : HSlider = get_node("DebugPanel/DebugSlider")
 
-@onready var resource_detail : Panel = null
+@onready var resource_panel : ResourcePanel = $ResourcePanel
 var jobsControllerScene : PackedScene = preload("res://Scenes/JobsController.tscn")
 var jobsController : Panel = null
 var expeditionsControllerScene : PackedScene = preload("res://Scenes/expeditions_panel.tscn")
@@ -34,73 +34,30 @@ func do_resource_tick():
 
 func _ready() -> void:
 	Globals.activeUI = self
-	
+
 	worldMap.select_new_train(get_parent().get_node("Train"))
 	selectedTrain = get_parent().get_node("Train")
-	
+
 	var update_timer : Timer = Timer.new()
 	add_child(update_timer)
 	update_timer.wait_time = 0.5
 	update_timer.one_shot = false
 	update_timer.timeout.connect(resource_panel_update)
 	update_timer.start()
-	
-	# Setup tick_timer
+
 	add_child(tick_timer)
 	tick_timer.timeout.connect(do_resource_tick)
 	tick_timer.wait_time = 2.0
 	tick_timer.one_shot = false
 	tick_timer.start()
-	
-	# Set initial state for Resource Detail hover-panel
-	resource_detail = get_node("ResourcePanel/ResourceDetailPanel")
-	resource_detail.hide()
-	setup_hover_signals()
-	
+
+	resource_panel.setup(selectedTrain)
+
 	backgroundController = get_parent().get_node("Background")
-	
-func setup_hover_signals():
-	var speedNode : RichTextLabel = get_node("ResourcePanel/Speed")
-	var fuelNode : RichTextLabel = get_node("ResourcePanel/Fuel")
-	var popNode : RichTextLabel = get_node("ResourcePanel/Pop")
-	var waterNode : RichTextLabel = get_node("ResourcePanel/CleanWater")
-	var greyNode : RichTextLabel = get_node("ResourcePanel/GreyWater")
-	var blackNode : RichTextLabel = get_node("ResourcePanel/BlackWater")
-	var foodNode : RichTextLabel = get_node("ResourcePanel/Food")
-	var partsNode : RichTextLabel = get_node("ResourcePanel/MechParts")
-	var scrapNode : RichTextLabel = get_node("ResourcePanel/Scrap")
-	var oilNode : RichTextLabel = get_node("ResourcePanel/Oil")
-
-	fuelNode.mouse_entered.connect(_on_mouse_res_hover.bind("fuel",fuelNode.position.x))
-	waterNode.mouse_entered.connect(_on_mouse_res_hover.bind("clean_water",waterNode.position.x))
-	greyNode.mouse_entered.connect(_on_mouse_res_hover.bind("grey_water",greyNode.position.x))
-	blackNode.mouse_entered.connect(_on_mouse_res_hover.bind("black_water",blackNode.position.x))
-	foodNode.mouse_entered.connect(_on_mouse_res_hover.bind("food1",foodNode.position.x))
-	partsNode.mouse_entered.connect(_on_mouse_res_hover.bind("mech_parts",partsNode.position.x))
-	scrapNode.mouse_entered.connect(_on_mouse_res_hover.bind("scrap",scrapNode.position.x))
-	oilNode.mouse_entered.connect(_on_mouse_res_hover.bind("scrap",oilNode.position.x))
-	
-	fuelNode.mouse_exited.connect(_on_mouse_res_leave.bind())
-	waterNode.mouse_exited.connect(_on_mouse_res_leave.bind())
-	greyNode.mouse_exited.connect(_on_mouse_res_leave.bind())
-	blackNode.mouse_exited.connect(_on_mouse_res_leave.bind())
-	foodNode.mouse_exited.connect(_on_mouse_res_leave.bind())
-	partsNode.mouse_exited.connect(_on_mouse_res_leave.bind())
-	scrapNode.mouse_exited.connect(_on_mouse_res_leave.bind())
-	oilNode.mouse_exited.connect(_on_mouse_res_leave.bind())
 
 
-func resource_panel_update():
-	$ResourcePanel/Speed.text = "Speed: " + Helpers.pretty_print_float(selectedTrain.speed)
-	$ResourcePanel/Fuel.text = "Fuel: " + Helpers.pretty_print_float(selectedTrain.get_res("fuel"))
-	$ResourcePanel/Pop.text = "Pop: " + String.num_int64(selectedTrain.passengerManager.passengers.size())
-	$ResourcePanel/CleanWater.text = "Water: " + Helpers.pretty_print_float(selectedTrain.get_res("clean_water"))
-	$ResourcePanel/GreyWater.text = "Grey: " + Helpers.pretty_print_float(selectedTrain.get_res("grey_water"))
-	$ResourcePanel/BlackWater.text = "Black: " + Helpers.pretty_print_float(selectedTrain.get_res("black_water"))
-	$ResourcePanel/MechParts.text = "Parts: " + Helpers.pretty_print_float(selectedTrain.get_res("mech_parts"))
-	$ResourcePanel/Food.text = "Food: " + Helpers.pretty_print_float(selectedTrain.get_res("food1"))
-	$ResourcePanel/Scrap.text = "Scrap: " + Helpers.pretty_print_float(selectedTrain.get_res("scrap"))
-	$ResourcePanel/Oil.text = "Oil: " + Helpers.pretty_print_float(selectedTrain.get_res("oil"))
+func resource_panel_update() -> void:
+	resource_panel.update_from_train(selectedTrain)
 
 func add_thought(newThought : String):
 	var listPos : int = thoughtsList.add_item(newThought, null, false)
@@ -253,19 +210,6 @@ func _on_thoughts_toggle_toggled(toggled_on: bool) -> void:
 
 func _on_car_button_pressed() -> void:
 	selectedTrain.add_car()
-
-func _on_mouse_res_hover(resource_type : String, xPos : float) -> void:
-	resource_detail.position.x = xPos
-	resource_detail.get_node("TypeLabel").text = resource_type
-	
-	if selectedTrain.res.has(resource_type) and selectedTrain.max_res.has(resource_type):
-		var valueLabel = resource_detail.get_node("ValueLabel")
-		valueLabel.text = "%s / %s" % [Helpers.pretty_print_float(selectedTrain.res[resource_type]), Helpers.pretty_print_float(selectedTrain.max_res[resource_type])]
-		resource_detail.show()
-	pass
-
-func _on_mouse_res_leave() -> void:
-	resource_detail.hide()
 
 func _on_JobController_open_toggled(toggled_on: bool) -> void:
 	if toggled_on == true:

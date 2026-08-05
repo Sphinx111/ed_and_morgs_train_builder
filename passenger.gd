@@ -112,27 +112,27 @@ func check_current_module():
 		if current_module.needs_worker(targetWork):
 			enter_worker_module(current_module, 1)
 
-func enter_customer_module(target : ModuleBase, _attemptNo : int):
+func enter_customer_module(target : ModuleBase, _attemptNo : int) -> void:
 	if target.can_enter(self):
-		if self.is_in_module==false:
+		if self.is_in_module == false:
 			target.add_customer(self)
-			self.position.y -= 20 + (randf()*30) #Globals.car_height
+			current_module = target
+			self.position.y -= 20 + (randf() * 30)
 			is_in_module = true
-			
+
 			if passengerPanel != null:
 				passengerPanel.actionLabel.text = "being served"
-			#current_module = target
 
-func enter_worker_module(target : ModuleBase, _attemptNo : int):
-	if self.is_in_module==false:
+func enter_worker_module(target : ModuleBase, _attemptNo : int) -> void:
+	if self.is_in_module == false:
 		if target.worker_can_enter(self):
 			target.add_worker(self)
-			self.position.y = 20+ (randf()*30) #Globals.car_height
+			current_module = target
+			self.position.y = 20 + (randf() * 30)
 			if passengerPanel != null:
 				passengerPanel.actionLabel.text = "working"
 			is_in_module = true
 			is_working = true
-			#current_module = target
 
 ## Used by passenger to tell module they're leaving
 func exit_customer_module():
