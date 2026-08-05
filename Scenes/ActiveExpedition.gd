@@ -104,7 +104,8 @@ func collect_resources():
 			label2.text = Helpers.pretty_print_float(resources_gathered[resourceType])
 
 func _on_return_button_pressed():
-	time_passed = travel_time + collection_time
+	if time_passed < travel_time + collection_time:
+		time_passed = travel_time + collection_time
 	return_button.text = "Abandon"
 	return_button.pressed.disconnect(_on_return_button_pressed)
 	return_button.pressed.connect(_on_abandon_button_pressed)

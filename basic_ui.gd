@@ -21,6 +21,7 @@ var jobsController : Panel = null
 var expeditionsControllerScene : PackedScene = preload("res://Scenes/expeditions_panel.tscn")
 var expeditionsController : ExpeditionsController = null
 var backgroundController : BackgroundManager = null
+var pending_module_type : String = ""
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
@@ -55,6 +56,37 @@ func _ready() -> void:
 	resource_panel.setup(selectedTrain)
 
 	backgroundController = get_parent().get_node("Background")
+	constructionPanel.placement_requested.connect(_on_construction_placement_requested)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if pending_module_type == "":
+		return
+	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
+		if _is_click_over_ui(event.global_position):
+			return
+		_place_module_at_click(event.global_position)
+		get_viewport().set_input_as_handled()
+
+
+func _on_construction_placement_requested(module_type: String) -> void:
+	pending_module_type = module_type
+	add_thought("Select a slot on the train to place %s." % module_type)
+
+
+func _place_module_at_click(global_position: Vector2) -> void:
+	var train_local_pos: Vector2 = selectedTrain.to_local(global_position)
+	var train_pos: Array[int] = Helpers.get_trainpos_from_coords(train_local_pos)
+	selectedTrain.add_module(pending_module_type, train_pos[0], train_pos[1])
+	_clear_placement_mode()
+
+
+func _is_click_over_ui(global_position: Vector2) -> bool:
+	return constructionPanel.get_global_rect().has_point(global_position)
+
+
+func _clear_placement_mode() -> void:
+	pending_module_type = ""
 
 
 func resource_panel_update() -> void:
@@ -241,5 +273,6 @@ func _on_construct_toggled(toggled_on: bool) -> void:
 		constructionPanel.show()
 		constructionPanel.setup()
 	else:
+		_clear_placement_mode()
 		constructionPanel.hide()
 		constructionPanel.teardown()

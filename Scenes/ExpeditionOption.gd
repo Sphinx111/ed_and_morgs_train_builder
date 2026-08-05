@@ -29,6 +29,7 @@ var costs : Array = [["pop", 1, Globals.pop_texture, Color.WHITE],
 					 ["clean_water", 2, Globals.water_texture, Color.AQUA],
 					 ["food1", 1, Globals.food_texture, Color.SADDLE_BROWN]]
 
+# The default resource costs needed to launch an expedition
 const default_costs : Dictionary = {
 	"pop" : ["pop", 1, Globals.pop_texture, Color.WHITE],
 	"clean_water" : ["clean_water", 2, Globals.water_texture, Color.AQUA],

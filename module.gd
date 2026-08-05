@@ -289,6 +289,7 @@ func set_type(newType : String):
 		$Outline.color = Color.DARK_SLATE_GRAY
 		workers_needed = 8
 		var fuelProducer = BasicFuelProducer.new()
+		add_producer(fuelProducer)
 		add_custom_storage({"oil" : 100.0, "fuel" : 100.0})
 	$Label.text = newType
 	if workers_needed > 0:

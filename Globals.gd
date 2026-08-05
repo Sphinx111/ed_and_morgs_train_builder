@@ -34,6 +34,8 @@ var passenger_consume_threshold : float = 0.6
 var passenger_seeks_threshold : float = 0.65
 var idle_wander_chance : float = 0.3    # Chance that passenger picks a random location to move to if they have no targetNeed
 var aliterating_name_chance : float = .5
+const needs_groups : Array[String] = ["thirst", "hunger", "rest"]
+const resource_groups : Array[String] = ["clean_water", "grey_water", "black_water", "food", "scrap", "mech_parts", "oil", "fuel"]
 var need_growth_rates : Dictionary[String, float] = {
 	"thirst" : 0.01,
 	"hunger" : 0.005,

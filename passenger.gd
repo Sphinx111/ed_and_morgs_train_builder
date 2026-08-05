@@ -14,9 +14,10 @@ var current_module : ModuleBase = null
 var next_module_pos : float = Globals.module_width		# If position.x exceeds this, check module
 var last_module_pos : float = 0.0						# If position.x falls below this, check module
 var direction : int = 0
+var goal_travel_pull : float = 0.0
+var wander_time_remaining : float = 0.0
 
 var home_cabin = null
-var destination : Vector2 = self.position
 var is_in_module : bool = false
 var is_working : bool = false
 var is_on_expedition : bool = false
@@ -44,6 +45,7 @@ const maxNeeds = {
 	"illness" : 1.0,
 	"social" : 1.0
 }
+const WANDER_DURATION : float = 2.0
 
 var targetWork : String = ""
 var skills = {
@@ -70,17 +72,22 @@ func _init_random_needs():
 	for key in needs:
 		needs[key] = randf_range(0.0, 0.5)
 
-func _process(delta) -> void:
-	if is_in_module == false and is_on_expedition == false:
-		destination.x = max(destination.x, parentTrain.minXpos)
-		destination.x = min(destination.x, parentTrain.maxXpos)
-		position = position.move_toward(destination, movespeed * delta * Globals.time_factor)
-		if position.x < parentTrain.minXpos:
-			position.x = parentTrain.minXpos
-		if position.x > parentTrain.maxXpos:
-			position.x = parentTrain.maxXpos
-		if (direction > 0 and position.x > next_module_pos) or (direction < 0 and position.x < last_module_pos):
-			update_module_positions()
+func _process(delta: float) -> void:
+	if is_in_module or is_on_expedition:
+		return
+	if direction == 0:
+		return
+
+	var step : float = direction * movespeed * delta * Globals.time_factor
+	position.x = clampf(position.x + step, parentTrain.minXpos, parentTrain.maxXpos)
+
+	if (direction > 0 and position.x > next_module_pos) or (direction < 0 and position.x < last_module_pos):
+		update_module_positions()
+
+	if wander_time_remaining > 0.0:
+		wander_time_remaining = maxf(0.0, wander_time_remaining - delta * Globals.time_factor)
+		if wander_time_remaining == 0.0:
+			direction = 0
 
 # Once at outset, or per module moved, confirm position on train and which module we are at
 # set thresholds to re-check module next
@@ -117,7 +124,8 @@ func enter_customer_module(target : ModuleBase, _attemptNo : int) -> void:
 		if self.is_in_module == false:
 			target.add_customer(self)
 			current_module = target
-			self.position.y -= 20 + (randf() * 30)
+			#self.position.y -= 20 + (randf() * 30)
+			self.hide()
 			is_in_module = true
 
 			if passengerPanel != null:
@@ -128,7 +136,7 @@ func enter_worker_module(target : ModuleBase, _attemptNo : int) -> void:
 		if target.worker_can_enter(self):
 			target.add_worker(self)
 			current_module = target
-			self.position.y = 20 + (randf() * 30)
+			self.hide()
 			if passengerPanel != null:
 				passengerPanel.actionLabel.text = "working"
 			is_in_module = true
@@ -141,14 +149,14 @@ func exit_customer_module():
 
 ## Used by modules to eject a passenger
 func ejected_from_module():
-	self.position.y = 0
+	self.show()
 	targetNeed = ""
 	is_in_module = false
 	is_working = false
 
 ## Used by passenger to tell module they're leaving
 func exit_worker_module():
-	self.position.y = 0
+	self.show()
 	targetWork = ""
 	is_in_module = false
 	is_working = false
@@ -156,7 +164,7 @@ func exit_worker_module():
 
 ## Used by modules to eject a worker
 func worker_ejected_from_module():
-	self.position.y = 0
+	self.show()
 	targetWork = ""
 	is_in_module = false
 	is_working = false
@@ -223,49 +231,70 @@ func hit_max_need(needType : String) -> int:
 	print("%s %s: Oh no! I am dying of %s" % [firstname, lastname, needType])
 	return Globals.RESULT_FATAL
 
-func pick_idle_move():
-	if randf() < Globals.idle_wander_chance:
-		destination = self.position
-		var offset : float = randi_range(-200, 200)
-		if offset >= 0: direction = 1
-		else: direction = -1
-		destination.x += offset
-		constrain_destination()
-
-func constrain_destination():
-	clamp(destination.x, parentTrain.minXpos, parentTrain.maxXpos)
-
-func pick_direction():
-	# Chance to idly move around if no behaviour
-	if targetNeed == "" and targetWork == "":
-		pick_idle_move()
-		return	# End early if no target
-	
-	var myLocation : Array[int] = Helpers.get_trainpos_from_coords(self.position)
-	var distanceToTarget = 0
-	if targetNeed != "":
-		distanceToTarget = parentTrain.passengerMap.get_direction_from_to(myLocation, targetNeed, "need")
-	elif targetWork != "":
-		distanceToTarget= parentTrain.passengerMap.get_direction_from_to(myLocation, targetWork, "work")
-	
-	if distanceToTarget == 9999:
-		if targetNeed != "": new_thought("I can't find anywhere to fulfil my crushing %s need!" % [targetNeed])
-		pick_idle_move()
+func pick_direction() -> void:
+	if targetNeed != "" or targetWork != "":
+		_pick_goal_direction()
 		return
-	if    distanceToTarget > 0: direction = 1
-	elif  distanceToTarget < 0: direction = -1
-	else: direction = 0
+
+	goal_travel_pull = 0.0
+	_start_wander_if_due()
+
+
+func _pick_goal_direction() -> void:
+	var my_location : Array[int] = Helpers.get_trainpos_from_coords(self.position)
+	goal_travel_pull = _get_goal_travel_pull(my_location)
+
+	if goal_travel_pull == PassengerVectorMap.NO_DIRECTION:
+		if targetNeed != "":
+			new_thought("I can't find anywhere to fulfil my crushing %s need!" % targetNeed)
+		_start_wander_if_due()
+		return
+
+	wander_time_remaining = 0.0
+
+	if goal_travel_pull == 0.0:
+		direction = 0
+		check_current_module()
+		return
+
+	direction = _travel_pull_to_direction(goal_travel_pull)
+
+	if absf(goal_travel_pull) > 7.0:
+		if targetNeed != "":
+			new_thought("It's a long way to fulfil my %s" % targetNeed)
+		elif targetWork != "":
+			new_thought("It's a long way to find %s work" % targetWork)
+
+
+func _start_wander_if_due() -> void:
+	if wander_time_remaining > 0.0:
+		return
+	_start_wander()
+
+
+func _start_wander() -> void:
+	if randf() >= Globals.idle_wander_chance:
+		direction = 0
+		return
+	direction = 1 if randf() < 0.5 else -1
 	if Globals.train_direction > 0:
-		direction = direction * -1
-	myLocation[0] += floor(distanceToTarget / Globals.modules_per_car) 
-	myLocation[1] += distanceToTarget % Globals.modules_per_car
-	destination.x = Helpers.get_xpos_from_trainpos(myLocation)
-	if Globals.train_direction < 0: destination.x += 0.5 * Globals.module_width
-	elif Globals.train_direction > 0: destination.x -= 0.5 * Globals.module_width
-	constrain_destination()
-	if distanceToTarget > 7:
-		if targetNeed != "": new_thought("It's a long way to fulfil my %s" %  [targetNeed])
-		elif targetWork != "": new_thought("It's a long way to find %s work" %  [targetWork])
+		direction *= -1
+	wander_time_remaining = WANDER_DURATION
+
+
+func _get_goal_travel_pull(my_location : Array[int]) -> float:
+	if targetNeed != "":
+		return parentTrain.passengerMap.get_travel_pull_at(my_location, targetNeed, "need")
+	if targetWork != "":
+		return parentTrain.passengerMap.get_travel_pull_at(my_location, targetWork, "work")
+	return PassengerVectorMap.NO_DIRECTION
+
+
+func _travel_pull_to_direction(travel_pull : float) -> int:
+	var travel_direction : int = 1 if travel_pull > 0.0 else -1
+	if Globals.train_direction > 0:
+		travel_direction *= -1
+	return travel_direction
 
 # adjust the need, and return the amount remaining
 func adjust_need(type : String, amount : float) -> float:

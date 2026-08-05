@@ -2,26 +2,35 @@ extends Panel
 
 class_name ConstructionPanel
 
-var buttons : Array [Button] = []
+signal placement_requested(module_type: String)
 
-func setup():
-	var newButton = Button.new()
-	var buttonList = ["water", "food", "kitchen", "cabin"]
-	for buttonWord in buttonList:
-		newButton = Button.new()
-		newButton.text=buttonWord
-		add_child(newButton)
-		buttons.append(newButton)
-		newButton.position.x = buttons.size() * 60 + 10
-		newButton.pressed.connect(pressButton.bind(newButton.text))
+const MODULE_TYPE_ALIASES: Dictionary = {
+	"water": "clean_water",
+	"food": "farm",
+	"kitchen": "kitchen",
+	"cabin": "cabin",
+}
 
-func teardown():
+var buttons: Array[Button] = []
+
+
+func setup() -> void:
+	var button_list: Array[String] = ["water", "food", "kitchen", "cabin"]
+	for button_word in button_list:
+		var new_button := Button.new()
+		new_button.text = button_word
+		add_child(new_button)
+		buttons.append(new_button)
+		new_button.position.x = buttons.size() * 60 + 10
+		new_button.pressed.connect(press_button.bind(new_button.text))
+
+
+func teardown() -> void:
 	for i in range(buttons.size() - 1, -1, -1):
-		buttons.get(i).queue_free()
-		buttons.remove_at(i);
-	
-func pressButton(textyargument):
-	# $LineEdit.text = 
-	print ("add %s at" % textyargument)
-#	$selectCarPanel.show()
-	
+		buttons[i].queue_free()
+		buttons.remove_at(i)
+
+
+func press_button(button_text: String) -> void:
+	var module_type: String = MODULE_TYPE_ALIASES.get(button_text, button_text)
+	placement_requested.emit(module_type)

@@ -5,7 +5,7 @@ class_name Train
 var train_name : String = ""	#Give it a name?
 var engine : ModuleBase = null
 var players = []				#Which players run the train?
-var carriages = []
+var carriages : Array[TraincarBase] = []
 var tickCount = 0 				#Resource ticks since the train launched
 
 var CarriageScene = preload("res://Scenes/traincar_base.tscn")
@@ -16,13 +16,14 @@ var worldMap : MapHandler = null
 var expedition_safety_flag : bool = false    ## Prevent train leaving if expeditions have been started
 
 # Passenger Navigation Variables
-var passengerMap : PassengerMap = null
+var passengerMap : PassengerVectorMap = null
 var passengerManager : PassengerManager = null
 var minXpos : float = 0.0
 var maxXpos : float = 0.0
 
 # x varieties of food
 var res = {
+	"food" : 100.0,
 	"food1" : 100.0,
 	"food2" : 100.0,
 	"food3" : 0.0,
@@ -183,33 +184,36 @@ func add_passenger_debug():
 func get_car_count():
 	return carriages.size()
 
-func init_passenger_map():
-	passengerMap = PassengerMap.new()
+func init_passenger_map() -> void:
+	passengerMap = PassengerVectorMap.new()
 	passengerMap.set_train(self)
 	passengerMap.init_maps()
 
-func rebuild_passenger_map():
+
+func rebuild_passenger_map() -> void:
 	passengerMap.rebuild_maps()
 
-func update_needs_maps(needsArray : Array[String], position : Array[int], newState : int):
-	passengerMap.modify_several_needs_maps(needsArray, position, newState)
 
-func update_work_maps(workArray : Array[String], position : Array[int], newState : int):
-	passengerMap.modify_several_work_maps(workArray, position, newState)
+func update_needs_maps(needs_array : Array[String], train_pos : Array[int], new_state : int) -> void:
+	passengerMap.modify_needs_maps(needs_array, train_pos, new_state)
+
+
+func update_work_maps(work_array : Array[String], train_pos : Array[int], new_state : int) -> void:
+	passengerMap.modify_work_maps(work_array, train_pos, new_state)
 
 # Return a simple array of where each type of need can be met for passengers
-func get_location_map_for_type(need_type_to_find : String) -> Array:
-	var result = []
+func get_location_map_for_type(need_type_to_find : String) -> Array[int]:
+	var result : Array[int] = []
 	
 	for i in range(carriages.size()):
-		result.append(carriages[i].get_type_map(need_type_to_find))
+		result.append_array(carriages[i].get_type_map(need_type_to_find))
 	
 	return result
 
-func get_work_location_map_for_type(work_type_to_find : String) -> Array:
-	var result = []
+func get_work_location_map_for_type(work_type_to_find : String) -> Array[int]:
+	var result : Array[int] = []
 	for i in range(carriages.size()):
-		result.append(carriages[i].get_work_map(work_type_to_find))
+		result.append_array(carriages[i].get_work_map(work_type_to_find))
 	
 	return result
 

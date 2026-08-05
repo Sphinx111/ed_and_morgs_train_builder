@@ -53,10 +53,10 @@ func resource_tick():
 ## Find next work priority in priority order, based on what was last checked
 func get_next_work_priority() -> String:
 	var result = "any"
-	var passengerMap : PassengerMap = get_parent().passengerMap
-	for workType in work_priorities:
-		if passengerMap.has_work_for_type(workType):
-			return workType
+	var passenger_map : PassengerVectorMap = get_parent().passengerMap
+	for work_type in work_priorities:
+		if passenger_map.has_work_for_type(work_type):
+			return work_type
 	return result
 
 func check_all_needs():
