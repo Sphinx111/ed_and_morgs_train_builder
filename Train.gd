@@ -149,7 +149,7 @@ func add_module(type: String, carNum : int, slot : int):
 ## Add a new car to the end of the train
 func add_car():
 	add_carriage(carriages.size())
-	passengerMap.resize_maps(1)
+	passengerMap.resize_maps()
 	if Globals.train_direction > 0:
 		minXpos -= Globals.car_length + Globals.car_separation
 	elif Globals.train_direction < 0:

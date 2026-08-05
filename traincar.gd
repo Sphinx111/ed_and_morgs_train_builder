@@ -34,27 +34,26 @@ func set_sequence(newSequence : int):
 	else: 
 		position.x = 0 - ((sequence + 1) * (Globals.car_length + Globals.car_separation)) - Globals.car_length
 		
-	if newSequence== 0:
+	if newSequence == 0:
 		for i in range(4):
-			init_module(defaultModuleArray[i], i)
+			modules[i].set_type(defaultModuleArray[i])
 func resource_tick():
 	for module in modules:
 		if module != null:
 			module.resource_tick()
 
-func init_module(type : String, position : int):
-	#Todo: Instance a new Module scene
-	var newModule = ModuleScene.instantiate()
-	self.add_child(newModule)
-	
-	newModule.set_type(type)
-	newModule.set_sequence(position)
-	
+func init_module(type : String, position : int) -> void:
+	var new_module : ModuleBase = ModuleScene.instantiate()
+	add_child(new_module)
+	new_module.set_type(type)
+	new_module.set_sequence(position)
+
 	if modules[position] != null:
-		newModule.customers  = modules[position].customers
-		newModule.workers  = modules[position].workers
-		remove_module(position)
-	modules[position] = newModule
+		new_module.customers = modules[position].customers
+		new_module.workers = modules[position].workers
+		modules[position].queue_free()
+
+	modules[position] = new_module
 
 func add_module(type : String, slot : int):
 	modules[slot].set_type(type)

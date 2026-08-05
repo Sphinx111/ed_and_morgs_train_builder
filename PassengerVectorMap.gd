@@ -6,7 +6,7 @@ const NO_DIRECTION : float = 9999.0
 const max_work_travel_dist : int = 5
 const max_needs_travel_dist : int = 10
 const all_needs_list : Array[String] = Globals.needs_groups
-const all_work_types_list : Array[String] = Globals.resource_groups
+const all_work_types_list : Array[String] = Globals.work_types
 
 var work_locations_map : Dictionary = {}
 var needs_locations_map : Dictionary = {}
@@ -32,7 +32,7 @@ func rebuild_maps() -> void:
 	init_maps()
 
 
-func resize_maps(_change : int) -> void:
+func resize_maps() -> void:
 	rebuild_maps()
 
 

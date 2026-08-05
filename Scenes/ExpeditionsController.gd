@@ -65,7 +65,7 @@ func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
 		expeditions_started.emit()
 	
 	for cost in typeToStart.costs:
-		selectedTrain.add_res(cost[0], -cost[1])
+		selectedTrain.add_res(cost[0], -cost[1] * typeToStart.pop_allocated)
 	
 	var index_to_use : int = 1
 	for expedition in expeditions_active:
