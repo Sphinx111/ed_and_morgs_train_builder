@@ -19,7 +19,7 @@ var max_gain : Array = [["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE]]
 
 const default_gains : Dictionary = {
 	"scrap" : ["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE],
-	"clean_water" : ["clean_water", 15, 1.0, Globals.water_texture, Color.AQUA],
+	"grey_water" : ["grey_water", 15, 1.0, Globals.water_texture, Color.AQUA],
 	"pop" : ["pop", 2, 1.0, Globals.pop_texture, Color.WHITE]
 }
 
@@ -84,7 +84,7 @@ static func get_default_costs_from_type(typeWanted : String) -> Array:
 		result.append(default_costs["pop"])
 		result.append(default_costs["clean_water"])
 		result.append(default_costs["food1"])
-	elif typeWanted == "clean_water":
+	elif typeWanted == "grey_water":
 		result.append(default_costs["pop"])
 		result.append(default_costs["clean_water"].duplicate())
 		result[1][1] = 2      # Increased cost for water missions

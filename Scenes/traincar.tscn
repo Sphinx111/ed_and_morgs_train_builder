@@ -259,12 +259,6 @@ offset_right = 971.0
 offset_bottom = 165.0
 script = ExtResource("4_o0k6p")
 
-[node name="Button" type="Button" parent="BasicUI/constructionPanel"]
-layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
-text = "exist"
-
 [node name="construct" type="Button" parent="BasicUI"]
 layout_mode = 0
 offset_left = 1058.0

@@ -10,6 +10,7 @@ var tick_timer : Timer = Timer.new()
 @onready var worldMap : MapHandler = get_node("WorldMap")
 
 @onready var thoughtsPanel : Panel = get_node("ThoughtsPanel")
+@onready var constructionPanel : ConstructionPanel = get_node("constructionPanel")
 @onready var thoughtsList : ItemList = thoughtsPanel.get_node("ThoughtsList")
 
 @onready var debug_slider : HSlider = get_node("DebugPanel/DebugSlider")
@@ -237,7 +238,8 @@ func _on_ExpeditionsController_open_toggled(toggled_on: bool) -> void:
 
 func _on_construct_toggled(toggled_on: bool) -> void:
 	if toggled_on == true :
-		$constructionPanel.show()
-		$constructionPanel.setup()
+		constructionPanel.show()
+		constructionPanel.setup()
 	else:
-		$constructionPanel.hide()
+		constructionPanel.hide()
+		constructionPanel.teardown()
