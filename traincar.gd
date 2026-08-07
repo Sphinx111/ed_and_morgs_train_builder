@@ -10,7 +10,7 @@ var parentTrain : Train = null
 var luxury : float = 0.0
 
 # List of modules in the car
-var modules = [null, null, null, null]
+var modules : Array[ModuleBase] = [null, null, null, null]
 var ModuleScene = preload("res://Scenes/module.tscn")
 var defaultModuleArray = ["clean_water", "farm", "cabin", "kitchen"] #passenger_door"]
 

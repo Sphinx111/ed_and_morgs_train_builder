@@ -2,25 +2,25 @@ extends Node
 
 var activeUI : TrainUI = null
 
-var display_width = 1152
-var display_height = 648
+const display_width = 1152
+const display_height = 648
 var game_tick : int = 0
 
 var time_factor : float = 1.0
 
 # Car variables
-var car_length : float = 200
-var car_height : float = 80
-var car_separation: float = 5
-var modules_per_car : int = 4
+const car_length : float = 200
+const car_height : float = 80
+const car_separation: float = 5
+const modules_per_car : int = 4
 
-var train_origin_x = display_width - car_length
-var train_direction = 1
-var train_initial_carriage_count = 3
+var train_origin_x : float = display_width - car_length
+var train_direction : int = 1
+const train_initial_carriage_count : int = 3
 
 # Module Variables
-var module_width : float = 50
-var module_height : float = 50
+const module_width : float = 50
+const module_height : float = 50
 var refund_module_fraction : float = 0.5
 
 # Production ratios
@@ -28,16 +28,16 @@ var scrap_to_mech_ratio : float = 0.2 # 5 Scrap to make 1 mech parts
 var water_purification_efficiency : float = 0.9
 
 # Passenger Variables
-var passengers_initial_count : int = 4
+const passengers_initial_count : int = 4
 var passenger_debug : bool = true
 var passenger_consume_threshold : float = 0.6
 var passenger_seeks_threshold : float = 0.65
 var idle_wander_chance : float = 0.3    # Chance that passenger picks a random location to move to if they have no targetNeed
-var aliterating_name_chance : float = .5
+const aliterating_name_chance : float = .5
 const needs_groups : Array[String] = ["thirst", "hunger", "rest"]
 const work_types : Array[String] = ["any", "clean_water", "grey_water", "food1", "scrap", "mech_parts", "fuel", "oil"]
 const resource_groups : Array[String] = ["clean_water", "grey_water", "black_water", "food", "scrap", "mech_parts", "oil", "fuel"]
-var need_growth_rates : Dictionary[String, float] = {
+const need_growth_rates : Dictionary[String, float] = {
 	"thirst" : 0.01,
 	"hunger" : 0.005,
 	"rest"   : 0.005,
@@ -49,12 +49,12 @@ var need_growth_rates : Dictionary[String, float] = {
 
 # Resource storage variables
 # Minimum values to leave when doing production cycles
-var safety_margins : Dictionary = {
+const safety_margins : Dictionary = {
 	"clean_water" : 50.0
 }
 
 # Expedition Variables
-var max_expedition_size = 10      # Maximum passengers who can take part in an expedition
+const max_expedition_size : int = 10      # Maximum passengers who can take part in an expedition
 
 # Common icon textures to use for Sprites
 const water_texture : Texture2D = preload("res://images/Water_Icon.png")

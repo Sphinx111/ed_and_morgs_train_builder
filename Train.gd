@@ -35,7 +35,7 @@ var res = {
 	"black_water" : 0.0,
 	"mech_parts" : 100.0,
 	"fuel" : 100.0,
-	"oil" : 10.0,
+	"oil" : 100.0,
 	"fertiliser" : 10.0,
 	"seeds1" : 10.0,
 	"seeds2" : 10.0,
@@ -50,7 +50,8 @@ var max_res : Dictionary = {}
 
 var speed : float = 200.0
 var target_speed : float = 200.00
-var acceleration_per_tick : float = 10.0
+const acceleration_per_tick : float = 10.0
+const fuel_per_accel_per_car : float = 0.1
 
 func _ready() -> void:
 	self.position.x = Globals.train_origin_x
@@ -93,11 +94,10 @@ func gather_res(key : String, amount : float) -> int:
 		return Globals.RESULT_OK
 	return Globals.NO_RESOURCES
 
-func add_res(key : String, amount : float):
+func add_res(key : String, amount : float) -> void:
 	if res.has(key):
 		res[key] = res[key] + amount
-		if res[key] > max_res[key]:
-			res[key] = max_res[key]    ## For now, just discard any excess resources produced
+		clampf(res[key], 0, max_res[key]) ## Todo: Don't discard extra res
 	elif key == "pop":
 		for i in range(floor(amount)):
 			passengerManager.add_passenger()
@@ -126,7 +126,9 @@ func resource_tick():
 func update_speed():
 	if expedition_safety_flag == false:
 		if target_speed > speed:
-			speed = move_toward(speed,target_speed,acceleration_per_tick)
+			var fuel_needed : float = fuel_per_accel_per_car * carriages.size()
+			if gather_res("fuel", fuel_needed) == Globals.RESULT_OK:
+				speed = move_toward(speed,target_speed,acceleration_per_tick)
 		elif target_speed < speed:
 			speed = move_toward(speed,target_speed,acceleration_per_tick*5)
 
