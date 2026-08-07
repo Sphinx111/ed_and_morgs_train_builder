@@ -70,6 +70,9 @@ func add_passenger():
 	apply_random_name(newPass)
 	passengers.append(newPass)
 
+func get_passenger_count():
+	return passengers.size()
+
 func recover_expedition(returning : Array[Passenger]):
 	for passenger in returning:
 		passenger.is_on_expedition = false

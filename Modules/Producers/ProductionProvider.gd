@@ -119,7 +119,7 @@ func start_cycle_either(train : Train, worker_modifier : float) -> int:
 
 
 func make_progress(train : Train, worker_modifier : float):
-	# Don't make progress if train is above max speed
+	# Don't make progress if train is above max speed for this module (ie scrap arms)
 	if max_speed >= 0 and train.speed > max_speed:
 		return
 	progress = progress + (worker_modifier / cycleTime)

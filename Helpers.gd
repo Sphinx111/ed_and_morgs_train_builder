@@ -3,28 +3,29 @@ extends Node
 func round_to_dec(num, digit):
 	return round(num * pow(10.0, digit)) / pow(10.0, digit)
 
-## Check if the proposed spend would break safety cutoff rules for the provided train
-func exceeds_safety_margin(train : Train, consumeType : String, produceType1 : String, produceType2 : String, amount : float = 0.0) -> int:	# compare a resource to the margins and return SAFETY_CUTOFF if amount is below margin
-	# Always allow grey and black water to be purified into clean
-	if produceType1 == "clean_water" or produceType2 == "clean_water":
-		if consumeType == "black_water" or consumeType == "grey_water":
-			return Globals.RESULT_OK
-	
-	if train.res.has(consumeType) == false:
-		return Globals.RESULT.OK
-	
-	if Globals.safety_margins.has(consumeType) == true:
-		var trainHas : float = train.get_res(consumeType)
-		if trainHas - amount <= Globals.safety_margins[consumeType]:
-			return Globals.SAFETY_CUTOFF
+## Recompute safety flags from current train stock. Call once at the end of each resource tick.
+func update_resource_safety_flags(train : Train) -> void:
+	for resource_type in Globals.safety_margins:
+		var is_safe : bool = train.get_res(resource_type) > Globals.safety_margins[resource_type] * train.get_passenger_count() 
+		var was_safe : bool = Globals.resource_safety_ok.get(resource_type, true)
+		if was_safe and not is_safe:
+			print("Helpers.gd:: Safety on for %s" % resource_type)
+		if is_safe and not was_safe:
+			print("Helpers.gd:: Safety off for %s" % resource_type)
+		Globals.resource_safety_ok[resource_type] = is_safe
 
-	# If train is consuming grey water at this point, and so far is ok, also check if there is a shortage of clean water
-	if consumeType == "grey_water":
-		var train_clean_water = train.get_res("clean_water")
-		if train_clean_water - amount <= Globals.safety_margins["clean_water"]:
-			print_debug("Preventing consumption of grey_water, its needed for purification")
-			return Globals.SAFETY_CUTOFF
-		
+
+## Check if consumption would break safety cutoff rules using precomputed Globals.resource_safety_ok flags.
+func exceeds_safety_margin(_train : Train, consume_type : String, produce_type1 : String, produce_type2 : String, _amount : float = 0.0) -> int:
+	if produce_type1 == "clean_water" or produce_type2 == "clean_water":
+		if consume_type == "black_water" or consume_type == "grey_water":
+			return Globals.RESULT_OK
+
+	if consume_type == "grey_water" and not Globals.resource_safety_ok.get("clean_water", true):
+		return Globals.SAFETY_CUTOFF
+
+	if Globals.safety_margins.has(consume_type) and not Globals.resource_safety_ok.get(consume_type, true):
+		return Globals.SAFETY_CUTOFF
 
 	return Globals.RESULT_OK
 

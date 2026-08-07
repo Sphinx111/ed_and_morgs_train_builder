@@ -47,11 +47,14 @@ const need_growth_rates : Dictionary[String, float] = {
 # Commenting out code contributed by junior dev (Izzy)
 #,kml,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-# Resource storage variables
-# Minimum values to leave when doing production cycles
+## Resource storage variables
+# Minimum values to leave per passenger when doing production cycles
 const safety_margins : Dictionary = {
-	"clean_water" : 50.0
+	"clean_water" : 10.0
 }
+
+## Updated at the end of each resource tick; true when the train is above the safety margin for that resource.
+var resource_safety_ok : Dictionary[String, bool] = {}
 
 # Expedition Variables
 const max_expedition_size : int = 10      # Maximum passengers who can take part in an expedition

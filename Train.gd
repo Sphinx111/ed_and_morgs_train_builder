@@ -35,7 +35,7 @@ var res = {
 	"black_water" : 0.0,
 	"mech_parts" : 100.0,
 	"fuel" : 100.0,
-	"oil" : 100.0,
+	"oil" : 10.0,
 	"fertiliser" : 10.0,
 	"seeds1" : 10.0,
 	"seeds2" : 10.0,
@@ -71,6 +71,7 @@ func _ready() -> void:
 	for i in range(0,Globals.train_initial_carriage_count):
 		add_carriage(i)
 	rebuild_passenger_map()
+	Helpers.update_resource_safety_flags(self)
 	worldMap = get_parent().find_child("BasicUI").worldMap
 
 ## Set up engine variables, placeholder for now
@@ -122,6 +123,7 @@ func resource_tick():
 			carriage.resource_tick()
 	passengerManager.resource_tick()
 	update_speed()
+	Helpers.update_resource_safety_flags(self)
 
 func update_speed():
 	if expedition_safety_flag == false:
@@ -185,6 +187,9 @@ func add_passenger_debug():
 
 func get_car_count():
 	return carriages.size()
+
+func get_passenger_count():
+	return passengerManager.get_passenger_count()
 
 func init_passenger_map() -> void:
 	passengerMap = PassengerVectorMap.new()
