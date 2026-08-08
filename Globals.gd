@@ -2,9 +2,11 @@ extends Node
 
 var activeUI : TrainUI = null
 
-const display_width = 1152
+const display_width = 1400 #1152
 const display_height = 648
+const resource_panel_width_percent : float = 80.0
 var game_tick : int = 0
+const tick_duration : float = 2.0
 
 var time_factor : float = 1.0
 

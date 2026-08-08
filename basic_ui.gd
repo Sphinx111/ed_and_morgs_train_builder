@@ -35,6 +35,8 @@ func do_resource_tick():
 	backgroundController.update_sun_state()
 
 func _ready() -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	Globals.activeUI = self
 
 	worldMap.select_new_train(get_parent().get_node("Train"))
@@ -49,7 +51,7 @@ func _ready() -> void:
 
 	add_child(tick_timer)
 	tick_timer.timeout.connect(do_resource_tick)
-	tick_timer.wait_time = 2.0
+	tick_timer.wait_time = Globals.tick_duration
 	tick_timer.one_shot = false
 	tick_timer.start()
 
@@ -58,6 +60,9 @@ func _ready() -> void:
 	backgroundController = get_parent().get_node("Background")
 	constructionPanel.placement_requested.connect(_on_construction_placement_requested)
 
+func _on_viewport_size_changed() -> void:
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	resource_panel.apply_panel_width()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if pending_module_type == "":
@@ -68,11 +73,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		_place_module_at_click(event.global_position)
 		get_viewport().set_input_as_handled()
 
-
 func _on_construction_placement_requested(module_type: String) -> void:
 	pending_module_type = module_type
 	add_thought("Select a slot on the train to place %s." % module_type)
-
 
 func _place_module_at_click(global_position: Vector2) -> void:
 	var train_local_pos: Vector2 = selectedTrain.to_local(global_position)
@@ -80,14 +83,11 @@ func _place_module_at_click(global_position: Vector2) -> void:
 	selectedTrain.add_module(pending_module_type, train_pos[0], train_pos[1])
 	_clear_placement_mode()
 
-
 func _is_click_over_ui(global_position: Vector2) -> bool:
 	return constructionPanel.get_global_rect().has_point(global_position)
 
-
 func _clear_placement_mode() -> void:
 	pending_module_type = ""
-
 
 func resource_panel_update() -> void:
 	resource_panel.update_from_train(selectedTrain)

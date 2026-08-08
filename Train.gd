@@ -49,9 +49,12 @@ var res = {
 var max_res : Dictionary = {}
 
 var speed : float = 200.0
+var is_accelerating : bool = false
+var is_decelerating : bool = false
 var target_speed : float = 200.00
-const acceleration_per_tick : float = 10.0
-const fuel_per_accel_per_car : float = 0.1
+var engine_thrust : float = 20000.0
+var braking_force : float = 40000.0
+const fuel_per_tick : float = 1
 
 func _ready() -> void:
 	self.position.x = Globals.train_origin_x
@@ -122,17 +125,36 @@ func resource_tick():
 		if carriage != null:
 			carriage.resource_tick()
 	passengerManager.resource_tick()
-	update_speed()
+	_speed_tick()
 	Helpers.update_resource_safety_flags(self)
 
-func update_speed():
+func _speed_tick() -> void:
 	if expedition_safety_flag == false:
 		if target_speed > speed:
-			var fuel_needed : float = fuel_per_accel_per_car * carriages.size()
-			if gather_res("fuel", fuel_needed) == Globals.RESULT_OK:
-				speed = move_toward(speed,target_speed,acceleration_per_tick)
+			if gather_res("fuel", fuel_per_tick) == Globals.RESULT_OK:
+				is_accelerating = true
+				is_decelerating = false
+			else:
+				is_accelerating = false
 		elif target_speed < speed:
-			speed = move_toward(speed,target_speed,acceleration_per_tick*5)
+			is_accelerating = false
+			is_decelerating = true
+		else:
+			is_accelerating = false
+			is_decelerating = false
+
+func _process(delta):
+	if is_accelerating:
+		speed = move_toward(speed,target_speed,get_acceleration(engine_thrust)*delta)
+	elif is_decelerating:
+		speed = move_toward(speed,target_speed,get_acceleration(braking_force) * delta)
+
+func get_acceleration(moving_force : float) -> float:
+	var train_mass : float = 0
+	for carriage in carriages:
+		train_mass += carriage.mass
+	
+	return moving_force / train_mass
 
 func add_module(type: String, carNum : int, slot : int):
 	if carNum >= carriages.size() or slot >= Globals.modules_per_car or carriages[carNum] == null:

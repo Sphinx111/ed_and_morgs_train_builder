@@ -15,6 +15,7 @@ const ROWS: Array[Dictionary] = [
 	{"node_name": "Oil", "display_label": "Oil", "type": "resource", "key": "oil"},
 ]
 
+@onready var _resource_rows: HBoxContainer = $ResourceRows
 @onready var _detail_panel: Panel = $ResourceDetailPanel
 @onready var _type_label: Label = $ResourceDetailPanel/TypeLabel
 @onready var _value_label: Label = $ResourceDetailPanel/ValueLabel
@@ -23,7 +24,20 @@ var _train: Train = null
 
 
 func _ready() -> void:
+	apply_panel_width()
 	_detail_panel.hide()
+	_configure_row_labels()
+
+
+func apply_panel_width() -> void:
+	anchor_left = 0.0
+	anchor_top = 0.0
+	anchor_right = Globals.resource_panel_width_percent / 100.0
+	anchor_bottom = 0.0
+	offset_left = 0.0
+	offset_top = 0.0
+	offset_right = 0.0
+	offset_bottom = 89.0
 
 
 func setup(train: Train) -> void:
@@ -34,8 +48,21 @@ func setup(train: Train) -> void:
 func update_from_train(train: Train) -> void:
 	_train = train
 	for row in ROWS:
-		var label: RichTextLabel = get_node(row["node_name"])
+		var label: RichTextLabel = _get_row_label(row["node_name"])
 		label.text = _format_row(row, train)
+
+func _process(delta : float) -> void:
+	if _train != null:
+		var label : RichTextLabel = _get_row_label("Speed")
+		if label!= null:
+			label.text = _format_row(ROWS[0], _train)
+
+func _configure_row_labels() -> void:
+	for row in ROWS:
+		var label: RichTextLabel = _get_row_label(row["node_name"])
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.mouse_filter = Control.MOUSE_FILTER_STOP
+		label.scroll_active = false
 
 
 func _format_row(row: Dictionary, train: Train) -> String:
@@ -53,14 +80,14 @@ func _setup_hover_signals() -> void:
 	for row in ROWS:
 		if row["type"] != "resource":
 			continue
-		var label: RichTextLabel = get_node(row["node_name"])
+		var label: RichTextLabel = _get_row_label(row["node_name"])
 		var resource_key: String = row["key"]
-		label.mouse_entered.connect(_on_resource_hover.bind(resource_key, label.position.x))
+		label.mouse_entered.connect(_on_resource_hover.bind(resource_key, label))
 		label.mouse_exited.connect(_on_resource_leave)
 
 
-func _on_resource_hover(resource_key: String, x_pos: float) -> void:
-	_detail_panel.position.x = x_pos
+func _on_resource_hover(resource_key: String, label: RichTextLabel) -> void:
+	_detail_panel.position.x = label.position.x
 	_type_label.text = resource_key
 
 	if _train.res.has(resource_key) and _train.max_res.has(resource_key):
@@ -73,3 +100,7 @@ func _on_resource_hover(resource_key: String, x_pos: float) -> void:
 
 func _on_resource_leave() -> void:
 	_detail_panel.hide()
+
+
+func _get_row_label(node_name: String) -> RichTextLabel:
+	return _resource_rows.get_node(node_name) as RichTextLabel

@@ -6,6 +6,7 @@ var parentCar : TraincarBase = null
 var parentTrain : Train = null
 var type : String = "empty"
 var sequence : int = 0
+var mass : float = 250.0
 
 var enabled : bool = true
 

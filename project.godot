@@ -20,6 +20,13 @@ config/icon="res://icon.svg"
 Globals="*res://Globals.gd"
 Helpers="*res://Helpers.gd"
 
+[display]
+
+window/size/viewport_width=1152
+window/size/viewport_height=648
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
 [input]
 
 enter={

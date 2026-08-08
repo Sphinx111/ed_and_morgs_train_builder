@@ -6,8 +6,8 @@ class_name TraincarBase
 var sequence : int = 0
 var parentTrain : Train = null
 
-# helper variable to hold the current luxury level of the car
-var luxury : float = 0.0
+# Base mass of the TrainCar
+var mass : float = 1000.0
 
 # List of modules in the car
 var modules : Array[ModuleBase] = [null, null, null, null]

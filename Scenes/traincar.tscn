@@ -12,115 +12,123 @@
 
 [node name="SceneRoot" type="Control"]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_o0k6p")
 
 [node name="BasicUI" type="Control" parent="."]
-top_level = true
-anchors_preset = 0
-offset_right = 1153.0
-offset_bottom = 648.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("4_fqnf8")
 
 [node name="ResourcePanel" type="Panel" parent="BasicUI"]
-layout_mode = 0
-offset_right = 1150.0
+layout_mode = 1
 offset_bottom = 89.0
 script = ExtResource("5_respnl")
 
-[node name="Speed" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_right = 56.0
-offset_bottom = 46.0
+[node name="ResourceRows" type="HBoxContainer" parent="BasicUI/ResourcePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Speed" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Speed: 50"
 fit_content = true
+scroll_active = false
 
-[node name="Fuel" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 75.0
-offset_right = 115.0
-offset_bottom = 46.0
+[node name="Fuel" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Fuel:
 25"
 fit_content = true
+scroll_active = false
 
-[node name="Pop" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 150.0
-offset_right = 188.0
-offset_bottom = 46.0
+[node name="Pop" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Pop: 25"
 fit_content = true
+scroll_active = false
 
-[node name="CleanWater" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 213.0
-offset_right = 268.0
-offset_bottom = 46.0
+[node name="CleanWater" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Water:
 100"
 fit_content = true
+scroll_active = false
 
-[node name="GreyWater" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 283.0
-offset_right = 331.0
-offset_bottom = 46.0
+[node name="GreyWater" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Grey:
 0"
 fit_content = true
+scroll_active = false
 
-[node name="BlackWater" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 344.0
-offset_right = 394.0
-offset_bottom = 46.0
+[node name="BlackWater" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Black:
 0"
 fit_content = true
+scroll_active = false
 
-[node name="MechParts" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 479.0
-offset_right = 530.0
-offset_bottom = 46.0
-text = "Parts:
-100"
-fit_content = true
-
-[node name="Scrap" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 538.0
-offset_right = 589.0
-offset_bottom = 46.0
-text = "Scrap:
-0"
-fit_content = true
-
-[node name="Oil" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 602.0
-offset_right = 638.0
-offset_bottom = 46.0
-text = "Oil:
-0"
-fit_content = true
-
-[node name="Food" type="RichTextLabel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
-offset_left = 409.0
-offset_right = 457.0
-offset_bottom = 46.0
+[node name="Food" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = "Food:
 0"
 fit_content = true
+scroll_active = false
+
+[node name="MechParts" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Parts:
+100"
+fit_content = true
+scroll_active = false
+
+[node name="Scrap" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Scrap:
+0"
+fit_content = true
+scroll_active = false
+
+[node name="Oil" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Oil:
+0"
+fit_content = true
+scroll_active = false
 
 [node name="ResourceDetailPanel" type="Panel" parent="BasicUI/ResourcePanel"]
-layout_mode = 0
+layout_mode = 1
 offset_left = 7.0
 offset_top = 92.0
 offset_right = 113.0
@@ -151,10 +159,10 @@ placeholder_text = "Type instructions here"
 
 [node name="Button" type="Button" parent="BasicUI"]
 layout_mode = 0
-offset_left = 1054.0
-offset_top = 7.0
-offset_right = 1144.0
-offset_bottom = 38.0
+offset_left = 1052.0
+offset_top = 44.0
+offset_right = 1142.0
+offset_bottom = 75.0
 focus_mode = 0
 toggle_mode = true
 text = "Workers"
@@ -244,10 +252,10 @@ text = "Car++"
 
 [node name="ExpeditionsButton" type="Button" parent="BasicUI"]
 layout_mode = 0
-offset_left = 937.0
-offset_top = 7.0
-offset_right = 1050.0
-offset_bottom = 38.0
+offset_left = 1029.0
+offset_top = 9.0
+offset_right = 1142.0
+offset_bottom = 40.0
 toggle_mode = true
 text = "Expeditions"
 
@@ -262,9 +270,9 @@ script = ExtResource("4_o0k6p")
 [node name="construct" type="Button" parent="BasicUI"]
 layout_mode = 0
 offset_left = 1058.0
-offset_top = 47.0
+offset_top = 79.0
 offset_right = 1142.0
-offset_bottom = 78.0
+offset_bottom = 110.0
 toggle_mode = true
 text = "Construct"
 
