@@ -4,6 +4,7 @@ class_name ProductionProvider
 
 var cycleTime      : int = 1             ## Number of resource ticks to complete a production cycle
 var progress : float     = 0.0           ## Helper variable to track progress towards production
+var carryOver : float = 0.0              ## progress carried over from last cycle
 
 var outputType1    : String  = ""	## The type of resource to produce
 var output1_amount : float = 0.0      ## Amount of resource to produce each cycle
@@ -16,7 +17,7 @@ var input_mode : int = Globals.USE_BOTH	## Defines whether to use both resources
 var inputType1 : String = ""	## Type of resource required to produce
 var input1_needed : float = 0.0     ## Amount of input type 1 to begin a production cycle
 var input1_from_map : bool = false  ## true if resource is taken from world map instead of train
-var max_speed : float = 110         ## If train speed is above this value, module does not produce
+var max_speed : float = -1        ## If train speed is above this value, module does not produce
 
 var inputType2 : String = ""	## Only set this if there is an inputType1
 var input2_needed : float = 0.0     ## Amount of input type 2 to begin a production cycle
@@ -42,6 +43,8 @@ func produce(train : Train, worker_modifier : float) -> int:
 			result = start_cycle_both(train, worker_modifier)	# Might indicate insufficient resources
 		elif input_mode == Globals.USE_EITHER:
 			result = start_cycle_either(train, worker_modifier)
+		progress += carryOver;
+		carryOver = 0.0
 	if progress > 0.0 and progress < 1.0:
 		make_progress(train, worker_modifier)
 	if progress >= 1.0:
@@ -76,7 +79,6 @@ func start_cycle_both(train : Train, worker_modifier : float) -> int:
 			if inputType2 != "":
 				train.add_res(inputType2, -1 * input2_needed)
 		progress = progress + (worker_modifier / cycleTime)
-	
 	return result
 
 ## Consumes resources and starts cycle
@@ -125,6 +127,7 @@ func make_progress(train : Train, worker_modifier : float):
 	progress = progress + (worker_modifier / cycleTime)
 
 func finish_cycle(train : Train):
+	carryOver = max(0,progress-1.0)
 	progress = 0.0
 	if outputType1 != "":
 		if outputType1 == "pop":

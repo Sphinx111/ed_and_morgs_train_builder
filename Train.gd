@@ -161,16 +161,16 @@ func add_module(type: String, carNum : int, slot : int):
 		print_debug("Error: Invalid Build slot: " + String.num_int64(carNum) + ":" + String.num_int64(slot))
 		return
 	
+	if carriages[carNum].modules[slot].type != "empty":
+		remove_module(carNum, slot)
+	
 	if type != "empty":
 		var cost : float = ModuleBase.build_cost[type]
 		if gather_res("mech_parts", cost) == Globals.NO_RESOURCES:
 			return
 	
-	var typesToRemove : Array[String] = carriages[carNum].modules[slot].serves_needs.duplicate()
 	carriages[carNum].add_module(type, slot)
-	
 	update_needs_maps(carriages[carNum].modules[slot].serves_needs,[carNum, slot],Globals.MODULE_ADDED)
-	update_needs_maps(typesToRemove,[carNum, slot],Globals.MODULE_REMOVED)
 
 ## Add a new car to the end of the train
 func add_car():
@@ -187,7 +187,7 @@ func remove_module(carNum : int, slot : int):
 	var typesToRemove : Array[String] = carriages[carNum].modules[slot].serves_needs.duplicate()
 	var workTypesToRemove : Array[String] = [] 
 	if carriages[carNum].modules[slot].workers_needed > 0:
-		carriages[carNum].modules[slot].work_types.duplicate()
+		workTypesToRemove = carriages[carNum].modules[slot].work_types.duplicate()
 	var modType = carriages[carNum].modules[slot].type
 	var refund : float = ModuleBase.build_cost[modType] * Globals.refund_module_fraction
 	add_res("mech_parts", refund)

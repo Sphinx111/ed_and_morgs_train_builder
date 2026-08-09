@@ -28,7 +28,9 @@ var services : Array[ServiceProvider] = []
 var serves_needs : Array[String] = []
 var customers : Array[Passenger] = []
 var service_speed_modifier = 1.0
+var baseCustomers : int = 0
 var maxCustomers : int = 0
+var customers_per_adjacency : int = floor(maxCustomers / (1 / Globals.ADJACENCY_BONUS))
 
 # Production Variables
 var producers : Array[ProductionProvider] = [] 
@@ -38,6 +40,9 @@ var work_types : Array[String] = []
 
 # Storage Variables
 var storages : Array[GenericStorageProvider] = []
+
+const PRODUCTION_PROGRESS_HEIGHT : float = 50.0
+const PRODUCTION_PROGRESS_BOTTOM : float = 80.0
 
 # All modules should know their parents and set position
 func _ready():
@@ -77,12 +82,13 @@ func resource_tick():
 	if enabled == false:
 		return
 	
-	
 	if services.size() > 0:
 		serve_customers()
 	
 	if producers.size() > 0:
 		produce_resources()
+	else:
+		_update_production_progress(0.0)
 		return
 
 func set_sequence(newSequence : int):
@@ -168,8 +174,18 @@ func produce_resources():
 			var worker_modifier = 1.0
 			if workers_needed > 0:
 				worker_modifier = float(workers.size()) / float(workers_needed)
+			worker_modifier += (adjacencies * Globals.ADJACENCY_BONUS)
 			producer.produce(parentTrain, worker_modifier)
-			$DebugProgress.size.y = 50.0 * producer.progress
+			_update_production_progress(producer.progress)
+	else:
+		_update_production_progress(0.0)
+
+
+func _update_production_progress(progress : float) -> void:
+	var bar_height : float = PRODUCTION_PROGRESS_HEIGHT * progress
+	$DebugProgress.offset_top = PRODUCTION_PROGRESS_BOTTOM - bar_height
+	$DebugProgress.offset_bottom = PRODUCTION_PROGRESS_BOTTOM
+	$DebugProgress.visible = progress > 0.0
 
 ## For each customer in the module, run through the repeatable services and attempt to provide them
 func serve_customers() -> void:
@@ -209,17 +225,25 @@ func reset_module():
 	workers_needed = 0
 	$Outline.color = Color.GRAY
 	
-	# Kick out any customers when module type changes
+	# Kick out any customers and workers when module type changes
 	for customer in customers:
 		if is_instance_valid(customer):
 			_eject_customer(customer)
-			_eject_worker(customer)
+	for worker in workers:
+		if is_instance_valid(worker):
+			_eject_worker(worker)
 	workers = []
 	customers = []
+	_update_production_progress(0.0)
 	
 	# Remove any storage provision from train
 	for storage in storages:
 		storage.remove_storage(parentTrain)
+
+func set_adjacency(newVal : int) -> void:
+	adjacencies = newVal
+	if (maxCustomers > 0):
+		maxCustomers = baseCustomers + floor(baseCustomers * newVal * Globals.ADJACENCY_BONUS)
 
 func set_type(newType : String):
 	reset_module()                    # Start from state of an 'empty' module
@@ -245,7 +269,7 @@ func set_type(newType : String):
 		var basicBedProvider = BasicBedProvider.new()
 		add_service(showerProvider)
 		add_service(basicBedProvider)
-		maxCustomers = 4
+		baseCustomers = 4
 	elif newType == "kitchen":
 		$Outline.color = Color.BISQUE
 		var basicFoodProvider = BasicFoodProvider.new()
@@ -253,12 +277,12 @@ func set_type(newType : String):
 		add_service(basicFoodProvider)
 		add_service(fastWaterProvider)
 		add_custom_storage({"clean_water" : 20.0,"food1" : 10.0,"food2" : 10.0})
-		maxCustomers = 10
+		baseCustomers = 3
 	elif newType == "farm":
 		$Outline.color = Color.SEA_GREEN
 		var basicFoodProvider = BasicFoodProvider.new()
 		add_service(basicFoodProvider)
-		maxCustomers = 5
+		baseCustomers = 5
 		
 		# Setup production
 		var food1Producer = BasicFood1Producer.new()
@@ -296,5 +320,6 @@ func set_type(newType : String):
 		add_producer(fuelProducer)
 		add_custom_storage({"oil" : 100.0, "fuel" : 100.0})
 	$Label.text = newType
+	maxCustomers = baseCustomers
 	if workers_needed > 0:
 		parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)

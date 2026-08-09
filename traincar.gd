@@ -62,12 +62,13 @@ func add_module(type : String, slot : int):
 # TODO: last slot seems to not get adjacencie bonuses test more then fix
 func recalculateAdjacencies():
 	for i in range(0,4):
-		modules[i].adjacencies = 0
+		var newVal : int = 0
 		var type=modules[i].type
 		if i>0 and modules[i-1].type == type :
-			modules[i].adjacencies += 1
+			newVal += 1
 		if i<3 and modules[i+1].type== type :
-			modules[i].adjacencies += 1
+			newVal += 1
+		modules[i].set_adjacency(newVal)
 
 func remove_module(slot: int):
 	modules[slot].set_type("empty")

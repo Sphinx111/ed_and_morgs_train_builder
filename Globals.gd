@@ -27,6 +27,7 @@ const train_initial_carriage_count : int = 3
 const module_width : float = 50
 const module_height : float = 50
 var refund_module_fraction : float = 0.5
+const ADJACENCY_BONUS : float = 0.25
 
 # Production ratios
 var scrap_to_mech_ratio : float = 0.2 # 5 Scrap to make 1 mech parts

@@ -11,4 +11,6 @@ func init() -> void:
 	outputType1 = "scrap"
 	output1_amount = 5.0
 
+	max_speed = 110
+
 	cycleTime = 1

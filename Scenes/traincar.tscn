@@ -297,12 +297,14 @@ position = Vector2(0, 78)
 script = ExtResource("3_ksonv")
 
 [node name="DebugRight" type="Line2D" parent="Train/PassengersManager"]
+visible = false
 position = Vector2(50, 0)
 points = PackedVector2Array(0, 0, 0, -15)
 width = 3.0
 default_color = Color(0.982137, 0.66339, 0.691368, 1)
 
 [node name="DebugLeft" type="Line2D" parent="Train/PassengersManager"]
+visible = false
 position = Vector2(-50, 0)
 points = PackedVector2Array(0, 0, 0, -15)
 width = 3.0

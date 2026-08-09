@@ -37,9 +37,10 @@ offset_right = 26.0
 offset_bottom = 108.0
 
 [node name="DebugProgress" type="ColorRect" parent="."]
+z_index = 1
 offset_left = 4.0
 offset_top = 80.0
 offset_right = 8.0
 offset_bottom = 80.0
-rotation = -3.14159
+mouse_filter = 2
 color = Color(0.438351, 0.42115, 0.399321, 1)
