@@ -20,7 +20,8 @@ var max_gain : Array = [["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE]]
 const default_gains : Dictionary = {
 	"scrap" : ["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE],
 	"grey_water" : ["grey_water", 15, 1.0, Globals.water_texture, Color.AQUA],
-	"pop" : ["pop", 2, 1.0, Globals.pop_texture, Color.WHITE]
+	"pop" : ["pop", 2, 1.0, Globals.pop_texture, Color.WHITE],
+	"oil" : ["oil", 10, 1.0, Globals.water_texture, Color.BLACK]
 }
 
 # List of resources required to launch the expedition, per person
@@ -94,6 +95,11 @@ static func get_default_costs_from_type(typeWanted : String) -> Array:
 		result.append(default_costs["pop"])
 		result.append(default_costs["clean_water"].duplicate())
 		result[1][1] = 4
+		result.append(default_costs["food1"].duplicate())
+		result[2][1] = 2
+	elif typeWanted == "oil":
+		result.append(default_costs["pop"])
+		result.append(default_costs["clean_water"])
 		result.append(default_costs["food1"].duplicate())
 		result[2][1] = 2
 	return result

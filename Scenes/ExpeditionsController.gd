@@ -40,8 +40,10 @@ func refresh_options():
 			expedition_name = "Fetch Scrap"
 		elif resourceSpot.resource_type == "grey_water":
 			expedition_name = "Fetch Water"
+		elif resourceSpot.resource_type == "oil":
+			expedition_name = "Fetch Oil"
 		
-		if resourceSpot.resource_type == "pop" or resourceSpot.resource_type == "scrap" or resourceSpot.resource_type == "grey_water":
+		if resourceSpot.resource_type == "pop" or resourceSpot.resource_type == "scrap" or resourceSpot.resource_type == "grey_water" or resourceSpot.resource_type == "oil":
 			var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceSpot.resource_type, resourceSpot)
 			options_available.append(newOption)
 			available_expeditions_panel.add_child(newOption)

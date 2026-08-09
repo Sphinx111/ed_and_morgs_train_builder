@@ -8,9 +8,11 @@ var carryOver : float = 0.0              ## progress carried over from last cycl
 
 var outputType1    : String  = ""	## The type of resource to produce
 var output1_amount : float = 0.0      ## Amount of resource to produce each cycle
+var output1_backlog : float = 0.0       ## Amount of resource waiting to add to train
 
 var outputType2    : String  = ""	## Only set this if there is an outputType1
 var output2_amount : float = 0.0      ## Amount of resource to produce each cycle
+var output2_backlog : float = 0.0     ## Amount of resource waiting to add to train
 
 var input_mode : int = Globals.USE_BOTH	## Defines whether to use both resources at once, or prioritise first input type
 
@@ -37,8 +39,8 @@ func get_work_types() -> Array[String]:
 ## Control function to call each resource tick, must provide MapHandler if resource comes from map
 func produce(train : Train, worker_modifier : float) -> int:
 	var result = Globals.RESULT_OK
-
-	if progress == 0.0:
+	chew_backlog(train)
+	if progress == 0.0 && (output1_backlog > 0 or output2_backlog > 0):
 		if input_mode == Globals.USE_BOTH:
 			result = start_cycle_both(train, worker_modifier)	# Might indicate insufficient resources
 		elif input_mode == Globals.USE_EITHER:
@@ -118,7 +120,9 @@ func start_cycle_either(train : Train, worker_modifier : float) -> int:
 	
 	return result
 
-
+func chew_backlog(train : Train):
+	var output1_backlog : float = train.add_res(outputType1, output1_backlog)
+	var output2_backlog : float = train.add_res(outputType2, output2_backlog)
 
 func make_progress(train : Train, worker_modifier : float):
 	# Don't make progress if train is above max speed for this module (ie scrap arms)
@@ -133,6 +137,6 @@ func finish_cycle(train : Train):
 		if outputType1 == "pop":
 			train.passengerManager.add_passenger()
 			return
-		train.add_res(outputType1, output1_amount)
+		output1_backlog += train.add_res(outputType1, output1_amount)
 		if outputType2 != "":
-			train.add_res(outputType2, output2_amount)
+			output2_backlog += train.add_res(outputType2, output2_amount)

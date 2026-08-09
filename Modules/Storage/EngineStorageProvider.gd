@@ -22,7 +22,8 @@ func create_storage(parentTrain : Train):
 		"seeds4" : 200.0,
 		"seeds5" : 200.0,
 		"seeds6" : 200.0,
-		"scrap" : 200.0
+		"scrap" : 200.0,
+		"oil" : 100.00
 	}
 	for type in max_storage:
 		parentTrain.amend_storage(type, max_storage[type])

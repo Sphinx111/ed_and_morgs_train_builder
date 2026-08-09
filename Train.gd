@@ -98,15 +98,23 @@ func gather_res(key : String, amount : float) -> int:
 		return Globals.RESULT_OK
 	return Globals.NO_RESOURCES
 
-func add_res(key : String, amount : float) -> void:
+# adds a resource to the train, returning the amount that could not be added
+func add_res(key : String, amount : float) -> float:
 	if res.has(key):
-		res[key] = res[key] + amount
-		clampf(res[key], 0, max_res[key]) ## Todo: Don't discard extra res
+		if max_res.has(key):
+			var goal_amount : float = res[key] + amount
+			if goal_amount > max_res[key]:
+				var excess : float = goal_amount - max_res[key]
+				res[key] = max_res[key];
+				return excess
+			else:
+				res[key] = res[key] + amount
 	elif key == "pop":
 		for i in range(floor(amount)):
 			passengerManager.add_passenger()
 	else:
 		print_debug("adding resource that doesn't exist: " + key)
+	return 0
 
 func get_expedition_team(passengers_needed : int) -> Array[Passenger]:
 	return passengerManager.get_expedition_passengers(passengers_needed)
