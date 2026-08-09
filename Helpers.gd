@@ -47,7 +47,8 @@ func get_xpos_from_trainpos(trainPos: Array) -> float:
 	if Globals.train_direction > 0: result = result * -1
 	return result
 
-## get a trainpost [carNum, moduleNum] from a local position (Vector2)
+## get a trainpos [carNum, moduleNum] from a local position (Vector2).
+## Position must be relative to PassengersManager, not the Train root node.
 func get_trainpos_from_coords(localPos : Vector2) -> Array[int]:
 	var offset_from_start : float = 0
 	offset_from_start = localPos.x

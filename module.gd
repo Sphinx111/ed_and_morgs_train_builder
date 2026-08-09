@@ -7,6 +7,7 @@ var parentTrain : Train = null
 var type : String = "empty"
 var sequence : int = 0
 var mass : float = 250.0
+var adjacencies : int = 0
 
 var enabled : bool = true
 
@@ -70,10 +71,12 @@ func needs_worker(work_type : String) -> bool:
 
 # For modules which produce or consume resources unrelated to presence of customers
 func resource_tick():
+	if type == "empty":
+		return
+	$Label.text = "%s %d" % [type, adjacencies]
 	if enabled == false:
 		return
-	elif type == "empty":
-		return
+	
 	
 	if services.size() > 0:
 		serve_customers()

@@ -57,9 +57,21 @@ func init_module(type : String, position : int) -> void:
 
 func add_module(type : String, slot : int):
 	modules[slot].set_type(type)
+	recalculateAdjacencies()
+	
+# TODO: last slot seems to not get adjacencie bonuses test more then fix
+func recalculateAdjacencies():
+	for i in range(0,4):
+		modules[i].adjacencies = 0
+		var type=modules[i].type
+		if i>0 and modules[i-1].type == type :
+			modules[i].adjacencies += 1
+		if i<3 and modules[i+1].type== type :
+			modules[i].adjacencies += 1
 
 func remove_module(slot: int):
 	modules[slot].set_type("empty")
+	recalculateAdjacencies()
 
 func get_type_map(need_type_to_find : String) -> Array:
 	var result = [0,0,0,0]

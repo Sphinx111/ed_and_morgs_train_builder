@@ -260,12 +260,23 @@ toggle_mode = true
 text = "Expeditions"
 
 [node name="constructionPanel" type="Panel" parent="BasicUI"]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 118.0
-offset_right = 971.0
-offset_bottom = 165.0
+visible = false
+layout_mode = 1
 script = ExtResource("4_o0k6p")
+
+[node name="ModuleButtons" type="HBoxContainer" parent="BasicUI/constructionPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+alignment = 1
 
 [node name="construct" type="Button" parent="BasicUI"]
 layout_mode = 0
@@ -275,12 +286,6 @@ offset_right = 1142.0
 offset_bottom = 110.0
 toggle_mode = true
 text = "Construct"
-
-[node name="selectCarPanel" type="Panel" parent="BasicUI"]
-layout_mode = 0
-offset_top = 483.0
-offset_right = 820.0
-offset_bottom = 523.0
 
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 340)

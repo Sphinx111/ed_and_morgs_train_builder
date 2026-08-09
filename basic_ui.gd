@@ -63,6 +63,7 @@ func _ready() -> void:
 func _on_viewport_size_changed() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	resource_panel.apply_panel_width()
+	constructionPanel.apply_panel_layout()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if pending_module_type == "":
@@ -78,8 +79,9 @@ func _on_construction_placement_requested(module_type: String) -> void:
 	add_thought("Select a slot on the train to place %s." % module_type)
 
 func _place_module_at_click(global_position: Vector2) -> void:
-	var train_local_pos: Vector2 = selectedTrain.to_local(global_position)
-	var train_pos: Array[int] = Helpers.get_trainpos_from_coords(train_local_pos)
+	# Match passenger/module coords: get_trainpos_from_coords expects PassengersManager-local space.
+	var placement_local_pos: Vector2 = selectedTrain.passengerManager.to_local(global_position)
+	var train_pos: Array[int] = Helpers.get_trainpos_from_coords(placement_local_pos)
 	selectedTrain.add_module(pending_module_type, train_pos[0], train_pos[1])
 	_clear_placement_mode()
 

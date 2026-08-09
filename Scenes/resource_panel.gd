@@ -37,7 +37,7 @@ func apply_panel_width() -> void:
 	offset_left = 0.0
 	offset_top = 0.0
 	offset_right = 0.0
-	offset_bottom = 89.0
+	offset_bottom = Globals.resource_panel_height
 
 
 func setup(train: Train) -> void:

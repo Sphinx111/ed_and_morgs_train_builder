@@ -54,7 +54,7 @@ var is_decelerating : bool = false
 var target_speed : float = 200.00
 var engine_thrust : float = 20000.0
 var braking_force : float = 40000.0
-const fuel_per_tick : float = 1
+const fuel_per_tick : float = 0.03
 
 func _ready() -> void:
 	self.position.x = Globals.train_origin_x

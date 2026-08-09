@@ -5,6 +5,9 @@ var activeUI : TrainUI = null
 const display_width = 1400 #1152
 const display_height = 648
 const resource_panel_width_percent : float = 80.0
+const resource_panel_height : float = 89.0
+const construction_panel_width_percent : float = 80.0
+const construction_panel_height : float = 47.0
 var game_tick : int = 0
 const tick_duration : float = 2.0
 
