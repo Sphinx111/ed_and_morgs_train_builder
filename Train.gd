@@ -15,6 +15,9 @@ var worldMap : MapHandler = null
 # temperature variables
 var train_temperature : float = 25.0
 var train_cooling_rate : float = Globals.train_base_cooling
+var sunIntensity : float = 0.0
+# making this a variable now since it will someday depend on difficulty
+var sunIntensityGrowthRate : float = 0.000001
 
 var expedition_safety_flag : bool = false    ## Prevent train leaving if expeditions have been started
 
@@ -147,8 +150,10 @@ func _temperature_tick() -> void:
 	if raw_sun_height <= 0.0:
 		train_temperature = move_toward(train_temperature, Globals.train_base_temp, train_cooling_rate)
 	else:
-		train_temperature = move_toward(train_temperature, Globals.train_max_temp, sun_height * Globals.temp_increase_in_sun)
-	print("sun: %f - train: %f" % [sun_height, train_temperature])
+		train_temperature = move_toward(train_temperature, Globals.train_max_temp, sunIntensity * sun_height * Globals.temp_increase_in_sun)
+	print("sun: %f intensity %f - train: %f" % [sun_height, sunIntensity, train_temperature])
+	if sunIntensity<1: #don't go over 1 
+		sunIntensity+= sunIntensityGrowthRate
 
 func _speed_tick() -> void:
 	if expedition_safety_flag == false:
