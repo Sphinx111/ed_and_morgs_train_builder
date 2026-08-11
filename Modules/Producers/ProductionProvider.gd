@@ -40,7 +40,7 @@ func get_work_types() -> Array[String]:
 func produce(train : Train, worker_modifier : float) -> int:
 	var result = Globals.RESULT_OK
 	chew_backlog(train)
-	if progress == 0.0 && (output1_backlog > 0 or output2_backlog > 0):
+	if progress == 0.0 && output1_backlog <= 0 && output2_backlog <= 0:
 		if input_mode == Globals.USE_BOTH:
 			result = start_cycle_both(train, worker_modifier)	# Might indicate insufficient resources
 		elif input_mode == Globals.USE_EITHER:
@@ -69,7 +69,7 @@ func start_cycle_both(train : Train, worker_modifier : float) -> int:
 				result = Globals.NO_RESOURCES
 				if result == Globals.RESULT_OK and inputType2 != "":
 					var input2_avail = train.get_res(inputType2)
-					result = Helpers.exceeds_safety_margin(train, inputType1, outputType1, outputType2, input1_needed)
+					result = Helpers.exceeds_safety_margin(train, inputType2, outputType1, outputType2, input2_needed)
 					if input2_avail < input2_needed:
 						result = Globals.NO_RESOURCES
 		elif input1_from_map == true:       # if input1 is from the map, it consumes it at this step
@@ -108,7 +108,7 @@ func start_cycle_either(train : Train, worker_modifier : float) -> int:
 	# Only consume resource2 if resource1 is not available
 	if result != Globals.RESULT_OK:
 		if inputType2 != "":
-			result = Helpers.exceeds_safety_margin(train, inputType1, outputType1, outputType2, input1_needed)
+			result = Helpers.exceeds_safety_margin(train, inputType2, outputType1, outputType2, input2_needed)
 			var input2_avail = train.get_res(inputType2)
 			if input2_avail < input2_needed:
 				result = Globals.NO_RESOURCES
@@ -121,9 +121,10 @@ func start_cycle_either(train : Train, worker_modifier : float) -> int:
 	return result
 
 func chew_backlog(train : Train):
-	var output1_backlog : float = train.add_res(outputType1, output1_backlog)
-	if outputType2 != "" :
-		var output2_backlog : float = train.add_res(outputType2, output2_backlog)
+	if output1_backlog > 0:
+		output1_backlog = train.add_res(outputType1, output1_backlog)
+	if output2_backlog > 0:
+		output2_backlog = train.add_res(outputType2, output2_backlog)
 
 func make_progress(train : Train, worker_modifier : float):
 	# Don't make progress if train is above max speed for this module (ie scrap arms)
