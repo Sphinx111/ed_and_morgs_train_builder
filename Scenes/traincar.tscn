@@ -287,6 +287,13 @@ offset_bottom = 110.0
 toggle_mode = true
 text = "Construct"
 
+[node name="sunInfo" type="Label" parent="BasicUI"]
+layout_mode = 0
+offset_left = 25.099976
+offset_top = 526.5
+offset_right = 65.099976
+offset_bottom = 549.5
+
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 340)
 script = ExtResource("1_rq5f1")

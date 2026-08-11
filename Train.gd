@@ -151,7 +151,7 @@ func _temperature_tick() -> void:
 		train_temperature = move_toward(train_temperature, Globals.train_base_temp, train_cooling_rate)
 	else:
 		train_temperature = move_toward(train_temperature, Globals.train_max_temp, sunIntensity * sun_height * Globals.temp_increase_in_sun)
-	print("sun: %f intensity %f - train: %f" % [sun_height, sunIntensity, train_temperature])
+	# debug message: print("sun: %f intensity %f - train: %f" % [sun_height, sunIntensity, train_temperature])
 	if sunIntensity<1: #don't go over 1 
 		sunIntensity+= sunIntensityGrowthRate
 

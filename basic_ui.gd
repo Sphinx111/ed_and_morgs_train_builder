@@ -16,6 +16,7 @@ var tick_timer : Timer = Timer.new()
 @onready var debug_slider : HSlider = get_node("DebugPanel/DebugSlider")
 
 @onready var resource_panel : ResourcePanel = $ResourcePanel
+@onready var sunInfo = get_node("sunInfo")
 var jobsControllerScene : PackedScene = preload("res://Scenes/JobsController.tscn")
 var jobsController : Panel = null
 var expeditionsControllerScene : PackedScene = preload("res://Scenes/expeditions_panel.tscn")
@@ -28,6 +29,7 @@ func do_resource_tick():
 	resource_panel_update()
 	worldMap.train_step()
 	Globals.game_tick += 1
+	sunInfo.text="Temp: %d Solar: %f" % [selectedTrain.train_temperature, selectedTrain.sunIntensity]
 	
 	if expeditionsController != null:
 		expeditionsController.train_tick()
