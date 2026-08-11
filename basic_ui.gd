@@ -66,8 +66,28 @@ func _on_viewport_size_changed() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	resource_panel.apply_panel_width()
 	constructionPanel.apply_panel_layout()
+	
+@onready var simSpeedSlider : HSlider = get_node("DebugPanel/DebugSlider")	
+var saveSpeed : int = 1
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_1:
+			simSpeedSlider.value = 1
+			simSpeedSlider.drag_ended.emit(true)
+		if event.keycode == KEY_2:
+			simSpeedSlider.value = 5
+			simSpeedSlider.drag_ended.emit(true)
+		if event.keycode == KEY_3:
+			simSpeedSlider.value =  10
+			simSpeedSlider.drag_ended.emit(true)
+		if event.keycode == KEY_SPACE:
+			if simSpeedSlider.value > 0 :
+				saveSpeed = simSpeedSlider.value
+				simSpeedSlider.value =  0
+			else:
+				simSpeedSlider.value = saveSpeed
+			simSpeedSlider.drag_ended.emit(true)
 	if pending_module_type == "":
 		return
 	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
