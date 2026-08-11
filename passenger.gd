@@ -47,6 +47,11 @@ const maxNeeds = {
 }
 const WANDER_DURATION : float = 2.0
 
+var temp_tolerance : float = 40.0 # At this temp, passenger consumes most resources
+var temp_stress_tolerance : float = temp_tolerance - Globals.train_base_temp # Amount above base temp
+var temp_death : float = 60.0 # At this temp, the passenger dies
+var water_consumption_at_tolerance : float = 4.0
+
 var targetWork : String = ""
 var skills = {
 	"strength" : randf() / 2,
@@ -169,9 +174,15 @@ func worker_ejected_from_module():
 	is_in_module = false
 	is_working = false
 
-func resource_tick():
+func resource_tick(_train_temperature : float):
 	for key in needs.keys():
-		needs[key] += Globals.need_growth_rates[key]
+		if key == "thirst":
+			var temp_stress : float = _train_temperature - Globals.train_base_temp
+			needs[key] += (Globals.need_growth_rates[key] * temp_stress / temp_stress_tolerance * water_consumption_at_tolerance);
+		else:
+			needs[key] += Globals.need_growth_rates[key]
+	if _train_temperature >= temp_death:
+		is_dying = true;
 	check_needs()
 	
 	check_for_work()

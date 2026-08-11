@@ -53,6 +53,14 @@ const need_growth_rates : Dictionary[String, float] = {
 # Commenting out code contributed by junior dev (Izzy)
 #,kml,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
+## Temperature Variables
+const train_min_temp : float = 0.0
+const train_base_temp : float = 15.0
+const train_max_temp : float = 110.0
+const temp_increase_in_sun : float = 1
+const train_base_cooling : float = 2
+
+
 ## Resource storage variables
 # Minimum values to leave per passenger when doing production cycles
 const safety_margins : Dictionary = {

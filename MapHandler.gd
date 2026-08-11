@@ -63,16 +63,19 @@ func is_position_in_sun(testPos : Vector2) -> bool:
 func get_sun_height_for_train() -> float:
 	return get_sun_height(trainMarker.position)
 
-## Get the sun's height in the sky from a given position. < 0 = down, 0.0 = left horizon, 1.0 = overhead, 2.0 right horizon
+## Get the sun's height in the sky from a given position.
+## Returns -1 when not in sunlight, otherwise 0.0 (left horizon) to 2.0 (right horizon),
+## with 1.0 at the seam where the two sun objects meet.
 func get_sun_height(testPosition : Vector2) -> float:
-	var result : float = -1
-	
-	var distance_to_nearest_sun : float = get_distance_to_any_sun(testPosition)
-	if distance_to_nearest_sun > sunradius/2:
-		return result    ## If not in either sun, then return -1
-	
-	result = distance_to_nearest_sun / (sunradius/2)
-	return result
+	var test_x : float = testPosition.x
+
+	if test_x >= sun1.position.x and test_x < sun1.position.x + sunradius:
+		return (test_x - sun1.position.x) / sunradius
+
+	if test_x >= sun2.position.x and test_x < sun2.position.x + sunradius:
+		return 1.0 + (test_x - sun2.position.x) / sunradius
+
+	return -1.0
 
 ## Important: Returns distance to midpoint of a sun
 func get_distance_to_any_sun(testPosition : Vector2) -> float:

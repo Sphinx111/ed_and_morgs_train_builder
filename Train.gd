@@ -12,6 +12,9 @@ var CarriageScene = preload("res://Scenes/traincar_base.tscn")
 
 # Pointer to world map so train can track its position in the world
 var worldMap : MapHandler = null
+# temperature variables
+var train_temperature : float = 25.0
+var train_cooling_rate : float = Globals.train_base_cooling
 
 var expedition_safety_flag : bool = false    ## Prevent train leaving if expeditions have been started
 
@@ -132,9 +135,20 @@ func resource_tick():
 	for carriage in carriages:
 		if carriage != null:
 			carriage.resource_tick()
-	passengerManager.resource_tick()
+	_temperature_tick()
+	passengerManager.resource_tick(train_temperature)
 	_speed_tick()
 	Helpers.update_resource_safety_flags(self)
+
+func _temperature_tick() -> void:
+	# Map height 0..2 (horizon..horizon) to heating intensity 0..1..0, peaking at seam/midday.
+	var raw_sun_height : float = worldMap.get_sun_height_for_train()
+	var sun_height : float = 1 - abs(raw_sun_height - 1.0)
+	if raw_sun_height <= 0.0:
+		train_temperature = move_toward(train_temperature, Globals.train_base_temp, train_cooling_rate)
+	else:
+		train_temperature = move_toward(train_temperature, Globals.train_max_temp, sun_height * Globals.temp_increase_in_sun)
+	print("sun: %f - train: %f" % [sun_height, train_temperature])
 
 func _speed_tick() -> void:
 	if expedition_safety_flag == false:

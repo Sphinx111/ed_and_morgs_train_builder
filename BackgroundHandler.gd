@@ -52,11 +52,19 @@ func _process(delta : float):
 			if Globals.train_direction > 0: rock.position.x = Globals.display_width + randf_range(50, 110)
 			elif Globals.train_direction < 0: rock.position.x = 0 - randf_range(50, 120)
 
-func update_sun_state():
-	var sun_height : float = train.worldMap.get_sun_height_for_train()
-	if sun_height <= -1:
+func update_sun_state() -> void:
+	var raw_sun_height : float = train.worldMap.get_sun_height_for_train()
+	if raw_sun_height < 0.0:
 		sunbeam.hide()
-	else:
-		sunbeam.show()
-		sunbeam.rotation = (1 * PI) - ((0.5 * PI) * sun_height)
-	pass
+		return
+
+	sunbeam.show()
+	var rotation_height : float = _sun_height_for_sunbeam_rotation(raw_sun_height)
+	sunbeam.rotation = PI - (0.5 * PI * rotation_height)
+
+
+## Remap 0..2 day arc back to the legacy -1..1 per-sun scale used by the sunbeam formula.
+func _sun_height_for_sunbeam_rotation(raw_sun_height : float) -> float:
+	if raw_sun_height <= 1.0:
+		return 1.0 - (2.0 * raw_sun_height)
+	return 3.0 - (2.0 * raw_sun_height)

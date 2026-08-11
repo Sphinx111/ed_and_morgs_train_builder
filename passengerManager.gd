@@ -28,7 +28,7 @@ func _process(_delta : float):
 		debugLeft.position.x = passengers[0].last_module_pos
 		debugRight.position.x = passengers[0].next_module_pos
 
-func resource_tick():
+func resource_tick(_train_temperature : float):
 	# Tidyup all dying passengers first
 	for passenger : Passenger in dying_passengers:
 		passenger.cleanup()
@@ -44,7 +44,7 @@ func resource_tick():
 	expedition_passengers = []
 
 	for passenger in passengers:
-		passenger.resource_tick()
+		passenger.resource_tick(_train_temperature)
 		if passenger.is_dying == true:
 			dying_passengers.append(passenger)
 		if passenger.is_on_expedition == true:
