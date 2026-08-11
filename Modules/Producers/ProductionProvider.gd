@@ -122,7 +122,8 @@ func start_cycle_either(train : Train, worker_modifier : float) -> int:
 
 func chew_backlog(train : Train):
 	var output1_backlog : float = train.add_res(outputType1, output1_backlog)
-	var output2_backlog : float = train.add_res(outputType2, output2_backlog)
+	if outputType2 != "" :
+		var output2_backlog : float = train.add_res(outputType2, output2_backlog)
 
 func make_progress(train : Train, worker_modifier : float):
 	# Don't make progress if train is above max speed for this module (ie scrap arms)
