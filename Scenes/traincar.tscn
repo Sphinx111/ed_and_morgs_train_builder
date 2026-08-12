@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=12 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bq288wrgttmyx" path="res://GameManager.gd" id="1_o0k6p"]
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://b422owa3buotj" path="res://Scenes/resource_panel.gd" id="5_respnl"]
 [ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://BackgroundHandler.gd" id="6_mscei"]
 [ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://Scenes/LeverControl.tscn" id="6_u0kvb"]
+[ext_resource type="Script" uid="uid://76holwxha2tp" path="res://camera_controller.gd" id="7_camctl"]
 
 [node name="SceneRoot" type="Control"]
 layout_mode = 3
@@ -21,8 +22,10 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_o0k6p")
 
-[node name="BasicUI" type="Control" parent="."]
-layout_mode = 1
+[node name="UICanvas" type="CanvasLayer" parent="."]
+
+[node name="BasicUI" type="Control" parent="UICanvas"]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -31,12 +34,12 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("4_fqnf8")
 
-[node name="ResourcePanel" type="Panel" parent="BasicUI"]
+[node name="ResourcePanel" type="Panel" parent="UICanvas/BasicUI"]
 layout_mode = 1
 offset_bottom = 89.0
 script = ExtResource("5_respnl")
 
-[node name="ResourceRows" type="HBoxContainer" parent="BasicUI/ResourcePanel"]
+[node name="ResourceRows" type="HBoxContainer" parent="UICanvas/BasicUI/ResourcePanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -50,14 +53,14 @@ grow_vertical = 2
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="Speed" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="Speed" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Speed: 50"
 fit_content = true
 scroll_active = false
 
-[node name="Fuel" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="Fuel" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Fuel:
@@ -65,14 +68,14 @@ text = "Fuel:
 fit_content = true
 scroll_active = false
 
-[node name="Pop" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="Pop" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Pop: 25"
 fit_content = true
 scroll_active = false
 
-[node name="CleanWater" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="CleanWater" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Water:
@@ -80,7 +83,7 @@ text = "Water:
 fit_content = true
 scroll_active = false
 
-[node name="GreyWater" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="GreyWater" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Grey:
@@ -88,7 +91,7 @@ text = "Grey:
 fit_content = true
 scroll_active = false
 
-[node name="BlackWater" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="BlackWater" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Black:
@@ -96,7 +99,7 @@ text = "Black:
 fit_content = true
 scroll_active = false
 
-[node name="Food" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="Food" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Food:
@@ -104,7 +107,7 @@ text = "Food:
 fit_content = true
 scroll_active = false
 
-[node name="MechParts" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="MechParts" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Parts:
@@ -112,7 +115,7 @@ text = "Parts:
 fit_content = true
 scroll_active = false
 
-[node name="Scrap" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="Scrap" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Scrap:
@@ -120,7 +123,7 @@ text = "Scrap:
 fit_content = true
 scroll_active = false
 
-[node name="Oil" type="RichTextLabel" parent="BasicUI/ResourcePanel/ResourceRows"]
+[node name="Oil" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Oil:
@@ -128,21 +131,21 @@ text = "Oil:
 fit_content = true
 scroll_active = false
 
-[node name="ResourceDetailPanel" type="Panel" parent="BasicUI/ResourcePanel"]
+[node name="ResourceDetailPanel" type="Panel" parent="UICanvas/BasicUI/ResourcePanel"]
 layout_mode = 1
 offset_left = 7.0
 offset_top = 92.0
 offset_right = 113.0
 offset_bottom = 144.0
 
-[node name="TypeLabel" type="Label" parent="BasicUI/ResourcePanel/ResourceDetailPanel"]
+[node name="TypeLabel" type="Label" parent="UICanvas/BasicUI/ResourcePanel/ResourceDetailPanel"]
 layout_mode = 0
 offset_left = 4.0
 offset_right = 51.0
 offset_bottom = 23.0
 text = "Water"
 
-[node name="ValueLabel" type="Label" parent="BasicUI/ResourcePanel/ResourceDetailPanel"]
+[node name="ValueLabel" type="Label" parent="UICanvas/BasicUI/ResourcePanel/ResourceDetailPanel"]
 layout_mode = 0
 offset_left = 4.0
 offset_top = 23.0
@@ -150,7 +153,7 @@ offset_right = 51.0
 offset_bottom = 46.0
 text = "25.05 / 100"
 
-[node name="LineEdit" type="LineEdit" parent="BasicUI"]
+[node name="LineEdit" type="LineEdit" parent="UICanvas/BasicUI"]
 layout_mode = 0
 offset_left = 3.0
 offset_top = 52.0
@@ -158,7 +161,7 @@ offset_right = 974.0
 offset_bottom = 88.0
 placeholder_text = "Type instructions here"
 
-[node name="Button" type="Button" parent="BasicUI"]
+[node name="Button" type="Button" parent="UICanvas/BasicUI"]
 layout_mode = 0
 offset_left = 1052.0
 offset_top = 44.0
@@ -168,18 +171,18 @@ focus_mode = 0
 toggle_mode = true
 text = "Workers"
 
-[node name="WorldMap" parent="BasicUI" instance=ExtResource("2_ksonv")]
+[node name="WorldMap" parent="UICanvas/BasicUI" instance=ExtResource("2_ksonv")]
 position = Vector2(829, 459)
 scale = Vector2(0.28, 0.28)
 
-[node name="ThoughtsPanel" type="Panel" parent="BasicUI"]
+[node name="ThoughtsPanel" type="Panel" parent="UICanvas/BasicUI"]
 layout_mode = 0
 offset_left = 215.0
 offset_top = 527.0
 offset_right = 825.0
 offset_bottom = 647.0
 
-[node name="ThoughtsList" type="ItemList" parent="BasicUI/ThoughtsPanel"]
+[node name="ThoughtsList" type="ItemList" parent="UICanvas/BasicUI/ThoughtsPanel"]
 layout_mode = 0
 offset_left = 5.0
 offset_top = 7.0
@@ -187,14 +190,14 @@ offset_right = 605.0
 offset_bottom = 114.0
 focus_mode = 0
 
-[node name="DebugPanel" type="Panel" parent="BasicUI"]
+[node name="DebugPanel" type="Panel" parent="UICanvas/BasicUI"]
 layout_mode = 0
 offset_top = 568.0
 offset_right = 206.0
 offset_bottom = 647.0
 script = ExtResource("5_8ylg8")
 
-[node name="Button" type="Button" parent="BasicUI/DebugPanel"]
+[node name="Button" type="Button" parent="UICanvas/BasicUI/DebugPanel"]
 layout_mode = 0
 offset_left = 6.0
 offset_top = 6.0
@@ -202,7 +205,7 @@ offset_right = 67.0
 offset_bottom = 37.0
 text = "Pass++"
 
-[node name="DebugSlider" type="HSlider" parent="BasicUI/DebugPanel"]
+[node name="DebugSlider" type="HSlider" parent="UICanvas/BasicUI/DebugPanel"]
 layout_mode = 0
 offset_left = 9.0
 offset_top = 43.0
@@ -216,7 +219,7 @@ value = 1.0
 tick_count = 8
 ticks_on_borders = true
 
-[node name="SliderLabel" type="Label" parent="BasicUI/DebugPanel"]
+[node name="SliderLabel" type="Label" parent="UICanvas/BasicUI/DebugPanel"]
 layout_mode = 0
 offset_left = 176.0
 offset_top = 47.0
@@ -225,7 +228,7 @@ offset_bottom = 70.0
 text = "1"
 clip_text = true
 
-[node name="CheckButton" type="CheckButton" parent="BasicUI/DebugPanel"]
+[node name="CheckButton" type="CheckButton" parent="UICanvas/BasicUI/DebugPanel"]
 layout_mode = 0
 offset_left = 1111.0
 offset_top = 53.0
@@ -234,7 +237,7 @@ offset_bottom = 82.0
 focus_mode = 0
 button_pressed = true
 
-[node name="ThoughtsToggle" type="CheckButton" parent="BasicUI/DebugPanel"]
+[node name="ThoughtsToggle" type="CheckButton" parent="UICanvas/BasicUI/DebugPanel"]
 layout_mode = 0
 offset_left = 767.0
 offset_top = 42.0
@@ -243,7 +246,7 @@ offset_bottom = 73.0
 focus_mode = 0
 button_pressed = true
 
-[node name="CarButton" type="Button" parent="BasicUI/DebugPanel"]
+[node name="CarButton" type="Button" parent="UICanvas/BasicUI/DebugPanel"]
 visible = false
 layout_mode = 0
 offset_left = 70.0
@@ -252,7 +255,7 @@ offset_right = 123.0
 offset_bottom = 37.0
 text = "Car++"
 
-[node name="ExpeditionsButton" type="Button" parent="BasicUI"]
+[node name="ExpeditionsButton" type="Button" parent="UICanvas/BasicUI"]
 layout_mode = 0
 offset_left = 1029.0
 offset_top = 9.0
@@ -261,12 +264,12 @@ offset_bottom = 40.0
 toggle_mode = true
 text = "Expeditions"
 
-[node name="constructionPanel" type="Panel" parent="BasicUI"]
+[node name="constructionPanel" type="Panel" parent="UICanvas/BasicUI"]
 visible = false
 layout_mode = 1
 script = ExtResource("4_o0k6p")
 
-[node name="ModuleButtons" type="HBoxContainer" parent="BasicUI/constructionPanel"]
+[node name="ModuleButtons" type="HBoxContainer" parent="UICanvas/BasicUI/constructionPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -280,7 +283,7 @@ grow_vertical = 2
 theme_override_constants/separation = 6
 alignment = 1
 
-[node name="construct" type="Button" parent="BasicUI"]
+[node name="construct" type="Button" parent="UICanvas/BasicUI"]
 layout_mode = 0
 offset_left = 1058.0
 offset_top = 79.0
@@ -289,7 +292,7 @@ offset_bottom = 110.0
 toggle_mode = true
 text = "Construct"
 
-[node name="sunInfo" type="Label" parent="BasicUI"]
+[node name="sunInfo" type="Label" parent="UICanvas/BasicUI"]
 layout_mode = 0
 offset_left = 25.099976
 offset_top = 526.5
@@ -324,8 +327,8 @@ position = Vector2(-96, 38)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 offset = Vector2(576, 324)
-position_smoothing_enabled = true
 editor_draw_limits = true
+script = ExtResource("7_camctl")
 
 [node name="Background" type="Node2D" parent="."]
 script = ExtResource("6_mscei")
@@ -346,14 +349,14 @@ offset_bottom = 1625.0
 rotation = 3.14159
 color = Color(1, 1, 0, 0.619608)
 
-[connection signal="text_submitted" from="BasicUI/LineEdit" to="BasicUI" method="_on_line_edit_text_submitted"]
-[connection signal="toggled" from="BasicUI/Button" to="BasicUI" method="_on_JobController_open_toggled"]
-[connection signal="pressed" from="BasicUI/DebugPanel/Button" to="BasicUI" method="_on_add_passenger_pressed"]
-[connection signal="drag_ended" from="BasicUI/DebugPanel/DebugSlider" to="BasicUI" method="_on_debug_tick_slider_ended"]
-[connection signal="toggled" from="BasicUI/DebugPanel/CheckButton" to="BasicUI" method="_on_map_toggled"]
-[connection signal="toggled" from="BasicUI/DebugPanel/ThoughtsToggle" to="BasicUI" method="_on_thoughts_toggle_toggled"]
-[connection signal="pressed" from="BasicUI/DebugPanel/CarButton" to="BasicUI" method="_on_car_button_pressed"]
-[connection signal="toggled" from="BasicUI/ExpeditionsButton" to="BasicUI" method="_on_ExpeditionsController_open_toggled"]
-[connection signal="toggled" from="BasicUI/construct" to="BasicUI" method="_on_construct_toggled"]
+[connection signal="text_submitted" from="UICanvas/BasicUI/LineEdit" to="UICanvas/BasicUI" method="_on_line_edit_text_submitted"]
+[connection signal="toggled" from="UICanvas/BasicUI/Button" to="UICanvas/BasicUI" method="_on_JobController_open_toggled"]
+[connection signal="pressed" from="UICanvas/BasicUI/DebugPanel/Button" to="UICanvas/BasicUI" method="_on_add_passenger_pressed"]
+[connection signal="drag_ended" from="UICanvas/BasicUI/DebugPanel/DebugSlider" to="UICanvas/BasicUI" method="_on_debug_tick_slider_ended"]
+[connection signal="toggled" from="UICanvas/BasicUI/DebugPanel/CheckButton" to="UICanvas/BasicUI" method="_on_map_toggled"]
+[connection signal="toggled" from="UICanvas/BasicUI/DebugPanel/ThoughtsToggle" to="UICanvas/BasicUI" method="_on_thoughts_toggle_toggled"]
+[connection signal="pressed" from="UICanvas/BasicUI/DebugPanel/CarButton" to="UICanvas/BasicUI" method="_on_car_button_pressed"]
+[connection signal="toggled" from="UICanvas/BasicUI/ExpeditionsButton" to="UICanvas/BasicUI" method="_on_ExpeditionsController_open_toggled"]
+[connection signal="toggled" from="UICanvas/BasicUI/construct" to="UICanvas/BasicUI" method="_on_construct_toggled"]
 [connection signal="position_changed" from="Train/LeverControl" to="Train" method="_on_speed_lever_changed"]
 [connection signal="position_changed" from="Train/LeverControl" to="Background" method="set_temp_multiplier"]

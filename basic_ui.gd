@@ -23,6 +23,7 @@ var expeditionsControllerScene : PackedScene = preload("res://Scenes/expeditions
 var expeditionsController : ExpeditionsController = null
 var backgroundController : BackgroundManager = null
 var pending_module_type : String = ""
+var scene_root : Node = null
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
@@ -40,9 +41,10 @@ func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
 	Globals.activeUI = self
+	scene_root = get_tree().current_scene
 
-	worldMap.select_new_train(get_parent().get_node("Train"))
-	selectedTrain = get_parent().get_node("Train")
+	worldMap.select_new_train(scene_root.get_node("Train"))
+	selectedTrain = scene_root.get_node("Train")
 
 	var update_timer : Timer = Timer.new()
 	add_child(update_timer)
@@ -59,7 +61,7 @@ func _ready() -> void:
 
 	resource_panel.setup(selectedTrain)
 
-	backgroundController = get_parent().get_node("Background")
+	backgroundController = scene_root.get_node("Background")
 	constructionPanel.placement_requested.connect(_on_construction_placement_requested)
 
 func _on_viewport_size_changed() -> void:
@@ -75,16 +77,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
 		if _is_click_over_ui(event.global_position):
 			return
-		_place_module_at_click(event.global_position)
+		_place_module_at_click(event.position)
 		get_viewport().set_input_as_handled()
 
 func _on_construction_placement_requested(module_type: String) -> void:
 	pending_module_type = module_type
 	add_thought("Select a slot on the train to place %s." % module_type)
 
-func _place_module_at_click(global_position: Vector2) -> void:
-	# Match passenger/module coords: get_trainpos_from_coords expects PassengersManager-local space.
-	var placement_local_pos: Vector2 = selectedTrain.passengerManager.to_local(global_position)
+func _place_module_at_click(viewport_position: Vector2) -> void:
+	var world_pos: Vector2 = TrainCamera.viewport_to_world(get_viewport(), viewport_position)
+	var placement_local_pos: Vector2 = selectedTrain.passengerManager.to_local(world_pos)
 	var train_pos: Array[int] = Helpers.get_trainpos_from_coords(placement_local_pos)
 	selectedTrain.add_module(pending_module_type, train_pos[0], train_pos[1])
 	_clear_placement_mode()
