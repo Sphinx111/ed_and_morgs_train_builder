@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
 [ext_resource type="Script" uid="uid://c841d2swd3ym7" path="res://Scenes/construction_panel.gd" id="4_o0k6p"]
-[ext_resource type="Script" uid="uid://cuui40vdfntkr" path="res://Scenes/debug_panel.gd" id="5_8ylg8"]
+[ext_resource type="Script" path="res://Scenes/debug_panel.gd" id="5_8ylg8"]
 [ext_resource type="Script" uid="uid://b422owa3buotj" path="res://Scenes/resource_panel.gd" id="5_respnl"]
 [ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://BackgroundHandler.gd" id="6_mscei"]
 [ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://Scenes/LeverControl.tscn" id="6_u0kvb"]

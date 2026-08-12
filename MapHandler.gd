@@ -33,6 +33,12 @@ func train_step():
 	sun1.progress -= sunspeed
 	sun2.progress -= sunspeed
 	update_time_to_sun()
+	# Debug testing - Next oil spot
+	var nextOil : ResourceSpot = get_next_resource_spot("oil")
+	if nextOil != null:
+		#nextOil.colorRect.color = Color.RED
+		print("distance to oil well: %f" % get_dist_to_next_resource_spot("oil"))
+		#print("Next Oil Well has %s units and is at %f" % [nextOil.quantity, nextOil.progress])
 
 func request_resources(wantedType : String) -> float:
 	return mainRoute.request_resources(wantedType, collection_margin)
@@ -42,6 +48,12 @@ func gather_resource(wantedType : String, amount : float) -> int:
 
 func query_resource_types() -> Array[ResourceSpot]:
 	return mainRoute.query_resources_types(collection_margin)
+
+func get_next_resource_spot(_type : String) -> ResourceSpot:
+	return mainRoute.get_next_resource_spot(_type)
+
+func get_dist_to_next_resource_spot(_type : String) -> float:
+	return mainRoute.get_dist_to_next_resource_spot(_type)
 
 func is_train_in_sun() -> bool:
 	#print("trainPos: %f sun1pos: %f sun2pos: %f" % [trainMarker.position.x, sun1.position.x, sun2.position.x])

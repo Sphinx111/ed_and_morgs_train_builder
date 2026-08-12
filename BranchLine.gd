@@ -121,3 +121,19 @@ func query_resources_types(collection_margin : float) -> Array[ResourceSpot]:
 		if abs(spot.progress - trainMarker.progress) <= collection_margin:
 			result.append(spot)
 	return result
+
+func get_next_resource_spot(_type : String) -> ResourceSpot:
+	var nextBestDistance : float = 99
+	var nextSpot : ResourceSpot = null
+	for resourceSpot in resources:
+		if resourceSpot.resource_type == _type or _type == null:
+			var progressDiff : float = trainMarker.progress - resourceSpot.progress
+			if Globals.train_direction == -1:
+				progressDiff = resourceSpot.progress - trainMarker.progress
+			if progressDiff > 0 && progressDiff < nextBestDistance:
+				nextBestDistance = progressDiff
+				nextSpot = resourceSpot
+	return nextSpot
+
+func get_dist_to_next_resource_spot(_type : String) -> float:
+	return abs(trainMarker.progress - get_next_resource_spot(_type).progress)
