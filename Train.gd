@@ -118,11 +118,23 @@ func add_res(key : String, amount : float) -> float:
 			else:
 				res[key] = res[key] + amount
 	elif key == "pop":
-		for i in range(floor(amount)):
+		for i in range(roundi(amount)):
 			passengerManager.add_passenger()
 	else:
 		print_debug("adding resource that doesn't exist: " + key)
 	return 0
+
+func add_pop(amount : int) -> void:
+	if amount > 0:
+		for i in range(amount):
+			passengerManager.add_passenger()
+	else:
+		for i in range(abs(amount)):
+			remove_random_passenger()
+
+
+func remove_random_passenger() -> void:
+	passengerManager.remove_random_passenger()
 
 func get_expedition_team(passengers_needed : int) -> Array[Passenger]:
 	return passengerManager.get_expedition_passengers(passengers_needed)

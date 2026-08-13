@@ -8,6 +8,7 @@ class_name TrainEvent
 const NO_EFFECT : int = 0
 const CHANGE_RESOURCE : int = 1
 const CHANGE_MOOD : int = 2
+const CHANGE_POP : int = 3
 
 var eventType : int = 0
 

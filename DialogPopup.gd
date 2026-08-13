@@ -16,6 +16,12 @@ var ready_to_close : bool = false
 
 func set_event(new_event: NarrativeEvent) -> void:
 	activeEvent = new_event
+	stepPos = 0
+	choiceMade = 0
+	ready_to_close = false
+	button1.hide()
+	button2.hide()
+	button3.hide()
 	_load_step(stepPos)
 
 func _load_step(stepNum : int) -> void:
@@ -75,6 +81,9 @@ func _on_button3_pressed() -> void:
 	next_step()
 
 func _event_finished() -> void:
-	var result : TrainEvent = activeEvent.choicesDict.get(choiceMade)[NarrativeEvent.DICT_EVENTRESULT]
-	print("DialogPopup::_event_finished, choice=%d, eventType=%d" % [choiceMade, result.eventType])
-	event_finished.emit(result)
+	var choice_data: Array = activeEvent.choicesDict.get(choiceMade)
+	var result: TrainEvent = choice_data[NarrativeEvent.DICT_EVENTRESULT]
+	var next_event_key: String = choice_data[NarrativeEvent.DICT_NEXTEVENTKEY] if choice_data.size() > NarrativeEvent.DICT_NEXTEVENTKEY else ""
+	var min_delay: float = choice_data[NarrativeEvent.DICT_MIN_DELAY] if choice_data.size() > NarrativeEvent.DICT_MIN_DELAY else 0.0
+	print("DialogPopup::_event_finished, choice=%d, eventType=%d, next=%s, delay=%s" % [choiceMade, result.eventType, next_event_key, min_delay])
+	event_finished.emit(result, next_event_key, min_delay)

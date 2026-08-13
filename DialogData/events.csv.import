@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cak2u8jx0h6p3"
+
+[deps]
+
+files=["res://DialogData/events.id.translation", "res://DialogData/events.steps.translation", "res://DialogData/events.choices.translation", "res://DialogData/events.sequence.translation"]
+
+source_file="res://DialogData/events.csv"
+dest_files=["res://DialogData/events.id.translation", "res://DialogData/events.steps.translation", "res://DialogData/events.choices.translation", "res://DialogData/events.sequence.translation"]
+
+[params]
+
+compress=true
+delimiter=0

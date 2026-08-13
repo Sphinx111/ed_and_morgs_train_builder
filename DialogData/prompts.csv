@@ -1,0 +1,5 @@
+event_key,step_index,prompt_text
+startingOut,0,"You are away, your home behind you. How do you feel?"
+treeGuy,0,"You see a survivor hanging from a burned out tree, they are going to try and leap onto your train"
+treeGuy,1,Will you open a door to let them in?
+treeGuySteals,0,The new passenger has been stealing from your supplies. What do you do?

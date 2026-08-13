@@ -70,6 +70,16 @@ func add_passenger():
 	apply_random_name(newPass)
 	passengers.append(newPass)
 
+
+func remove_random_passenger() -> void:
+	if passengers.is_empty():
+		return
+	var index: int = randi_range(0, passengers.size() - 1)
+	var passenger: Passenger = passengers[index]
+	passenger.cleanup()
+	passengers.remove_at(index)
+	passenger.queue_free()
+
 func get_passenger_count():
 	return passengers.size()
 

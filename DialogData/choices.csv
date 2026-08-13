@@ -1,0 +1,8 @@
+event_key,choice_index,button_text,outcome_text,event_type,var1,var2,nextEventKey,min_delay
+startingOut,0,"Relieved - We survived, that's the best we could expect",Your crew are unaffected,NO_EFFECT,,,,
+startingOut,1,Fearful - How are we supposed to survive this?,Your crew are hardened,CHANGE_MOOD,-1,,,
+startingOut,2,Optimistic - This will be a new start for us,Your crew are happier,CHANGE_MOOD,1,,,
+treeGuy,0,Yes,A new passenger joins the train,CHANGE_POP,1,,treeGuySteals,30
+treeGuy,1,No,"You see them fall, they probably didn't survive that",NO_EFFECT,,,,
+treeGuySteals,0,Kick him off the train,You throw him from the moving train,CHANGE_POP,-1,,,
+treeGuySteals,1,Let him stay,He keeps a low profile after that,NO_EFFECT,,,,

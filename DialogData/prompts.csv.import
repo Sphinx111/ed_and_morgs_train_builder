@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://cu4vu5yesec7y"
+
+[deps]
+
+files=["res://DialogData/prompts.step.translation", "res://DialogData/prompts.prompt.translation"]
+
+source_file="res://DialogData/prompts.csv"
+dest_files=["res://DialogData/prompts.step.translation", "res://DialogData/prompts.prompt.translation"]
+
+[params]
+
+compress=true
+delimiter=0

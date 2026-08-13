@@ -1,0 +1,4 @@
+event_key,id,steps_count,choices_count,sequence
+startingOut,1,1,3,1|2
+treeGuy,2,2,2,0|1|2
+treeGuySteals,3,1,2,1|2
