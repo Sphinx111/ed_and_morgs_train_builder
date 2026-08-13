@@ -18,6 +18,7 @@ var event_sim_speed : float = 0.1
 var popupScene : PackedScene = preload("res://Scenes/dialog_popup.tscn")
 var active_popup : DialogPopup
 var active_event : NarrativeEvent
+var _saved_time_factor : float = 1.0
 
 func start() -> void:
 	main_timer.wait_time = first_event_time
@@ -32,6 +33,8 @@ func _on_main_timer_timeout() -> void:
 	active_popup = popupScene.instantiate()
 	var ui_canvas: CanvasLayer = get_parent().get_node("UICanvas")
 	ui_canvas.add_child(active_popup)
+	_saved_time_factor = Globals.time_factor
+	EventBus.request_time_factor(event_sim_speed)
 	_connect_signals()
 	active_popup.set_event(active_event)
 
@@ -41,6 +44,7 @@ func _connect_signals():
 	active_popup.option3.connect(_on_option3)
 
 func cleanup_dialogbox() -> void:
+	EventBus.request_time_factor(_saved_time_factor)
 	active_popup.queue_free()
 	active_popup = null
 

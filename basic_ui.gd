@@ -63,6 +63,12 @@ func _ready() -> void:
 
 	backgroundController = scene_root.get_node("Background")
 	constructionPanel.placement_requested.connect(_on_construction_placement_requested)
+	EventBus.time_factor_requested.connect(_on_time_factor_requested)
+
+
+func _exit_tree() -> void:
+	if EventBus.time_factor_requested.is_connected(_on_time_factor_requested):
+		EventBus.time_factor_requested.disconnect(_on_time_factor_requested)
 
 func _on_viewport_size_changed() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -224,14 +230,24 @@ func _on_add_passenger_pressed() -> void:
 
 func _on_debug_tick_slider_ended(value_changed: bool) -> void:
 	if value_changed == true:
-		$DebugPanel/SliderLabel.text = ("%f" % (debug_slider.value))
-		tick_time = 1.0 / debug_slider.value
+		EventBus.request_time_factor(debug_slider.value)
+
+
+func _on_time_factor_requested(new_time_factor: float) -> void:
+	_apply_time_factor(new_time_factor)
+
+
+func _apply_time_factor(new_time_factor: float) -> void:
+	Globals.time_factor = new_time_factor
+	if new_time_factor <= 0.0:
+		tick_time = 0.0
+		tick_timer.stop()
+	else:
+		tick_time = 1.0 / new_time_factor
 		tick_timer.wait_time = tick_time
-		Globals.time_factor = debug_slider.value
-		if tick_time == 0.0:
-			tick_timer.stop()
-		else:
-			tick_timer.start()
+		tick_timer.start()
+	debug_slider.set_value_no_signal(new_time_factor)
+	$DebugPanel/SliderLabel.text = "%f" % new_time_factor
 
 
 func _on_map_toggled(toggled_on: bool) -> void:
