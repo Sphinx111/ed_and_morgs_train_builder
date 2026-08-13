@@ -15,5 +15,6 @@ func handle_event(newEvent : TrainEvent):
 		if (newEvent.variable1 is float):
 			print("Changing mood by %d" % newEvent.variable1)
 	if newEvent.eventType == TrainEvent.CHANGE_RESOURCE:
+		print("eventProcessor:: resType=%s resAmt=%f" % [newEvent.eventType, newEvent.variable1])
 		if (newEvent.variable1 is String && newEvent.variable2 is float):
 			train.add_res(newEvent.variable1, newEvent.variable2)

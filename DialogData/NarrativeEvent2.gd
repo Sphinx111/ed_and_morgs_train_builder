@@ -1,8 +1,9 @@
-extends Node
+extends Resource
 
 ## This class holds the data that will populate a Narrative event's Dialog Popup
-class_name NarrativeEvent
+class_name NarrativeEvent2
 
+var id : int = 0
 var eventName : String = "exampleEvent"
 
 var stepsCount : int = 1

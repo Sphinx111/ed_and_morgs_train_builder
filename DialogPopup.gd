@@ -7,10 +7,7 @@ class_name DialogPopup
 @onready var button2: Button = get_node("DialogPanel/Button2")
 @onready var button3: Button = get_node("DialogPanel/Button3")
 
-signal option1
-signal option2
-signal option3
-signal finished
+signal event_finished
 
 var choiceMade : int = 0
 var stepPos : int = 0
@@ -22,29 +19,34 @@ func set_event(new_event: NarrativeEvent) -> void:
 	_load_step(stepPos)
 
 func _load_step(stepNum : int) -> void:
+	## Protect against outOfBounds exceptions
 	if stepNum > activeEvent.stepsCount:
 		print_debug("%d stepcount reached???" % stepNum)
 		return
+	
+	## if we are on the final step of event
 	if (activeEvent.sequence[stepNum] == NarrativeEvent.OUTCOME):
-		promptLabel.text = activeEvent.outcomeTexts[choiceMade]
+		promptLabel.text = activeEvent.choicesDict.get(choiceMade)[NarrativeEvent.DICT_OUTCOMETEXT]
 		button1.text = "Continue"
 		button1.show()
 		ready_to_close = true
 		return
+	## if we are on a TEXT_ONLY step
 	elif (activeEvent.sequence[stepNum] == NarrativeEvent.TEXT_ONLY):
 		promptLabel.text = activeEvent.promptTexts[stepNum]
 		button1.text = "Continue"
 		button1.show()
+	## if we are on a CHOICE step
 	elif (activeEvent.sequence[stepNum] == NarrativeEvent.CHOICE):
 		promptLabel.text = activeEvent.promptTexts[stepNum]
 		if activeEvent.choicesCount >= 1:
-			button1.text = activeEvent.choiceTexts[0]
+			button1.text = activeEvent.choicesDict.get(0)[NarrativeEvent.DICT_BUTTONTEXT]
 			button1.show()
 		if activeEvent.choicesCount >= 2:
-			button2.text = activeEvent.choiceTexts[1]
+			button2.text = activeEvent.choicesDict.get(1)[NarrativeEvent.DICT_BUTTONTEXT]
 			button2.show()
 		if activeEvent.choicesCount >= 3:
-			button3.text = activeEvent.choiceTexts[2]
+			button3.text = activeEvent.choicesDict.get(2)[NarrativeEvent.DICT_BUTTONTEXT]
 			button3.show()
 	pass
 
@@ -61,24 +63,18 @@ func _on_button1_pressed() -> void:
 		return;
 	choiceMade = 0
 	next_step()
-	pass # Replace with function body.
 
 
 func _on_button2_pressed() -> void:
 	choiceMade = 1
 	next_step()
-	pass # Replace with function body.
 
 
 func _on_button3_pressed() -> void:
 	choiceMade = 2
 	next_step()
-	pass # Replace with function body.
 
 func _event_finished() -> void:
-	if choiceMade == 0:
-		option1.emit()
-	elif choiceMade == 1:
-		option2.emit()
-	elif choiceMade == 2:
-		option3.emit()
+	var result : TrainEvent = activeEvent.choicesDict.get(choiceMade)[NarrativeEvent.DICT_EVENTRESULT]
+	print("DialogPopup::_event_finished, choice=%d, eventType=%d" % [choiceMade, result.eventType])
+	event_finished.emit(result)

@@ -17,8 +17,11 @@ var event_sim_speed : float = 0.1
 
 var popupScene : PackedScene = preload("res://Scenes/dialog_popup.tscn")
 var active_popup : DialogPopup
-var active_event : NarrativeEvent
+var active_event
 var _saved_time_factor : float = 1.0
+
+var next_event : int = 0
+var planned_events : Array = [NarrativeEvent.new("")]
 
 func start() -> void:
 	main_timer.wait_time = first_event_time
@@ -29,7 +32,9 @@ func start() -> void:
 
 
 func _on_main_timer_timeout() -> void:
-	active_event = NarrativeEvent.new("someType")
+	if next_event >= planned_events.size():
+		return
+	active_event = planned_events[next_event]
 	active_popup = popupScene.instantiate()
 	var ui_canvas: CanvasLayer = get_parent().get_node("UICanvas")
 	ui_canvas.add_child(active_popup)
@@ -39,29 +44,14 @@ func _on_main_timer_timeout() -> void:
 	active_popup.set_event(active_event)
 
 func _connect_signals():
-	active_popup.option1.connect(_on_option1)
-	active_popup.option2.connect(_on_option2)
-	active_popup.option3.connect(_on_option3)
+	active_popup.event_finished.connect(_receive_event_outcome)
 
 func cleanup_dialogbox() -> void:
 	EventBus.request_time_factor(_saved_time_factor)
 	active_popup.queue_free()
 	active_popup = null
 
-func _on_option1():
-	print("option1 pressed")
-	train.eventProcessor.handle_event(active_event.narrativeResults[0])
+func _receive_event_outcome(eventResult : TrainEvent) -> void:
+	train.eventProcessor.handle_event(eventResult)
+	print("eventResult is %d" % eventResult.eventType)
 	cleanup_dialogbox()
-	pass
-
-func _on_option2():
-	print("option2 pressed")
-	train.eventProcessor.handle_event(active_event.narrativeResults[1])
-	cleanup_dialogbox()
-	pass
-
-func _on_option3():
-	print("option3 pressed")
-	train.eventProcessor.handle_event(active_event.narrativeResults[2])
-	cleanup_dialogbox()
-	pass

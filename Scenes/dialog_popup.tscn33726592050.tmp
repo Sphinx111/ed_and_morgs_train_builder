@@ -1,0 +1,85 @@
+[gd_scene load_steps=2 format=3 uid="uid://gierjwa0bweg"]
+
+[ext_resource type="Script" uid="uid://dxa5f0vev8vqe" path="res://DialogPopup.gd" id="1_6ma02"]
+
+[node name="Node2D" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_6ma02")
+
+[node name="DialogPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -290.5
+offset_top = -159.5
+offset_right = 290.5
+offset_bottom = 159.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button1" type="Button" parent="DialogPanel"]
+visible = false
+layout_mode = 0
+offset_left = 25.0
+offset_top = 198.0
+offset_right = 555.0
+offset_bottom = 229.0
+text = "1 - Option One"
+
+[node name="Button2" type="Button" parent="DialogPanel"]
+visible = false
+layout_mode = 0
+offset_left = 25.0
+offset_top = 234.0
+offset_right = 555.0
+offset_bottom = 265.0
+text = "2 - Option Two"
+
+[node name="Button3" type="Button" parent="DialogPanel"]
+visible = false
+layout_mode = 0
+offset_left = 25.0
+offset_top = 270.0
+offset_right = 555.0
+offset_bottom = 301.0
+text = "3 - Option Three"
+
+[node name="PromptLabel" type="RichTextLabel" parent="DialogPanel"]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 20.0
+offset_right = 552.0
+offset_bottom = 176.0
+text = "An event Happens
+And you need to decide how you will react to it"
+
+[node name="TextInput" type="TextEdit" parent="DialogPanel"]
+visible = false
+layout_mode = 0
+offset_left = 30.0
+offset_top = 234.0
+offset_right = 554.0
+offset_bottom = 268.0
+placeholder_text = "Type your answer here"
+
+[node name="TextSubmitButton" type="Button" parent="DialogPanel"]
+visible = false
+layout_mode = 0
+offset_left = 473.0
+offset_top = 274.0
+offset_right = 555.0
+offset_bottom = 305.0
+text = "Submit"
+
+[connection signal="pressed" from="DialogPanel/Button1" to="." method="_on_button1_pressed"]
+[connection signal="pressed" from="DialogPanel/Button2" to="." method="_on_button2_pressed"]
+[connection signal="pressed" from="DialogPanel/Button3" to="." method="_on_button3_pressed"]
