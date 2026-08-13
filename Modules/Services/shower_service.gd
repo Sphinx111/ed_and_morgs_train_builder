@@ -1,6 +1,6 @@
 extends ServiceProvider
 
-class_name ShowerProvider
+class_name ShowerServiceProvider
 
 func init():
  trigger_once = true

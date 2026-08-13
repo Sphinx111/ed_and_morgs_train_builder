@@ -17,8 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-Globals="*res://Globals.gd"
-Helpers="*res://Helpers.gd"
+Globals="*res://globals.gd"
+Helpers="*res://helpers.gd"
 EventBus="*res://event_bus.gd"
 
 [display]

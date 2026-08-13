@@ -1,12 +1,12 @@
 extends ServiceProvider
 
-class_name BasicFoodProvider
+class_name FastWaterServiceProvider
 
 func init():
- outputType = "hunger"
- outputRate = 0.05
+ outputType = "thirst"
+ outputRate = 0.5
 
- inputType1 = "food1"
+ inputType1 = "clean_water"
  input1_needed = 1.0
 
  wasteType1 = "black_water"

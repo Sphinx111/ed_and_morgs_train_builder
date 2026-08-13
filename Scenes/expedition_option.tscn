@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://c1ja4h8m3bxmk"]
 
-[ext_resource type="Script" uid="uid://cl586ua4c23hc" path="res://Scenes/ExpeditionOption.gd" id="1_tsbr2"]
+[ext_resource type="Script" uid="uid://cl586ua4c23hc" path="res://Scenes/expedition_option.gd" id="1_tsbr2"]
 [ext_resource type="Texture2D" uid="uid://dreadage4q14n" path="res://images/Water_Icon.png" id="2_biqpn"]
 [ext_resource type="Texture2D" uid="uid://cla8b6uc21p5v" path="res://images/food_icon.png" id="3_labxj"]
 [ext_resource type="Texture2D" uid="uid://bhgh5xiobf8gh" path="res://images/Pop_Icon.png" id="4_jf32k"]

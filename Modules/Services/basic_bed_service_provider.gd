@@ -1,6 +1,6 @@
 extends ServiceProvider
 
-class_name BasicBedProvider
+class_name BasicBedServiceProvider
 
 func init():
  outputType = "rest"

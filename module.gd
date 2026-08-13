@@ -265,22 +265,22 @@ func set_type(newType : String):
 		add_custom_storage({"clean_water" : 25.0,"grey_water" : 25.0, "black_water" : 10.0})
 	elif newType == "cabin":
 		$Outline.color = Color.BROWN
-		var showerProvider = ShowerProvider.new()
-		var basicBedProvider = BasicBedProvider.new()
+		var showerProvider = ShowerServiceProvider.new()
+		var basicBedProvider = BasicBedServiceProvider.new()
 		add_service(showerProvider)
 		add_service(basicBedProvider)
 		baseCustomers = 4
 	elif newType == "kitchen":
 		$Outline.color = Color.BISQUE
-		var basicFoodProvider = BasicFoodProvider.new()
-		var fastWaterProvider = FastWaterProvider.new()
+		var basicFoodProvider = BasicFoodServiceProvider.new()
+		var fastWaterProvider = FastWaterServiceProvider.new()
 		add_service(basicFoodProvider)
 		add_service(fastWaterProvider)
 		add_custom_storage({"clean_water" : 20.0,"food1" : 10.0,"food2" : 10.0})
 		baseCustomers = 3
 	elif newType == "farm":
 		$Outline.color = Color.SEA_GREEN
-		var basicFoodProvider = BasicFoodProvider.new()
+		var basicFoodProvider = BasicFoodServiceProvider.new()
 		add_service(basicFoodProvider)
 		baseCustomers = 5
 		

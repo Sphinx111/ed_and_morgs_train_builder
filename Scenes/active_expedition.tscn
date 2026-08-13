@@ -1,8 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://dqdek7iu3ur87"]
 
-[ext_resource type="Script" uid="uid://cc75o1wfcrxt7" path="res://Scenes/ActiveExpedition.gd" id="1_cve47"]
+[ext_resource type="Script" uid="uid://cc75o1wfcrxt7" path="res://Scenes/active_expedition.gd" id="1_cve47"]
 [ext_resource type="Texture2D" uid="uid://bhgh5xiobf8gh" path="res://images/Pop_Icon.png" id="2_1t25s"]
 [ext_resource type="Texture2D" uid="uid://dbqhndenl23nt" path="res://images/scrap_icon.png" id="3_w0bwm"]
+
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bmukf"]
 bg_color = Color(0.198, 0.33, 0, 1)
