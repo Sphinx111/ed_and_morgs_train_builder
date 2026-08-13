@@ -37,8 +37,9 @@ func train_step():
 	var nextOil : ResourceSpot = get_next_resource_spot("oil")
 	if nextOil != null:
 		#nextOil.colorRect.color = Color.RED
-		print("distance to oil well: %f" % get_dist_to_next_resource_spot("oil"))
+		#print("distance to oil well: %f" % get_dist_to_next_resource_spot("oil"))
 		#print("Next Oil Well has %s units and is at %f" % [nextOil.quantity, nextOil.progress])
+		pass
 
 func request_resources(wantedType : String) -> float:
 	return mainRoute.request_resources(wantedType, collection_margin)

@@ -6,19 +6,16 @@
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
 [ext_resource type="Script" uid="uid://c841d2swd3ym7" path="res://Scenes/construction_panel.gd" id="4_o0k6p"]
-[ext_resource type="Script" path="res://Scenes/debug_panel.gd" id="5_8ylg8"]
+[ext_resource type="Script" uid="uid://cuui40vdfntkr" path="res://Scenes/debug_panel.gd" id="5_8ylg8"]
 [ext_resource type="Script" uid="uid://b422owa3buotj" path="res://Scenes/resource_panel.gd" id="5_respnl"]
 [ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://BackgroundHandler.gd" id="6_mscei"]
 [ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://Scenes/LeverControl.tscn" id="6_u0kvb"]
 [ext_resource type="Script" uid="uid://76holwxha2tp" path="res://camera_controller.gd" id="7_camctl"]
 
 [node name="SceneRoot" type="Control"]
+layout_direction = 2
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
 mouse_filter = 1
 script = ExtResource("1_o0k6p")
 
@@ -157,7 +154,7 @@ text = "25.05 / 100"
 layout_mode = 0
 offset_left = 3.0
 offset_top = 52.0
-offset_right = 974.0
+offset_right = 916.0
 offset_bottom = 88.0
 placeholder_text = "Type instructions here"
 

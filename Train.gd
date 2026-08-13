@@ -8,6 +8,8 @@ var players = []				#Which players run the train?
 var carriages : Array[TraincarBase] = []
 var tickCount = 0 				#Resource ticks since the train launched
 
+var eventProcessor : TrainEventProcessor = TrainEventProcessor.new(self)
+
 var CarriageScene = preload("res://Scenes/traincar_base.tscn")
 
 # Pointer to world map so train can track its position in the world
