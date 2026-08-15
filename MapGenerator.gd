@@ -16,18 +16,21 @@ class TownChain:
 
 @export var min_distance: float = 80.0
 @export var town_min_distance: float = 80.0
+@export var village_min_distance: float = 30.0
 @export var min_horizontal_distance: float = 70.0
 @export var placement_passes: int = 20
 @export var towns_per_branch: int = 6 ## Target number of towns in each branch chain
 @export var sharp_angle_threshold: float = 45.0 ## Minimum allowed angle in degrees between edges at a node
-@export var village_variability: float = 0.35 ## Random variation when distributing villages across branch edges
+@export var village_variability: float = 0.2 ## Random variation applied to each branch's share of the village budget
 @export var village_edge_offset_ratio: float = 0.12 ## Perpendicular kink offset as a fraction of edge length
-@export var min_edge_length_for_village: float = 60.0
-@export var max_trunk_villages: int = 2
+@export var min_edge_length_for_village: float = 40.0
+@export var max_trunk_villages: int = 5
+@export var max_villages_per_branch: int = 4 ## Maximum villages placed on each town branch chain
 
 const SHARP_ANGLE_MOVE_STEP: float = 8.0
 const SHARP_ANGLE_MAX_STEPS: int = 10
 const SHARP_ANGLE_MAX_PASSES: int = 4
+const EDGE_CROSSING_MAX_PASSES: int = 12
 
 var allNodes: Array[MapLocation] = []
 var mapSize: Vector2 = Vector2(1024, 724)
@@ -35,6 +38,7 @@ var margins: float = 50.0
 @export var city_vertical_band: float = 0.4 ## Middle fraction of map height for cities and loopers
 @export var town_vertical_band: float = 0.7 ## Middle fraction of map height for towns
 var looper_height_helper: float = 0.0
+var _town_branches: Array[TownChain] = []
 
 
 func _ready() -> void:
@@ -49,6 +53,7 @@ func regenerate_map() -> void:
 	second_pass()
 	third_pass()
 	_resolve_sharp_angles()
+	_resolve_edge_crossings()
 	var elapsed_ms: int = Time.get_ticks_msec() - start_time_ms
 	print("MapGenerator.regenerate_map took %d ms" % elapsed_ms)
 
@@ -85,6 +90,7 @@ func connect_loopers_across_map() -> void:
 # --- Pass two: town branches off the main city spine --------------------------------------------
 
 func second_pass() -> void:
+	_town_branches.clear()
 	var towns: Array[MapLocation] = _place_all_towns()
 	if towns.is_empty():
 		return
@@ -96,6 +102,7 @@ func second_pass() -> void:
 
 	var branches: Array[TownChain] = _build_town_branches(towns, main_route, cities)
 	_sort_branches_for_connection(branches)
+	_town_branches = branches
 	for branch in branches:
 		_connect_town_branch(branch)
 
@@ -334,13 +341,9 @@ func third_pass() -> void:
 		return
 
 	var trunk_edges: Array[MapGraphEdge] = []
-	var branch_edges: Array[MapGraphEdge] = []
-
 	for edge in _get_village_candidate_edges():
 		if edge.type == MapGraphEdge.EdgeType.TRUNK:
 			trunk_edges.append(edge)
-		else:
-			branch_edges.append(edge)
 
 	var trunk_village_count: int = _get_trunk_village_count(trunk_edges.size())
 	var branch_village_count: int = numOfVillages - trunk_village_count
@@ -348,16 +351,18 @@ func third_pass() -> void:
 	var trunk_allocations: Array[int] = _allocate_villages_to_edges(
 		trunk_edges,
 		trunk_village_count,
-		0.0
+		0.0,
+		1
 	)
-	var branch_allocations: Array[int] = _allocate_villages_to_edges(
-		branch_edges,
+	_apply_village_allocations(trunk_edges, trunk_allocations)
+
+	var branch_allocations: Array[int] = _allocate_villages_to_branches(
+		_town_branches,
 		branch_village_count,
 		village_variability
 	)
-
-	_apply_village_allocations(trunk_edges, trunk_allocations)
-	_apply_village_allocations(branch_edges, branch_allocations)
+	for branch_index in range(_town_branches.size()):
+		_place_villages_on_town_branch(_town_branches[branch_index], branch_allocations[branch_index])
 
 
 func _get_village_candidate_edges() -> Array[MapGraphEdge]:
@@ -391,41 +396,206 @@ func _get_trunk_village_count(trunk_edge_count: int) -> int:
 func _allocate_villages_to_edges(
 	edges: Array[MapGraphEdge],
 	total_villages: int,
+	variability: float,
+	max_per_edge: int
+) -> Array[int]:
+	return _allocate_villages_with_average(edges.size(), total_villages, variability, max_per_edge)
+
+
+func _allocate_villages_to_branches(
+	branches: Array[TownChain],
+	total_villages: int,
 	variability: float
 ) -> Array[int]:
-	var allocations: Array[int] = []
-	if edges.is_empty() or total_villages <= 0:
-		return allocations
-
-	var weights: Array[float] = []
-	var weight_sum: float = 0.0
-	for edge in edges:
-		var weight: float = maxf(0.1, 1.0 + randf_range(-variability, variability))
-		weights.append(weight)
-		weight_sum += weight
-
-	var assigned_villages: int = 0
-	for weight_index in range(edges.size()):
-		var village_count: int = int(floor(float(total_villages) * weights[weight_index] / weight_sum))
-		allocations.append(village_count)
-		assigned_villages += village_count
-
-	var remaining_villages: int = total_villages - assigned_villages
-	var edge_order: Array[int] = []
-	for edge_index in range(edges.size()):
-		edge_order.append(edge_index)
-	edge_order.sort_custom(func(left_index: int, right_index: int) -> bool:
-		return weights[left_index] > weights[right_index]
+	return _allocate_villages_with_average(
+		branches.size(),
+		total_villages,
+		variability,
+		max_villages_per_branch
 	)
 
-	var order_index: int = 0
-	while remaining_villages > 0:
-		var edge_index: int = edge_order[order_index % edge_order.size()]
-		allocations[edge_index] += 1
-		remaining_villages -= 1
-		order_index += 1
 
+func _allocate_villages_with_average(
+	slot_count: int,
+	total_villages: int,
+	variability: float,
+	max_per_slot: int
+) -> Array[int]:
+	var allocations: Array[int] = []
+	if slot_count <= 0 or total_villages <= 0 or max_per_slot <= 0:
+		return allocations
+
+	for _slot_index in range(slot_count):
+		allocations.append(0)
+
+	var average_per_slot: float = float(total_villages) / float(slot_count)
+	for slot_index in range(slot_count):
+		var modifier: float = 1.0 + randf_range(-variability, variability)
+		var slot_target: int = int(round(average_per_slot * modifier))
+		allocations[slot_index] = clampi(slot_target, 0, max_per_slot)
+
+	_normalize_village_allocations(allocations, total_villages, max_per_slot)
 	return allocations
+
+
+func _normalize_village_allocations(
+	allocations: Array[int],
+	target_total: int,
+	max_per_slot: int
+) -> void:
+	var current_total: int = 0
+	for allocation in allocations:
+		current_total += allocation
+
+	var difference: int = target_total - current_total
+	if difference == 0:
+		return
+
+	var slot_order: Array[int] = []
+	for slot_index in range(allocations.size()):
+		slot_order.append(slot_index)
+	slot_order.shuffle()
+
+	while difference > 0:
+		var adjusted: bool = false
+		for slot_index in slot_order:
+			if allocations[slot_index] >= max_per_slot:
+				continue
+			allocations[slot_index] += 1
+			difference -= 1
+			adjusted = true
+			if difference == 0:
+				break
+		if not adjusted:
+			break
+
+	while difference < 0:
+		var adjusted: bool = false
+		for slot_index in slot_order:
+			if allocations[slot_index] <= 0:
+				continue
+			allocations[slot_index] -= 1
+			difference += 1
+			adjusted = true
+			if difference == 0:
+				break
+		if not adjusted:
+			break
+
+
+func _place_villages_on_town_branch(branch: TownChain, village_count: int) -> void:
+	if branch == null or village_count <= 0:
+		return
+
+	var base_route: Array[MapLocation] = _get_branch_route(branch)
+	if base_route.size() < 2:
+		return
+
+	var segment_count: int = base_route.size() - 1
+	var segment_allocations: Array[int] = _allocate_villages_with_average(
+		segment_count,
+		village_count,
+		village_variability,
+		max_villages_per_branch
+	)
+
+	for segment_index in range(segment_count):
+		var villages_for_segment: int = segment_allocations[segment_index]
+		if villages_for_segment <= 0:
+			continue
+
+		var segment_edges: Array[MapGraphEdge] = _get_connecting_branch_edges(
+			base_route[segment_index],
+			base_route[segment_index + 1]
+		)
+		var target_edge: MapGraphEdge = _find_longest_edge(segment_edges)
+		if target_edge == null:
+			continue
+
+		_try_insert_villages_on_edge(target_edge, villages_for_segment)
+
+
+func _find_longest_edge(edges: Array[MapGraphEdge]) -> MapGraphEdge:
+	var best_edge: MapGraphEdge = null
+	var best_length: float = -1.0
+
+	for edge in edges:
+		if edge == null or not is_instance_valid(edge):
+			continue
+		var edge_length: float = edge.node1.position.distance_to(edge.node2.position)
+		if edge_length < min_edge_length_for_village:
+			continue
+		if edge_length <= best_length:
+			continue
+		best_length = edge_length
+		best_edge = edge
+
+	return best_edge
+
+
+func _try_insert_villages_on_edge(edge: MapGraphEdge, village_count: int) -> void:
+	var villages_to_place: int = mini(
+		village_count,
+		_get_max_villages_for_edge(edge, max_villages_per_branch)
+	)
+	while villages_to_place > 0:
+		if _insert_villages_on_edge(edge, villages_to_place) > 0:
+			return
+		villages_to_place -= 1
+
+
+func _get_connecting_branch_edges(from_node: MapLocation, to_node: MapLocation) -> Array[MapGraphEdge]:
+	var direct_edge: MapGraphEdge = _find_edge_between(from_node, to_node)
+	if direct_edge != null:
+		return [direct_edge]
+	return _find_branch_path_edges(from_node, to_node)
+
+
+func _find_edge_between(first_node: MapLocation, second_node: MapLocation) -> MapGraphEdge:
+	for edge in first_node.edges:
+		if edge.node1 == second_node or edge.node2 == second_node:
+			return edge
+	return null
+
+
+func _find_branch_path_edges(from_node: MapLocation, to_node: MapLocation) -> Array[MapGraphEdge]:
+	var visited: Dictionary = {}
+	visited[from_node] = true
+	var queue: Array = [[from_node, []]]
+
+	while not queue.is_empty():
+		var item: Array = queue.pop_front()
+		var current_node: MapLocation = item[0]
+		var path_edges: Array = item[1]
+
+		if current_node == to_node:
+			var result: Array[MapGraphEdge] = []
+			for path_edge in path_edges:
+				result.append(path_edge as MapGraphEdge)
+			return result
+
+		for edge in current_node.edges:
+			if edge.type != MapGraphEdge.EdgeType.BRANCH:
+				continue
+
+			var other_node: MapLocation = edge.node1
+			if other_node == current_node:
+				other_node = edge.node2
+			if visited.has(other_node):
+				continue
+
+			visited[other_node] = true
+			var next_path: Array = path_edges.duplicate()
+			next_path.append(edge)
+			queue.append([other_node, next_path])
+
+	return []
+
+
+func _get_max_villages_for_edge(edge: MapGraphEdge, max_per_edge: int) -> int:
+	var edge_length: float = edge.node1.position.distance_to(edge.node2.position)
+	var length_cap: int = maxi(1, int(edge_length / village_min_distance) - 1)
+	return mini(max_per_edge, length_cap)
 
 
 func _apply_village_allocations(edges: Array[MapGraphEdge], allocations: Array[int]) -> void:
@@ -483,8 +653,8 @@ func _build_village_positions_on_edge(
 	var perpendicular: Vector2 = Vector2(-edge_direction.y, edge_direction.x)
 	var edge_length: float = start_pos.distance_to(end_pos)
 	var offset_amount: float = clampf(
-		edge_length * village_edge_offset_ratio,
-		8.0,
+		edge_length * village_edge_offset_ratio / maxf(1.0, float(village_count) * 0.75),
+		6.0,
 		40.0
 	)
 	var offset_side: float = 1.0 if randf() > 0.5 else -1.0
@@ -502,7 +672,9 @@ func _build_village_positions_on_edge(
 
 		village_pos = _clamp_to_map(village_pos)
 		if not _is_far_enough_for_village(village_pos, [node_a, node_b], positions):
-			return []
+			if positions.is_empty():
+				return []
+			break
 
 		positions.append(village_pos)
 		offset_side *= -1.0
@@ -586,11 +758,11 @@ func _is_far_enough_for_village(
 			and map_node.type != MapLocation.VILLAGE
 		):
 			continue
-		if pos.distance_to(map_node.position) < min_distance:
+		if pos.distance_to(map_node.position) < village_min_distance:
 			return false
 
 	for pending_pos in pending_positions:
-		if pos.distance_to(pending_pos) < min_distance:
+		if pos.distance_to(pending_pos) < village_min_distance:
 			return false
 
 	return true
@@ -860,6 +1032,156 @@ func _update_node_edges(map_node: MapLocation) -> void:
 		edge.update_line()
 
 
+# --- Edge crossing cleanup -----------------------------------------------------------------------
+
+func _resolve_edge_crossings() -> void:
+	for _pass_index in range(EDGE_CROSSING_MAX_PASSES):
+		var crossing_pair: Array = _find_first_crossing_edge_pair()
+		if crossing_pair.is_empty():
+			break
+		if _try_resolve_crossing_with_villages(crossing_pair[0], crossing_pair[1]):
+			continue
+		break
+
+
+func _find_first_crossing_edge_pair() -> Array:
+	var edges: Array[MapGraphEdge] = _get_all_edges()
+	for first_index in range(edges.size()):
+		for second_index in range(first_index + 1, edges.size()):
+			var first_edge: MapGraphEdge = edges[first_index]
+			var second_edge: MapGraphEdge = edges[second_index]
+			if _edges_share_node(first_edge, second_edge):
+				continue
+			if _edge_pair_crosses(first_edge, second_edge):
+				return [first_edge, second_edge]
+	return []
+
+
+func _edges_share_node(first_edge: MapGraphEdge, second_edge: MapGraphEdge) -> bool:
+	return (
+		first_edge.node1 == second_edge.node1
+		or first_edge.node1 == second_edge.node2
+		or first_edge.node2 == second_edge.node1
+		or first_edge.node2 == second_edge.node2
+	)
+
+
+func _edge_pair_crosses(first_edge: MapGraphEdge, second_edge: MapGraphEdge) -> bool:
+	return _segments_intersect(
+		first_edge.node1.position,
+		first_edge.node2.position,
+		second_edge.node1.position,
+		second_edge.node2.position
+	)
+
+
+func _count_edge_crossings() -> int:
+	var crossing_count: int = 0
+	var edges: Array[MapGraphEdge] = _get_all_edges()
+	for first_index in range(edges.size()):
+		for second_index in range(first_index + 1, edges.size()):
+			var first_edge: MapGraphEdge = edges[first_index]
+			var second_edge: MapGraphEdge = edges[second_index]
+			if _edges_share_node(first_edge, second_edge):
+				continue
+			if _edge_pair_crosses(first_edge, second_edge):
+				crossing_count += 1
+	return crossing_count
+
+
+func _try_resolve_crossing_with_villages(first_edge: MapGraphEdge, second_edge: MapGraphEdge) -> bool:
+	var villages: Array[MapLocation] = []
+	for village in _get_villages_on_edge(first_edge):
+		villages.append(village)
+	for village in _get_villages_on_edge(second_edge):
+		if villages.has(village):
+			continue
+		villages.append(village)
+
+	for village in villages:
+		if _try_move_village_to_reduce_crossings(village):
+			return true
+
+	for village in _get_village_nodes():
+		if villages.has(village):
+			continue
+		if _try_move_village_to_reduce_crossings(village):
+			return true
+
+	return false
+
+
+func _get_villages_on_edge(edge: MapGraphEdge) -> Array[MapLocation]:
+	var villages: Array[MapLocation] = []
+	for endpoint in [edge.node1, edge.node2]:
+		if endpoint.type == MapLocation.VILLAGE:
+			villages.append(endpoint)
+	return villages
+
+
+func _try_move_village_to_reduce_crossings(village: MapLocation) -> bool:
+	if village.type != MapLocation.VILLAGE:
+		return false
+
+	var original_position: Vector2 = village.position
+	var best_position: Vector2 = original_position
+	var best_crossing_count: int = _count_edge_crossings()
+
+	for candidate_position in _generate_village_uncross_candidates(village):
+		var clamped_position: Vector2 = _clamp_to_map(candidate_position)
+		if not _is_valid_village_move_position(village, clamped_position):
+			continue
+
+		village.position = clamped_position
+		_update_node_edges(village)
+		var crossing_count: int = _count_edge_crossings()
+		if crossing_count < best_crossing_count:
+			best_crossing_count = crossing_count
+			best_position = clamped_position
+		if best_crossing_count == 0:
+			break
+
+	village.position = best_position
+	_update_node_edges(village)
+	return not best_position.is_equal_approx(original_position)
+
+
+func _generate_village_uncross_candidates(village: MapLocation) -> Array[Vector2]:
+	var candidates: Array[Vector2] = []
+	var neighbors: Array[MapLocation] = _get_neighbor_nodes(village)
+	if neighbors.size() != 2:
+		return candidates
+
+	var first_neighbor_pos: Vector2 = neighbors[0].position
+	var second_neighbor_pos: Vector2 = neighbors[1].position
+	var edge_direction: Vector2 = (second_neighbor_pos - first_neighbor_pos).normalized()
+	var perpendicular: Vector2 = Vector2(-edge_direction.y, edge_direction.x)
+	var along_positions: Array[float] = [0.2, 0.33, 0.5, 0.66, 0.8]
+
+	for along_t in along_positions:
+		var on_edge_pos: Vector2 = first_neighbor_pos.lerp(second_neighbor_pos, along_t)
+		candidates.append(on_edge_pos)
+		for offset_amount in [8.0, 16.0, 24.0, 32.0, 40.0]:
+			candidates.append(on_edge_pos + perpendicular * offset_amount)
+			candidates.append(on_edge_pos - perpendicular * offset_amount)
+
+	for direction in [perpendicular, -perpendicular, edge_direction, -edge_direction]:
+		for step in range(1, SHARP_ANGLE_MAX_STEPS + 1):
+			candidates.append(
+				village.position + direction * SHARP_ANGLE_MOVE_STEP * float(step)
+			)
+
+	return candidates
+
+
+func _is_valid_village_move_position(village: MapLocation, candidate_position: Vector2) -> bool:
+	return _is_far_enough_for_village(
+		candidate_position,
+		_get_neighbor_nodes(village),
+		[]
+	)
+
+
 # --- Graph helpers -------------------------------------------------------------------------------
 
 func _add_map_node(map_node: MapLocation) -> void:
@@ -958,6 +1280,14 @@ func _get_town_nodes() -> Array[MapLocation]:
 		if map_node.type == MapLocation.TOWN:
 			towns.append(map_node)
 	return towns
+
+
+func _get_village_nodes() -> Array[MapLocation]:
+	var villages: Array[MapLocation] = []
+	for map_node in allNodes:
+		if map_node.type == MapLocation.VILLAGE:
+			villages.append(map_node)
+	return villages
 
 
 func _get_main_branch_cities() -> Array[MapLocation]:

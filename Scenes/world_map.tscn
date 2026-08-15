@@ -251,7 +251,11 @@ text = "Regenerate"
 script = ExtResource("5_67byq")
 numOfTowns = 12
 numOfVillages = 20
+village_min_distance = null
 min_horizontal_distance = 100.0
+min_edge_length_for_village = 60.0
+max_trunk_villages = 2
+max_villages_per_branch = null
 metadata/_custom_type_script = "uid://xw62eb0m2po0"
 
 [connection signal="pressed" from="DebugRegenButton" to="MapGenerator" method="regenerate_map"]
