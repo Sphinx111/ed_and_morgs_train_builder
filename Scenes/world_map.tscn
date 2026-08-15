@@ -253,6 +253,7 @@ numOfTowns = 12
 numOfVillages = 20
 village_min_distance = null
 min_horizontal_distance = 100.0
+village_variability = 0.35
 min_edge_length_for_village = 60.0
 max_trunk_villages = 2
 max_villages_per_branch = null

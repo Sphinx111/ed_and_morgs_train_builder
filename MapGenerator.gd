@@ -31,6 +31,8 @@ const SHARP_ANGLE_MOVE_STEP: float = 8.0
 const SHARP_ANGLE_MAX_STEPS: int = 10
 const SHARP_ANGLE_MAX_PASSES: int = 4
 const EDGE_CROSSING_MAX_PASSES: int = 12
+const GENERATION_SOFT_TIMEOUT_MS: int = 200
+const GENERATION_HARD_TIMEOUT_MS: int = 2000
 
 var allNodes: Array[MapLocation] = []
 var mapSize: Vector2 = Vector2(1024, 724)
@@ -39,6 +41,7 @@ var margins: float = 50.0
 @export var town_vertical_band: float = 0.7 ## Middle fraction of map height for towns
 var looper_height_helper: float = 0.0
 var _town_branches: Array[TownChain] = []
+var _generation_session: Dictionary = {}
 
 
 func _ready() -> void:
@@ -46,15 +49,94 @@ func _ready() -> void:
 
 
 func regenerate_map() -> void:
-	var start_time_ms: int = Time.get_ticks_msec()
+	var total_start_ms: int = Time.get_ticks_msec()
+
+	if _run_generation_attempt(1, true):
+		_log_generation_time(total_start_ms)
+		return
+
+	print(
+		"MapGenerator: first generation attempt exceeded %d ms, restarting"
+		% GENERATION_SOFT_TIMEOUT_MS
+	)
+
+	if _run_generation_attempt(2, false):
+		_log_generation_time(total_start_ms)
+		return
+
+	push_error(
+		"MapGenerator: generation did not complete within %d ms on the second attempt"
+		% GENERATION_HARD_TIMEOUT_MS
+	)
+
+
+func _run_generation_attempt(attempt_number: int, enforce_soft_timeout: bool) -> bool:
+	_begin_generation_session(attempt_number, enforce_soft_timeout)
 	looper_height_helper = 0.0
 	_clear_generated_nodes()
+
+	var completed: bool = _run_generation_pipeline()
+	_end_generation_session()
+	return completed
+
+
+func _run_generation_pipeline() -> bool:
+	if _generation_checkpoint():
+		return false
+
 	first_pass()
+	if _generation_checkpoint():
+		return false
+
 	second_pass()
+	if _generation_checkpoint():
+		return false
+
 	third_pass()
+	if _generation_checkpoint():
+		return false
+
 	_resolve_sharp_angles()
+	if _generation_checkpoint():
+		return false
+
 	_resolve_edge_crossings()
-	var elapsed_ms: int = Time.get_ticks_msec() - start_time_ms
+	if _generation_checkpoint():
+		return false
+
+	return true
+
+
+func _begin_generation_session(attempt_number: int, enforce_soft_timeout: bool) -> void:
+	_generation_session = {
+		"attempt": attempt_number,
+		"start_ms": Time.get_ticks_msec(),
+		"enforce_soft_timeout": enforce_soft_timeout,
+		"hard_timeout": false,
+	}
+
+
+func _end_generation_session() -> void:
+	_generation_session.clear()
+
+
+func _generation_checkpoint() -> bool:
+	if _generation_session.is_empty():
+		return false
+
+	var elapsed_ms: int = Time.get_ticks_msec() - _generation_session["start_ms"]
+	if _generation_session["enforce_soft_timeout"]:
+		return elapsed_ms >= GENERATION_SOFT_TIMEOUT_MS
+
+	if elapsed_ms >= GENERATION_HARD_TIMEOUT_MS:
+		_generation_session["hard_timeout"] = true
+		return true
+
+	return false
+
+
+func _log_generation_time(total_start_ms: int) -> void:
+	var elapsed_ms: int = Time.get_ticks_msec() - total_start_ms
 	print("MapGenerator.regenerate_map took %d ms" % elapsed_ms)
 
 
@@ -64,6 +146,8 @@ func first_pass() -> void:
 	allNodes.clear()
 	add_map_looper("left")
 	for i in range(numOfCities):
+		if _generation_checkpoint():
+			return
 		var city_pos: Variant = _pick_map_pos_with_min_city_distance()
 		if city_pos == null:
 			continue
@@ -104,6 +188,8 @@ func second_pass() -> void:
 	_sort_branches_for_connection(branches)
 	_town_branches = branches
 	for branch in branches:
+		if _generation_checkpoint():
+			return
 		_connect_town_branch(branch)
 
 	_connect_nearby_unlinked_towns()
@@ -122,6 +208,8 @@ func _sort_branches_for_connection(branches: Array[TownChain]) -> void:
 func _place_all_towns() -> Array[MapLocation]:
 	var towns: Array[MapLocation] = []
 	for i in range(numOfTowns):
+		if _generation_checkpoint():
+			return towns
 		var town_pos: Variant = _pick_map_pos_with_min_town_distance()
 		if town_pos == null:
 			continue
@@ -362,6 +450,8 @@ func third_pass() -> void:
 		village_variability
 	)
 	for branch_index in range(_town_branches.size()):
+		if _generation_checkpoint():
+			return
 		_place_villages_on_town_branch(_town_branches[branch_index], branch_allocations[branch_index])
 
 
@@ -500,6 +590,8 @@ func _place_villages_on_town_branch(branch: TownChain, village_count: int) -> vo
 	)
 
 	for segment_index in range(segment_count):
+		if _generation_checkpoint():
+			return
 		var villages_for_segment: int = segment_allocations[segment_index]
 		if villages_for_segment <= 0:
 			continue
@@ -861,8 +953,12 @@ func _resolve_sharp_angles() -> void:
 		return
 
 	for _pass_index in range(SHARP_ANGLE_MAX_PASSES):
+		if _generation_checkpoint():
+			return
 		var improved_any: bool = false
 		for map_node in allNodes:
+			if _generation_checkpoint():
+				return
 			if not _is_angle_adjustable_node(map_node):
 				continue
 			if _try_improve_node_sharp_angle(map_node):
@@ -897,6 +993,8 @@ func _try_improve_node_sharp_angle(map_node: MapLocation) -> bool:
 
 	for direction in directions:
 		for step in range(1, SHARP_ANGLE_MAX_STEPS + 1):
+			if _generation_checkpoint():
+				return false
 			var candidate_position: Vector2 = _clamp_to_map(
 				map_node.position + direction * SHARP_ANGLE_MOVE_STEP * float(step)
 			)
@@ -1036,6 +1134,8 @@ func _update_node_edges(map_node: MapLocation) -> void:
 
 func _resolve_edge_crossings() -> void:
 	for _pass_index in range(EDGE_CROSSING_MAX_PASSES):
+		if _generation_checkpoint():
+			return
 		var crossing_pair: Array = _find_first_crossing_edge_pair()
 		if crossing_pair.is_empty():
 			break
@@ -1079,6 +1179,8 @@ func _count_edge_crossings() -> int:
 	var crossing_count: int = 0
 	var edges: Array[MapGraphEdge] = _get_all_edges()
 	for first_index in range(edges.size()):
+		if _generation_checkpoint():
+			return crossing_count
 		for second_index in range(first_index + 1, edges.size()):
 			var first_edge: MapGraphEdge = edges[first_index]
 			var second_edge: MapGraphEdge = edges[second_index]
@@ -1128,6 +1230,8 @@ func _try_move_village_to_reduce_crossings(village: MapLocation) -> bool:
 	var best_crossing_count: int = _count_edge_crossings()
 
 	for candidate_position in _generate_village_uncross_candidates(village):
+		if _generation_checkpoint():
+			break
 		var clamped_position: Vector2 = _clamp_to_map(candidate_position)
 		if not _is_valid_village_move_position(village, clamped_position):
 			continue
