@@ -8,7 +8,7 @@ const TOWN: int = 1
 const VILLAGE: int = 2
 const MAP_LOOPER: int = 3
 
-const VISUAL_RADIUS: float = 8.0
+var visual_radius : float = 8.0
 
 var type: int = 0
 var edges: Array[MapGraphEdge] = []
@@ -29,7 +29,8 @@ func _setup_visual() -> void:
 	var visual := Polygon2D.new()
 	visual.name = "Visual"
 	visual.color = _get_type_color()
-	visual.polygon = _make_circle_polygon(VISUAL_RADIUS, 16)
+	visual_radius = _get_type_radius()
+	visual.polygon = _make_circle_polygon(visual_radius, 16)
 	add_child(visual)
 
 
@@ -45,6 +46,15 @@ func _get_type_color() -> Color:
 			return Color(1.0, 0.3, 0.3)
 		_:
 			return Color.WHITE
+
+
+func _get_type_radius() -> float:
+	match type:
+		MapLocation.TOWN:
+			return 6.0
+		MapLocation.VILLAGE:
+			return 4.0
+	return 8.0
 
 
 func _make_circle_polygon(radius: float, segments: int) -> PackedVector2Array:
