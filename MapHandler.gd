@@ -14,6 +14,7 @@ var sun2 : PathFollow2D = null
 var sunradius : float = 512.0
 var sun_path_length : float = 2048.0
 var map_width : float = 1024.0
+const MAP_CONTENT_SIZE : Vector2 = Vector2(1024.0, 723.0)
 var sunspeed : float = 1.0
 
 func _ready():
