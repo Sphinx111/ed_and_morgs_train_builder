@@ -14,6 +14,7 @@ var tick_timer : Timer = Timer.new()
 @onready var thoughtsList : ItemList = thoughtsPanel.get_node("ThoughtsList")
 
 @onready var debug_slider : HSlider = get_node("DebugPanel/DebugSlider")
+@onready var map_toggle : CheckButton = get_node("DebugPanel/CheckButton")
 
 @onready var resource_panel : ResourcePanel = $ResourcePanel
 @onready var sunInfo = get_node("sunInfo")
@@ -24,6 +25,10 @@ var expeditionsController : ExpeditionsController = null
 var backgroundController : BackgroundManager = null
 var pending_module_type : String = ""
 var scene_root : Node = null
+var _world_map_rest_position : Vector2 = Vector2.ZERO
+var _world_map_rest_scale : Vector2 = Vector2.ONE
+var _world_map_rest_z_index : int = 0
+var _world_map_is_fullscreen : bool = false
 
 func do_resource_tick():
 	selectedTrain.resource_tick()
@@ -65,6 +70,17 @@ func _ready() -> void:
 	constructionPanel.placement_requested.connect(_on_construction_placement_requested)
 	EventBus.time_factor_requested.connect(_on_time_factor_requested)
 
+	_world_map_rest_position = worldMap.position
+	_world_map_rest_scale = worldMap.scale
+	_world_map_rest_z_index = worldMap.z_index
+	worldMap.show()
+	if map_toggle.button_pressed:
+		_world_map_is_fullscreen = true
+		_apply_world_map_fullscreen()
+	else:
+		_world_map_is_fullscreen = false
+		_restore_world_map_layout()
+
 
 func _exit_tree() -> void:
 	if EventBus.time_factor_requested.is_connected(_on_time_factor_requested):
@@ -74,7 +90,8 @@ func _on_viewport_size_changed() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	resource_panel.apply_panel_width()
 	constructionPanel.apply_panel_layout()
-	
+	if _world_map_is_fullscreen:
+		_apply_world_map_fullscreen()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -251,11 +268,31 @@ func _apply_time_factor(new_time_factor: float) -> void:
 
 
 func _on_map_toggled(toggled_on: bool) -> void:
-	if toggled_on == true:
-		worldMap.show()
+	worldMap.show()
+	if toggled_on:
+		_world_map_is_fullscreen = true
+		_apply_world_map_fullscreen()
 	else:
-		worldMap.hide()
-	pass # Replace with function body.
+		_world_map_is_fullscreen = false
+		_restore_world_map_layout()
+
+
+func _apply_world_map_fullscreen() -> void:
+	var viewport_size: Vector2 = get_viewport_rect().size
+	var fit_scale: float = minf(
+		viewport_size.x / MapHandler.MAP_CONTENT_SIZE.x,
+		viewport_size.y / MapHandler.MAP_CONTENT_SIZE.y
+	)
+	var scaled_size: Vector2 = MapHandler.MAP_CONTENT_SIZE * fit_scale
+	worldMap.scale = Vector2(fit_scale, fit_scale)
+	worldMap.position = (viewport_size - scaled_size) * 0.5
+	worldMap.z_index = 100
+
+
+func _restore_world_map_layout() -> void:
+	worldMap.position = _world_map_rest_position
+	worldMap.scale = _world_map_rest_scale
+	worldMap.z_index = _world_map_rest_z_index
 
 func _on_thoughts_toggle_toggled(toggled_on: bool) -> void:
 	if toggled_on == true:
