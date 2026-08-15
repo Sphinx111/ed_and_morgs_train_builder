@@ -38,7 +38,6 @@ func _init(newTrain: Train) -> void:
 
 
 func start() -> void:
-	return
 	NarrativeEventLoader.load_all()
 	_poll_timer.wait_time = poll_interval
 	_poll_timer.timeout.connect(_on_poll_timer_timeout)

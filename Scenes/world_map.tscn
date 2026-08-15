@@ -64,7 +64,6 @@ point_count = 2
 script = ExtResource("1_deu6t")
 
 [node name="Background" type="Sprite2D" parent="."]
-visible = false
 modulate = Color(0.427493, 0.427493, 0.427493, 1)
 position = Vector2(-2, -39)
 scale = Vector2(1.705, 1.925)
@@ -72,25 +71,21 @@ texture = ExtResource("2_4ojr4")
 centered = false
 
 [node name="TrainMarker" type="PathFollow2D" parent="."]
-visible = false
 position = Vector2(-3, 177)
 loop = false
 
 [node name="Rect" type="ColorRect" parent="TrainMarker"]
-visible = false
 offset_top = -14.0
 offset_right = 40.0
 offset_bottom = 18.0
 
 [node name="MainRoute" parent="." node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-visible = false
 scale = Vector2(1, 1)
 next_junction = NodePath("../JunctionsParent/Looper1")
 last_junction = NodePath("../JunctionsParent/Junction1")
 water_count = 1
 
 [node name="RoutesParent" type="Node2D" parent="."]
-visible = false
 
 [node name="Route2" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
 scale = Vector2(1, 1)
@@ -158,7 +153,6 @@ last_junction = NodePath("../../JunctionsParent/Junction96")
 water_count = 4
 
 [node name="JunctionsParent" type="Node2D" parent="."]
-visible = false
 
 [node name="Junction2" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
 position = Vector2(316, 218)
@@ -189,14 +183,13 @@ position = Vector2(567, 298)
 lines = [NodePath("../../RoutesParent/Route94")]
 
 [node name="MapMask" type="ColorRect" parent="."]
-visible = false
 clip_children = 1
 offset_left = -2.0
 offset_top = -40.0
 offset_right = 1022.0
 offset_bottom = 683.0
 mouse_filter = 1
-color = Color(1, 1, 1, 0.278431)
+color = Color(1, 1, 1, 0.16470589)
 
 [node name="Sunpath" type="Path2D" parent="MapMask"]
 curve = SubResource("Curve2D_1huhg")
@@ -251,12 +244,10 @@ text = "Regenerate"
 script = ExtResource("5_67byq")
 numOfTowns = 12
 numOfVillages = 20
-village_min_distance = null
 min_horizontal_distance = 100.0
 village_variability = 0.35
 min_edge_length_for_village = 60.0
 max_trunk_villages = 2
-max_villages_per_branch = null
 metadata/_custom_type_script = "uid://xw62eb0m2po0"
 
 [connection signal="pressed" from="DebugRegenButton" to="MapGenerator" method="regenerate_map"]
