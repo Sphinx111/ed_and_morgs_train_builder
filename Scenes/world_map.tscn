@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dve3f2r47q48u" path="res://images/Pixel_world_map.jpg" id="2_4ojr4"]
 [ext_resource type="PackedScene" uid="uid://d0rv1tppk484j" path="res://Scenes/route.tscn" id="3_g8h5j"]
 [ext_resource type="PackedScene" uid="uid://6q5oa1s1n37c" path="res://Scenes/junction.tscn" id="4_g8h5j"]
-[ext_resource type="Script" uid="uid://xw62eb0m2po0" path="res://MapGenerator.gd" id="5_67byq"]
+[ext_resource type="Script" uid="uid://xw62eb0m2po0" path="res://MapGraphGenerator.gd" id="5_67byq"]
 
 [sub_resource type="Curve2D" id="Curve2D_67byq"]
 _data = {
@@ -240,7 +240,7 @@ offset_right = 106.0
 offset_bottom = 37.0
 text = "Regenerate"
 
-[node name="MapGenerator" type="Node2D" parent="."]
+[node name="MapGraphGenerator" type="Node2D" parent="."]
 script = ExtResource("5_67byq")
 numOfTowns = 12
 numOfVillages = 20
@@ -250,4 +250,4 @@ min_edge_length_for_village = 60.0
 max_trunk_villages = 2
 metadata/_custom_type_script = "uid://xw62eb0m2po0"
 
-[connection signal="pressed" from="DebugRegenButton" to="MapGenerator" method="regenerate_map"]
+[connection signal="pressed" from="DebugRegenButton" to="." method="regenerate_map"]

@@ -2,6 +2,10 @@ extends Node2D
 
 class_name MapHandler
 
+@onready var map_graph_generator : MapGraphGenerator = $MapGraphGenerator
+var resource_generator : MapResourceGenerator = MapResourceGenerator.new()
+var map_graph : MapGraph = null
+
 var mainRoute : BranchLine = null          ## The current branch that the train is on
 var trainMarker : PathFollow2D = null      ## A visual marker for the train's position on the route
 var selectedTrain : Train = null           ## A pointer to the player's train
@@ -17,6 +21,12 @@ var map_width : float = 1024.0
 const MAP_CONTENT_SIZE : Vector2 = Vector2(1024.0, 723.0)
 var sunspeed : float = 1.0
 
+func _enter_tree() -> void:
+	var generator: MapGraphGenerator = get_node_or_null("MapGraphGenerator") as MapGraphGenerator
+	if generator != null and not generator.map_graph_generated.is_connected(_on_map_graph_generated):
+		generator.map_graph_generated.connect(_on_map_graph_generated)
+
+
 func _ready():
 	mainRoute = get_node("MainRoute")
 	trainMarker = get_node("TrainMarker")
@@ -25,6 +35,18 @@ func _ready():
 	sun2 = get_node("MapMask/Sunpath/Sun2")
 	mainRoute.add_train(trainMarker)
 	trainMarker.progress_ratio = 0.5
+
+
+func _on_map_graph_generated(graph: MapGraph) -> void:
+	map_graph = graph
+	if map_graph == null:
+		return
+	resource_generator.add_resources_to_map_graph(map_graph)
+
+
+func regenerate_map() -> void:
+	if map_graph_generator != null:
+		map_graph_generator.regenerate_map()
 
 func select_new_train(newTrain : Train):
 	selectedTrain = newTrain

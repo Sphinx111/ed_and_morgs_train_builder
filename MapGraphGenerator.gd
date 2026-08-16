@@ -2,7 +2,7 @@
 extends Node2D
 
 ## Procedural world map generation: main spine, town branches, villages on edges, angle cleanup.
-class_name MapGenerator
+class_name MapGraphGenerator
 
 class TownChain:
 	var towns: Array[MapLocation] = []
@@ -43,31 +43,45 @@ var looper_height_helper: float = 0.0
 var _town_branches: Array[TownChain] = []
 var _generation_session: Dictionary = {}
 
+signal map_graph_generated(graph: MapGraph)
+
 
 func _ready() -> void:
 	regenerate_map()
 
 
-func regenerate_map() -> void:
+func regenerate_map() -> MapGraph:
 	var total_start_ms: int = Time.get_ticks_msec()
+	var graph: MapGraph
 
 	if _run_generation_attempt(1, true):
 		_log_generation_time(total_start_ms)
-		return
+		graph = extract_map_graph()
+	else:
+		print(
+			"MapGraphGenerator: first generation attempt exceeded %d ms, restarting"
+			% GENERATION_SOFT_TIMEOUT_MS
+		)
 
-	print(
-		"MapGenerator: first generation attempt exceeded %d ms, restarting"
-		% GENERATION_SOFT_TIMEOUT_MS
-	)
+		if _run_generation_attempt(2, false):
+			_log_generation_time(total_start_ms)
+			graph = extract_map_graph()
+		else:
+			push_error(
+				"MapGraphGenerator: generation did not complete within %d ms on the second attempt"
+				% GENERATION_HARD_TIMEOUT_MS
+			)
+			graph = extract_map_graph()
 
-	if _run_generation_attempt(2, false):
-		_log_generation_time(total_start_ms)
-		return
+	map_graph_generated.emit(graph)
+	return graph
 
-	push_error(
-		"MapGenerator: generation did not complete within %d ms on the second attempt"
-		% GENERATION_HARD_TIMEOUT_MS
-	)
+
+## Returns the generated graph without copying nodes or edges.
+## The arrays are new; the MapLocation and MapGraphEdge instances are the originals,
+## so each node's edges array and each edge's node1/node2 still point at each other.
+func extract_map_graph() -> MapGraph:
+	return MapGraph.from_nodes(allNodes)
 
 
 func _run_generation_attempt(attempt_number: int, enforce_soft_timeout: bool) -> bool:
@@ -137,7 +151,7 @@ func _generation_checkpoint() -> bool:
 
 func _log_generation_time(total_start_ms: int) -> void:
 	var elapsed_ms: int = Time.get_ticks_msec() - total_start_ms
-	print("MapGenerator.regenerate_map took %d ms" % elapsed_ms)
+	print("MapGraphGenerator.regenerate_map took %d ms" % elapsed_ms)
 
 
 # --- Pass one: loopers, cities, and the main spine -----------------------------------------------
@@ -151,7 +165,7 @@ func first_pass() -> void:
 		var city_pos: Variant = _pick_map_pos_with_min_city_distance()
 		if city_pos == null:
 			continue
-		_add_map_node(MapLocation.new(MapLocation.CITY, city_pos))
+		_add_map_node(MapLocation.new(MapLocation.TYPE.CITY, city_pos))
 	add_map_looper("right")
 	connect_loopers_across_map()
 
@@ -159,7 +173,7 @@ func first_pass() -> void:
 func connect_loopers_across_map() -> void:
 	var loopers: Array[MapLocation] = _get_looper_nodes()
 	if loopers.size() < 2:
-		push_error("MapGenerator: expected two looper nodes")
+		push_error("MapGraphGenerator: expected two looper nodes")
 		return
 
 	var left_looper: MapLocation = loopers[0]
@@ -213,7 +227,7 @@ func _place_all_towns() -> Array[MapLocation]:
 		var town_pos: Variant = _pick_map_pos_with_min_town_distance()
 		if town_pos == null:
 			continue
-		var town: MapLocation = MapLocation.new(MapLocation.TOWN, town_pos)
+		var town: MapLocation = MapLocation.new(MapLocation.TYPE.TOWN, town_pos)
 		_add_map_node(town)
 		towns.append(town)
 	return towns
@@ -723,7 +737,7 @@ func _insert_villages_on_edge(edge: MapGraphEdge, village_count: int) -> int:
 
 	var chain: Array[MapLocation] = [node_a]
 	for village_pos in village_positions:
-		var village: MapLocation = MapLocation.new(MapLocation.VILLAGE, village_pos)
+		var village: MapLocation = MapLocation.new(MapLocation.TYPE.VILLAGE, village_pos)
 		_add_map_node(village)
 		chain.append(village)
 	chain.append(node_b)
@@ -820,7 +834,7 @@ func _pick_map_pos_with_min_town_distance() -> Variant:
 
 func _is_far_enough_from_cities(pos: Vector2) -> bool:
 	for map_node in allNodes:
-		if map_node.type != MapLocation.CITY:
+		if map_node.type != MapLocation.TYPE.CITY:
 			continue
 		if abs(pos.x - map_node.position.x) < min_horizontal_distance:
 			return false
@@ -829,7 +843,7 @@ func _is_far_enough_from_cities(pos: Vector2) -> bool:
 
 func _is_far_enough_for_town(pos: Vector2) -> bool:
 	for map_node in allNodes:
-		if map_node.type != MapLocation.CITY and map_node.type != MapLocation.TOWN:
+		if map_node.type < MapLocation.TYPE.TOWN:
 			continue
 		if pos.distance_to(map_node.position) < town_min_distance:
 			return false
@@ -844,11 +858,7 @@ func _is_far_enough_for_village(
 	for map_node in allNodes:
 		if excluded_nodes.has(map_node):
 			continue
-		if (
-			map_node.type != MapLocation.CITY
-			and map_node.type != MapLocation.TOWN
-			and map_node.type != MapLocation.VILLAGE
-		):
+		if map_node.type < MapLocation.TYPE.VILLAGE:
 			continue
 		if pos.distance_to(map_node.position) < village_min_distance:
 			return false
@@ -867,7 +877,7 @@ func add_map_looper(edge: String) -> void:
 	var pos: Vector2 = Vector2(0.0, looper_height_helper)
 	if edge == "right":
 		pos.x = mapSize.x
-	_add_map_node(MapLocation.new(MapLocation.MAP_LOOPER, pos))
+	_add_map_node(MapLocation.new(MapLocation.TYPE.MAP_LOOPER, pos))
 
 
 func pick_random_map_pos() -> Vector2:
@@ -968,7 +978,7 @@ func _resolve_sharp_angles() -> void:
 
 
 func _is_angle_adjustable_node(map_node: MapLocation) -> bool:
-	return map_node.type == MapLocation.TOWN or map_node.type == MapLocation.VILLAGE
+	return map_node.type > MapLocation.TYPE.MAP_LOOPER and map_node.type < MapLocation.TYPE.CITY
 
 
 func _try_improve_node_sharp_angle(map_node: MapLocation) -> bool:
@@ -1111,9 +1121,9 @@ func _is_valid_angle_adjustment_position(map_node: MapLocation, candidate_positi
 
 
 func _get_required_separation(first_node: MapLocation, second_node: MapLocation) -> float:
-	if first_node.type == MapLocation.TOWN or second_node.type == MapLocation.TOWN:
+	if first_node.type == MapLocation.TYPE.TOWN or second_node.type == MapLocation.TYPE.TOWN:
 		return town_min_distance
-	if first_node.type == MapLocation.VILLAGE or second_node.type == MapLocation.VILLAGE:
+	if first_node.type == MapLocation.TYPE.VILLAGE or second_node.type == MapLocation.TYPE.VILLAGE:
 		return min_distance
 	return min_distance
 
@@ -1216,13 +1226,13 @@ func _try_resolve_crossing_with_villages(first_edge: MapGraphEdge, second_edge: 
 func _get_villages_on_edge(edge: MapGraphEdge) -> Array[MapLocation]:
 	var villages: Array[MapLocation] = []
 	for endpoint in [edge.node1, edge.node2]:
-		if endpoint.type == MapLocation.VILLAGE:
+		if endpoint.type == MapLocation.TYPE.VILLAGE:
 			villages.append(endpoint)
 	return villages
 
 
 func _try_move_village_to_reduce_crossings(village: MapLocation) -> bool:
-	if village.type != MapLocation.VILLAGE:
+	if village.type != MapLocation.TYPE.VILLAGE:
 		return false
 
 	var original_position: Vector2 = village.position
@@ -1365,7 +1375,7 @@ func _get_all_edges() -> Array[MapGraphEdge]:
 func _get_looper_nodes() -> Array[MapLocation]:
 	var loopers: Array[MapLocation] = []
 	for map_node in allNodes:
-		if map_node.type == MapLocation.MAP_LOOPER:
+		if map_node.type == MapLocation.TYPE.MAP_LOOPER:
 			loopers.append(map_node)
 	return _sort_nodes_by_x(loopers)
 
@@ -1373,7 +1383,7 @@ func _get_looper_nodes() -> Array[MapLocation]:
 func _get_city_nodes() -> Array[MapLocation]:
 	var cities: Array[MapLocation] = []
 	for map_node in allNodes:
-		if map_node.type == MapLocation.CITY:
+		if map_node.type == MapLocation.TYPE.CITY:
 			cities.append(map_node)
 	return cities
 
@@ -1381,7 +1391,7 @@ func _get_city_nodes() -> Array[MapLocation]:
 func _get_town_nodes() -> Array[MapLocation]:
 	var towns: Array[MapLocation] = []
 	for map_node in allNodes:
-		if map_node.type == MapLocation.TOWN:
+		if map_node.type == MapLocation.TYPE.TOWN:
 			towns.append(map_node)
 	return towns
 
@@ -1389,7 +1399,7 @@ func _get_town_nodes() -> Array[MapLocation]:
 func _get_village_nodes() -> Array[MapLocation]:
 	var villages: Array[MapLocation] = []
 	for map_node in allNodes:
-		if map_node.type == MapLocation.VILLAGE:
+		if map_node.type == MapLocation.TYPE.VILLAGE:
 			villages.append(map_node)
 	return villages
 

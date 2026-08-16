@@ -17,7 +17,7 @@ var train: Train
 ## Seconds before the first scripted storyline event can trigger
 var first_event_time: float = 5.0
 ## How often the engine checks the scheduled event pool
-var poll_interval: float = 0.25
+var poll_interval: float = 2.00
 ## How fast time progresses whilst the player is reading an event
 var event_sim_speed: float = 0.1
 
@@ -29,6 +29,8 @@ var _dialog_active: bool = false
 var _story_time: float = 0.0
 var _scheduled_events: Array = []
 var _entry_event_queue: Array[String] = ["treeGuy"]
+
+const POPUP_Z_INDEX: int = 200
 
 var _poll_timer: Timer = Timer.new()
 
@@ -83,6 +85,7 @@ func _show_event(event_key: String) -> void:
 		push_error("NarrativeEngine: missing narrative event '%s'" % event_key)
 		return
 	active_popup = popupScene.instantiate()
+	active_popup.z_index = POPUP_Z_INDEX
 	var ui_canvas: CanvasLayer = get_parent().get_node("UICanvas")
 	ui_canvas.add_child(active_popup)
 	active_popup.set_event(active_event)

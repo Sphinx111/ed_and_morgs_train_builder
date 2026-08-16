@@ -36,6 +36,7 @@ var water_purification_efficiency : float = 0.9
 # Passenger Variables
 const passengers_initial_count : int = 4
 var passenger_debug : bool = true
+var MAP_GEN_DEBUG : bool = true
 var passenger_consume_threshold : float = 0.6
 var passenger_seeks_threshold : float = 0.65
 var idle_wander_chance : float = 0.3    # Chance that passenger picks a random location to move to if they have no targetNeed

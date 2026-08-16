@@ -3,18 +3,24 @@ extends Node2D
 ## This represents a 'node' on the map where tracks should connect to
 class_name MapLocation
 
-const CITY: int = 0
-const TOWN: int = 1
-const VILLAGE: int = 2
-const MAP_LOOPER: int = 3
+## Ordered by settlement size so types can be compared numerically.
+## Example: `location.type < TYPE.TOWN` is true for villages and map loopers.
+enum TYPE {
+	MAP_LOOPER = 0,
+	VILLAGE = 1,
+	TOWN = 2,
+	CITY = 3,
+}
 
 var visual_radius : float = 8.0
 
-var type: int = 0
+var type: TYPE = TYPE.MAP_LOOPER
 var edges: Array[MapGraphEdge] = []
+var resource_containers : Dictionary = {}
+var _debug_label: Label = null
 
 
-func _init(new_type: int, map_position: Vector2 = Vector2.ZERO) -> void:
+func _init(new_type: TYPE, map_position: Vector2 = Vector2.ZERO) -> void:
 	type = new_type
 	position = map_position
 	_setup_visual()
@@ -36,13 +42,13 @@ func _setup_visual() -> void:
 
 func _get_type_color() -> Color:
 	match type:
-		MapLocation.CITY:
+		TYPE.CITY:
 			return Color(1.0, 0.85, 0.2)
-		MapLocation.TOWN:
+		TYPE.TOWN:
 			return Color(0.4, 0.8, 1.0)
-		MapLocation.VILLAGE:
+		TYPE.VILLAGE:
 			return Color(0.7, 0.9, 0.5)
-		MapLocation.MAP_LOOPER:
+		TYPE.MAP_LOOPER:
 			return Color(1.0, 0.3, 0.3)
 		_:
 			return Color.WHITE
@@ -50,9 +56,9 @@ func _get_type_color() -> Color:
 
 func _get_type_radius() -> float:
 	match type:
-		MapLocation.TOWN:
+		TYPE.TOWN:
 			return 6.0
-		MapLocation.VILLAGE:
+		TYPE.VILLAGE:
 			return 4.0
 	return 8.0
 
@@ -63,3 +69,46 @@ func _make_circle_polygon(radius: float, segments: int) -> PackedVector2Array:
 		var angle: float = TAU * float(i) / float(segments)
 		points.append(Vector2(cos(angle), sin(angle)) * radius)
 	return points
+
+func get_resource_containers() -> Dictionary:
+	return resource_containers
+
+func add_resource_container(resourceType : String, container : MapResourceContainer) -> void:
+	resource_containers.set(resourceType, container)
+	_refresh_debug_view()
+
+
+func _refresh_debug_view() -> void:
+	if not Globals.MAP_GEN_DEBUG:
+		if _debug_label != null:
+			_debug_label.visible = false
+		return
+
+	if _debug_label == null:
+		_setup_debug_label()
+
+	_debug_label.text = _build_resource_debug_text()
+	_debug_label.visible = not _debug_label.text.is_empty()
+
+
+func _setup_debug_label() -> void:
+	_debug_label = Label.new()
+	_debug_label.name = "DebugResources"
+	_debug_label.position = Vector2(visual_radius + 2.0, -visual_radius)
+	_debug_label.z_index = 20
+	_debug_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_debug_label.add_theme_font_size_override("font_size", 8)
+	_debug_label.add_theme_color_override("font_color", Color.WHITE)
+	_debug_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	_debug_label.add_theme_constant_override("outline_size", 2)
+	add_child(_debug_label)
+
+
+func _build_resource_debug_text() -> String:
+	var lines: PackedStringArray = PackedStringArray()
+	for resource_type in resource_containers:
+		var container: MapResourceContainer = resource_containers[resource_type]
+		if container == null:
+			continue
+		lines.append(container.get_debug_text())
+	return "\n".join(lines)
