@@ -77,9 +77,11 @@ func _ready() -> void:
 	if map_toggle.button_pressed:
 		_world_map_is_fullscreen = true
 		_apply_world_map_fullscreen()
+		worldMap.set_map_node_clicks_enabled(true)
 	else:
 		_world_map_is_fullscreen = false
 		_restore_world_map_layout()
+		worldMap.set_map_node_clicks_enabled(false)
 
 
 func _exit_tree() -> void:
@@ -272,9 +274,11 @@ func _on_map_toggled(toggled_on: bool) -> void:
 	if toggled_on:
 		_world_map_is_fullscreen = true
 		_apply_world_map_fullscreen()
+		worldMap.set_map_node_clicks_enabled(true)
 	else:
 		_world_map_is_fullscreen = false
 		_restore_world_map_layout()
+		worldMap.set_map_node_clicks_enabled(false)
 
 
 func _apply_world_map_fullscreen() -> void:

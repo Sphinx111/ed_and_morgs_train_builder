@@ -43,12 +43,6 @@ var looper_height_helper: float = 0.0
 var _town_branches: Array[TownChain] = []
 var _generation_session: Dictionary = {}
 
-signal map_graph_generated(graph: MapGraph)
-
-
-func _ready() -> void:
-	regenerate_map()
-
 
 func regenerate_map() -> MapGraph:
 	var total_start_ms: int = Time.get_ticks_msec()
@@ -73,7 +67,6 @@ func regenerate_map() -> MapGraph:
 			)
 			graph = extract_map_graph()
 
-	map_graph_generated.emit(graph)
 	return graph
 
 

@@ -25,26 +25,26 @@ func _ready():
 	refresh_options()
 
 func refresh_options():
-	var resources_in_range : Array[ResourceSpot] = selectedTrain.worldMap.query_resource_types()
-	
+	var result : Dictionary = selectedTrain.worldMap.query_resource_types()
+	var resource_types_in_range : Array[String] = result.keys()
 	for child in available_expeditions_panel.get_children():
 		if child is ExpeditionOption:
 			child.queue_free()
 	
-	for i in range(resources_in_range.size()):
-		var resourceSpot : ResourceSpot = resources_in_range[i]
+	for i in range(resource_types_in_range.size()):
+		var resourceType : String = resource_types_in_range[i]
 		var expedition_name : String = ""
-		if resourceSpot.resource_type == "pop":
+		if resourceType == "pop":
 			expedition_name = "Find Survivors"
-		elif resourceSpot.resource_type == "scrap":
+		elif resourceType == "scrap":
 			expedition_name = "Fetch Scrap"
-		elif resourceSpot.resource_type == "grey_water":
+		elif resourceType == "grey_water":
 			expedition_name = "Fetch Water"
-		elif resourceSpot.resource_type == "oil":
+		elif resourceType == "oil":
 			expedition_name = "Fetch Oil"
 		
-		if resourceSpot.resource_type == "pop" or resourceSpot.resource_type == "scrap" or resourceSpot.resource_type == "grey_water" or resourceSpot.resource_type == "oil":
-			var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceSpot.resource_type, resourceSpot)
+		if resourceType == "pop" or resourceType == "scrap" or resourceType == "grey_water" or resourceType == "oil":
+			var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceType, result.get(resourceType))
 			options_available.append(newOption)
 			available_expeditions_panel.add_child(newOption)
 			newOption.position.y = (i * (height_of_option + separation_between_options)) + separation_between_options

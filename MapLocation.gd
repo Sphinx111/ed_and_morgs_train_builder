@@ -23,12 +23,14 @@ var tick_cooldown: int = 10
 var map_handler: MapHandler = null
 var resource_containers : Dictionary = {}
 var _debug_label: Label = null
+var _click_area: Area2D = null
 
 
 func _init(new_type: TYPE, map_position: Vector2 = Vector2.ZERO) -> void:
 	type = new_type
 	position = map_position
 	_setup_visual()
+	_setup_click_area()
 
 
 func register_edge(edge: MapGraphEdge) -> void:
@@ -47,20 +49,59 @@ func get_selected_track_segment() -> TrackSegment:
 	return track_segments[track_selector]
 
 
+## When building the active route, pick a segment leaving this node.
+## If the current selection is the incoming segment, switch to another (trunks first).
+func select_outgoing_track(from_segment: TrackSegment) -> TrackSegment:
+	if track_segments.is_empty():
+		return null
+
+	var selected := get_selected_track_segment()
+	if from_segment == null or selected != from_segment:
+		return selected
+
+	if track_segments.size() <= 1:
+		return selected
+
+	var best_segment: TrackSegment = null
+	var best_rank: int = 999
+	for segment in track_segments:
+		if segment == from_segment:
+			continue
+		var rank := _get_track_edge_rank(segment)
+		if best_segment == null or rank < best_rank:
+			best_segment = segment
+			best_rank = rank
+
+	if best_segment != null:
+		track_selector = track_segments.find(best_segment)
+	return best_segment if best_segment != null else selected
+
+
+func _get_track_edge_rank(segment: TrackSegment) -> int:
+	if segment == null or segment.map_edge == null:
+		return 2
+	match segment.map_edge.type:
+		MapGraphEdge.EdgeType.TRUNK:
+			return 0
+		MapGraphEdge.EdgeType.BRANCH:
+			return 1
+		_:
+			return 2
+
+
 func highlight_track_selection() -> void:
-	for segment_index in range(track_segments.size()):
-		track_segments[segment_index].set_active(segment_index == track_selector)
+	pass
 
 
 func switch_track() -> void:
 	if not can_switch_track():
 		return
-	track_segments[track_selector].set_active(false)
 	track_selector += 1
 	if track_selector >= track_segments.size():
 		track_selector = 0
-	track_segments[track_selector].set_active(true)
 	last_changed_tick = Globals.game_tick
+	if map_handler != null:
+		map_handler.recalculate_active_route_from_train()
 
 
 func can_switch_track() -> bool:
@@ -72,15 +113,19 @@ func can_switch_track() -> bool:
 
 
 func transfer_train(train_marker: PathFollow2D, from_segment: TrackSegment = null) -> void:
-	var segment: TrackSegment = get_selected_track_segment()
+	if type == TYPE.MAP_LOOPER and map_handler != null:
+		if map_handler.try_transfer_via_looper(train_marker as TrainMarker, self, from_segment):
+			return
+
+	var segment: TrackSegment = select_outgoing_track(from_segment)
 	if segment == null:
 		return
-	if segment == from_segment and track_segments.size() > 1:
+	if segment == from_segment:
 		return
 	if map_handler != null:
-		map_handler.assign_train_to_track(segment, train_marker)
-	else:
-		segment.add_train(train_marker)
+		map_handler.assign_train_to_track(segment, train_marker as TrainMarker)
+	elif train_marker is TrainMarker:
+		train_marker.enter_track(segment)
 
 
 func _setup_visual() -> void:
@@ -90,6 +135,33 @@ func _setup_visual() -> void:
 	visual_radius = _get_type_radius()
 	visual.polygon = _make_circle_polygon(visual_radius, 16)
 	add_child(visual)
+
+
+func _setup_click_area() -> void:
+	_click_area = Area2D.new()
+	_click_area.name = "ClickArea"
+	_click_area.input_pickable = false
+
+	var shape_node := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = maxf(visual_radius * 2.0, 12.0)
+	shape_node.shape = circle
+	_click_area.add_child(shape_node)
+	add_child(_click_area)
+	_click_area.input_event.connect(_on_click_area_input_event)
+
+
+func set_click_input_enabled(enabled: bool) -> void:
+	if _click_area != null:
+		_click_area.input_pickable = enabled
+
+
+func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if map_handler == null or not map_handler.map_node_clicks_enabled:
+		return
+	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
+		switch_track()
+		get_viewport().set_input_as_handled()
 
 
 func _get_type_color() -> Color:
@@ -164,3 +236,11 @@ func _build_resource_debug_text() -> String:
 			continue
 		lines.append(container.get_debug_text())
 	return "\n".join(lines)
+
+func get_next_node_with_resource(_type : String, _attempts : int, _maxAttempts : int) -> MapLocation:
+	if _attempts < _maxAttempts or type == TYPE.MAP_LOOPER:
+		return null
+	if resource_containers.has(_type):
+		return self
+	var track : TrackSegment = track_segments[track_selector]
+	return track.get_other_node(self).get_next_node_with_resource(_type, _attempts + 1, _maxAttempts)

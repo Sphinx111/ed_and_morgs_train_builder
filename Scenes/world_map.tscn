@@ -1,58 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://b3ph64gipnlm5"]
+[gd_scene load_steps=6 format=3 uid="uid://b3ph64gipnlm5"]
 
 [ext_resource type="Script" uid="uid://bywwc888bn2bf" path="res://MapHandler.gd" id="1_deu6t"]
 [ext_resource type="Texture2D" uid="uid://dve3f2r47q48u" path="res://images/Pixel_world_map.jpg" id="2_4ojr4"]
-[ext_resource type="PackedScene" uid="uid://d0rv1tppk484j" path="res://Scenes/route.tscn" id="3_g8h5j"]
-[ext_resource type="PackedScene" uid="uid://6q5oa1s1n37c" path="res://Scenes/junction.tscn" id="4_g8h5j"]
+[ext_resource type="Script" uid="uid://c4vqpjq4nfrxx" path="res://TrainMarker.gd" id="3_train"]
 [ext_resource type="Script" uid="uid://xw62eb0m2po0" path="res://MapGraphGenerator.gd" id="5_67byq"]
-
-[sub_resource type="Curve2D" id="Curve2D_67byq"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 116, 134, 0, 0, 0, 0, 145, 138, 0, 0, 0, 0, 163, 153, 0, 0, 0, 0, 180, 186, 0, 0, 0, 0, 205, 220, 0, 0, 0, 0, 236, 234, 0, 0, 0, 0, 258, 230, 0, 0, 0, 0, 275, 239, 0, 0, 0, 0, 297, 236, 0, 0, 0, 0, 316, 219)
-}
-point_count = 10
-
-[sub_resource type="Curve2D" id="Curve2D_ikf48"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 116, 135, 0, 0, 0, 0, 137, 115, 0, 0, 0, 0, 166, 107, 0, 0, 0, 0, 199, 108, 0, 0, 0, 0, 215, 126, 0, 0, 0, 0, 239, 127, 0, 0, 0, 0, 263, 146, 0, 0, 0, 0, 294, 153, 0, 0, 0, 0, 298, 181, 0, 0, 0, 0, 315, 218)
-}
-point_count = 10
-
-[sub_resource type="Curve2D" id="Curve2D_ecn11"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 900, 120, 0, 0, 0, 0, 968, 150, 0, 0, 0, 0, 1021, 167)
-}
-point_count = 3
-
-[sub_resource type="Curve2D" id="Curve2D_3jykw"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 567, 301, 0, 0, 0, 0, 632, 296, 0, 0, 0, 0, 686, 310, 0, 0, 0, 0, 755, 291, 0, 0, 0, 0, 831, 250, 0, 0, 0, 0, 869, 210, 0, 0, 0, 0, 898, 190, 0, 0, 0, 0, 896, 159, 0, 0, 0, 0, 900, 120)
-}
-point_count = 9
-
-[sub_resource type="Curve2D" id="Curve2D_w1i7g"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 741, 144, 0, 0, 0, 0, 820, 117, 0, 0, 0, 0, 900, 120)
-}
-point_count = 3
-
-[sub_resource type="Curve2D" id="Curve2D_g8h5j"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 316, 218, 0, 0, 0, 0, 364, 179, 0, 0, 0, 0, 396, 146, 0, 0, 0, 0, 417, 137, 0, 0, 0, 0, 436, 169, 0, 0, 0, 0, 466, 207, 0, 0, 0, 0, 478, 234, 0, 0, 0, 0, 534, 224, 0, 0, 0, 0, 575, 204, 0, 0, 0, 0, 617, 177, 0, 0, 0, 0, 650, 151, 0, 0, 0, 0, 694, 142, 0, 0, 0, 0, 741, 144)
-}
-point_count = 13
-
-[sub_resource type="Curve2D" id="Curve2D_cwbjy"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 567, 299, 0, 0, 0, 0, 601, 279, 0, 0, 0, 0, 607, 244, 0, 0, 0, 0, 646, 233, 0, 0, 0, 0, 677, 207, 0, 0, 0, 0, 722, 189, 0, 0, 0, 0, 741, 144)
-}
-point_count = 7
-
-[sub_resource type="Curve2D" id="Curve2D_pykxj"]
-_data = {
-"points": PackedVector2Array(0, 0, 0, 0, 316, 218, 0, 0, 0, 0, 339, 253, 0, 0, 0, 0, 374, 277, 0, 0, 0, 0, 414, 292, 0, 0, 0, 0, 458, 303, 0, 0, 0, 0, 504, 322, 0, 0, 0, 0, 551, 323, 0, 0, 0, 0, 567, 298)
-}
-point_count = 8
 
 [sub_resource type="Curve2D" id="Curve2D_1huhg"]
 _data = {
@@ -64,7 +15,7 @@ point_count = 2
 script = ExtResource("1_deu6t")
 
 [node name="Background" type="Sprite2D" parent="."]
-modulate = Color(0.427493, 0.427493, 0.427493, 1)
+modulate = Color(0, 0, 0, 1)
 position = Vector2(-2, -39)
 scale = Vector2(1.705, 1.925)
 texture = ExtResource("2_4ojr4")
@@ -73,114 +24,12 @@ centered = false
 [node name="TrainMarker" type="PathFollow2D" parent="."]
 position = Vector2(-3, 177)
 loop = false
+script = ExtResource("3_train")
 
 [node name="Rect" type="ColorRect" parent="TrainMarker"]
 offset_top = -14.0
 offset_right = 40.0
 offset_bottom = 18.0
-
-[node name="MainRoute" parent="." node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-next_junction = NodePath("../JunctionsParent/Looper1")
-last_junction = NodePath("../JunctionsParent/Junction1")
-water_count = 1
-
-[node name="RoutesParent" type="Node2D" parent="."]
-
-[node name="Route2" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-curve = SubResource("Curve2D_67byq")
-next_junction = NodePath("../../JunctionsParent/Junction1")
-last_junction = NodePath("../../JunctionsParent/Junction2")
-pop_count = 3
-water_count = 1
-oil_count = 2
-
-[node name="Route3" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-curve = SubResource("Curve2D_ikf48")
-next_junction = NodePath("../../JunctionsParent/Junction1")
-last_junction = NodePath("../../JunctionsParent/Junction2")
-scrap_count = 3
-pop_count = 1
-water_count = 1
-
-[node name="Route99" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-curve = SubResource("Curve2D_ecn11")
-next_junction = NodePath("../../JunctionsParent/Junction99")
-last_junction = NodePath("../../JunctionsParent/Looper1")
-oil_count = 2
-
-[node name="Route98" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-curve = SubResource("Curve2D_3jykw")
-next_junction = NodePath("../../JunctionsParent/Junction96")
-last_junction = NodePath("../../JunctionsParent/Junction99")
-scrap_count = 7
-pop_count = 2
-water_count = 1
-
-[node name="Route97" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-curve = SubResource("Curve2D_w1i7g")
-next_junction = NodePath("../../JunctionsParent/Junction97")
-last_junction = NodePath("../../JunctionsParent/Junction99")
-pop_count = 2
-water_count = 1
-
-[node name="Route96" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-curve = SubResource("Curve2D_g8h5j")
-next_junction = NodePath("../../JunctionsParent/Junction2")
-last_junction = NodePath("../../JunctionsParent/Junction98")
-scrap_count = 4
-water_count = 2
-
-[node name="Route95" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-curve = SubResource("Curve2D_cwbjy")
-next_junction = NodePath("../../JunctionsParent/Junction96")
-last_junction = NodePath("../../JunctionsParent/Junction97")
-pop_count = 7
-oil_count = 4
-
-[node name="Route94" parent="RoutesParent" node_paths=PackedStringArray("next_junction", "last_junction") instance=ExtResource("3_g8h5j")]
-scale = Vector2(1, 1)
-curve = SubResource("Curve2D_pykxj")
-next_junction = NodePath("../../JunctionsParent/Junction2")
-last_junction = NodePath("../../JunctionsParent/Junction96")
-water_count = 4
-
-[node name="JunctionsParent" type="Node2D" parent="."]
-
-[node name="Junction2" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
-position = Vector2(316, 218)
-lines = [NodePath("../../RoutesParent/Route2"), NodePath("../../RoutesParent/Route3")]
-
-[node name="Junction1" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
-position = Vector2(116, 134)
-lines = [NodePath("../../MainRoute")]
-
-[node name="Looper1" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
-position = Vector2(0, 177)
-lines = [NodePath("../../RoutesParent/Route99")]
-
-[node name="Junction99" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
-position = Vector2(900, 120)
-lines = [NodePath("../../RoutesParent/Route98"), NodePath("../../RoutesParent/Route97")]
-
-[node name="Junction98" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
-position = Vector2(741, 144)
-lines = [NodePath("../../RoutesParent/Route96"), NodePath("../../RoutesParent/Route95")]
-
-[node name="Junction97" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
-position = Vector2(741, 144)
-lines = [NodePath("../../RoutesParent/Route96"), NodePath("../../RoutesParent/Route95")]
-
-[node name="Junction96" parent="JunctionsParent" node_paths=PackedStringArray("lines") instance=ExtResource("4_g8h5j")]
-position = Vector2(567, 298)
-lines = [NodePath("../../RoutesParent/Route94")]
 
 [node name="MapMask" type="ColorRect" parent="."]
 clip_children = 1

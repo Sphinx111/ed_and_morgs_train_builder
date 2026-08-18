@@ -33,6 +33,17 @@ func get_main_route() -> Array[MapLocation]:
 	return mainRoute
 
 
+func get_other_looper(looper: MapLocation) -> MapLocation:
+	if loopers.is_empty() and not nodes.is_empty():
+		_populate_typed_node_lists()
+	if loopers.size() < 2:
+		return null
+	for node in loopers:
+		if node != looper:
+			return node
+	return null
+
+
 func _populate_typed_node_lists() -> void:
 	allCities.clear()
 	allTowns.clear()
