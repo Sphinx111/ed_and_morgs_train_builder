@@ -27,6 +27,8 @@ func init_line(origin_point : Vector2):
 
 ## Move train on by number of pixels
 func update_trainPos(progress : float):
+	if trainMarker == null or not is_instance_valid(trainMarker):
+		return
 	trainMarker.progress = trainMarker.progress - (progress * Globals.train_direction)
 	if Globals.train_direction < 0 and trainMarker.progress_ratio >= 1.0: last_junction.transfer_train(trainMarker)
 	elif Globals.train_direction > 0 and trainMarker.progress_ratio <= 0.0: next_junction.transfer_train(trainMarker)

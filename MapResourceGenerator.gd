@@ -42,6 +42,8 @@ var secondPassTotals: Array[ResourceSpec] = [
 	ResourceSpec.new("mech_parts",  300.0,    0.0,  MapLocation.TYPE.CITY,     false,  0.7)
 ]
 
+var variability : float = 0.8 # Proportion up or down resources vary per city
+
 func add_resources_to_map_graph(_mapGraph : MapGraph) -> void:
 	self.mapGraph = _mapGraph
 	cities_first_pass()
@@ -66,7 +68,8 @@ func cities_first_pass():
 				remainingLocations -= 1
 				continue
 			
-			var amount_to_place : float = max( total_remaining / remainingLocations, resourceSpec.min_per_location )
+			var amount_to_place : float = total_remaining / float(remainingLocations) * randf_range(1 - variability, 1 + variability)
+			amount_to_place = max(amount_to_place, resourceSpec.min_per_location)
 			var resource_container : MapResourceContainer = MapResourceContainer.new(
 				resourceSpec.resource_type,
 				amount_to_place
@@ -103,7 +106,7 @@ func nodes_second_pass() -> void:
 				remainingLocations -= 1
 				continue
 
-			var share: float = total_remaining / float(remainingLocations)
+			var share: float = total_remaining / float(remainingLocations) *  randf_range(1 - variability, 1 + variability)
 			var amount_to_place: float = share
 			if resourceSpec.min_per_location > 0.0:
 				amount_to_place = maxf(share, resourceSpec.min_per_location)

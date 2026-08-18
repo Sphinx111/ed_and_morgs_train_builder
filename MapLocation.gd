@@ -16,6 +16,11 @@ var visual_radius : float = 8.0
 
 var type: TYPE = TYPE.MAP_LOOPER
 var edges: Array[MapGraphEdge] = []
+var track_segments: Array[TrackSegment] = []
+var track_selector: int = 0
+var last_changed_tick: int = 0
+var tick_cooldown: int = 10
+var map_handler: MapHandler = null
 var resource_containers : Dictionary = {}
 var _debug_label: Label = null
 
@@ -29,6 +34,53 @@ func _init(new_type: TYPE, map_position: Vector2 = Vector2.ZERO) -> void:
 func register_edge(edge: MapGraphEdge) -> void:
 	if not edges.has(edge):
 		edges.append(edge)
+
+
+func register_track_segment(segment: TrackSegment) -> void:
+	if not track_segments.has(segment):
+		track_segments.append(segment)
+
+
+func get_selected_track_segment() -> TrackSegment:
+	if track_segments.is_empty():
+		return null
+	return track_segments[track_selector]
+
+
+func highlight_track_selection() -> void:
+	for segment_index in range(track_segments.size()):
+		track_segments[segment_index].set_active(segment_index == track_selector)
+
+
+func switch_track() -> void:
+	if not can_switch_track():
+		return
+	track_segments[track_selector].set_active(false)
+	track_selector += 1
+	if track_selector >= track_segments.size():
+		track_selector = 0
+	track_segments[track_selector].set_active(true)
+	last_changed_tick = Globals.game_tick
+
+
+func can_switch_track() -> bool:
+	if Globals.game_tick < (last_changed_tick + tick_cooldown):
+		return false
+	if track_segments.size() < 2:
+		return false
+	return true
+
+
+func transfer_train(train_marker: PathFollow2D, from_segment: TrackSegment = null) -> void:
+	var segment: TrackSegment = get_selected_track_segment()
+	if segment == null:
+		return
+	if segment == from_segment and track_segments.size() > 1:
+		return
+	if map_handler != null:
+		map_handler.assign_train_to_track(segment, train_marker)
+	else:
+		segment.add_train(train_marker)
 
 
 func _setup_visual() -> void:

@@ -5,12 +5,14 @@ class_name MapHandler
 @onready var map_graph_generator : MapGraphGenerator = $MapGraphGenerator
 var resource_generator : MapResourceGenerator = MapResourceGenerator.new()
 var map_graph : MapGraph = null
+var active_track : TrackSegment = null
+var _track_segments : Array[TrackSegment] = []
 
-var mainRoute : BranchLine = null          ## The current branch that the train is on
+var mainRoute : BranchLine = null          ## Legacy route; superseded by active_track when set
 var trainMarker : PathFollow2D = null      ## A visual marker for the train's position on the route
 var selectedTrain : Train = null           ## A pointer to the player's train
 
-var collection_margin : float = 40   ## Range at which resources can be collected
+var collection_margin : float = 30   ## Range at which resources can be collected
 var local_to_global_speed_conversion : float = 0.005     # Multiple train's speed value by this to get worldmap pixels per tick
 
 var sun1 : PathFollow2D = null
@@ -33,26 +35,172 @@ func _ready():
 	trainMarker.loop = false
 	sun1 = get_node("MapMask/Sunpath/Sun1")
 	sun2 = get_node("MapMask/Sunpath/Sun2")
-	mainRoute.add_train(trainMarker)
-	trainMarker.progress_ratio = 0.5
+	if map_graph != null:
+		_place_train_on_active_route()
+	else:
+		assign_train_to_legacy_route(trainMarker)
+		trainMarker.progress_ratio = 0.5
 
 
 func _on_map_graph_generated(graph: MapGraph) -> void:
 	map_graph = graph
 	if map_graph == null:
 		return
+	_build_track_segments_from_graph(map_graph)
 	resource_generator.add_resources_to_map_graph(map_graph)
+	_place_train_on_active_route()
 
 
 func regenerate_map() -> void:
 	if map_graph_generator != null:
 		map_graph_generator.regenerate_map()
 
+
+func _build_track_segments_from_graph(graph: MapGraph) -> void:
+	_clear_track_segments()
+	if map_graph_generator == null:
+		return
+
+	var tracks_parent := _get_tracks_parent()
+	for location in graph.nodes:
+		location.track_segments.clear()
+		location.map_handler = self
+
+	for edge in graph.edges:
+		if edge.node1 == null or edge.node2 == null:
+			continue
+		var segment := TrackSegment.new()
+		segment.configure(edge, self)
+		tracks_parent.add_child(segment)
+		_track_segments.append(segment)
+		edge.node1.register_track_segment(segment)
+		edge.node2.register_track_segment(segment)
+
+	for location in graph.nodes:
+		if location.track_segments.size() > 0:
+			location.highlight_track_selection()
+
+
+func _clear_track_segments() -> void:
+	_detach_train_marker_from_routes()
+	for segment in _track_segments:
+		if is_instance_valid(segment):
+			segment.queue_free()
+	_track_segments.clear()
+	active_track = null
+
+	if map_graph != null:
+		for location in map_graph.nodes:
+			location.track_segments.clear()
+
+
+func _resolve_train_marker() -> PathFollow2D:
+	if trainMarker == null or not is_instance_valid(trainMarker):
+		trainMarker = get_node_or_null("TrainMarker") as PathFollow2D
+	return trainMarker
+
+
+func _detach_train_marker_from_routes() -> void:
+	var marker := _resolve_train_marker()
+	if marker == null:
+		active_track = null
+		return
+
+	_clear_route_train_references(marker)
+
+	if marker.get_parent() != self:
+		var current_parent := marker.get_parent()
+		if current_parent != null:
+			current_parent.remove_child(marker)
+		add_child(marker)
+
+	active_track = null
+
+
+func _clear_route_train_references(marker: PathFollow2D) -> void:
+	for segment in _track_segments:
+		if is_instance_valid(segment) and segment.train_marker == marker:
+			segment.train_marker = null
+	if mainRoute != null and mainRoute.trainMarker == marker:
+		mainRoute.trainMarker = null
+
+
+func assign_train_to_track(segment: TrackSegment, marker: PathFollow2D) -> void:
+	_clear_route_train_references(marker)
+	active_track = segment
+	segment.add_train(marker)
+
+
+func assign_train_to_legacy_route(marker: PathFollow2D) -> void:
+	if mainRoute == null:
+		return
+	_clear_route_train_references(marker)
+	active_track = null
+	mainRoute.add_train(marker)
+
+
+func _get_tracks_parent() -> Node2D:
+	var existing := map_graph_generator.get_node_or_null("TracksParent") as Node2D
+	if existing == null:
+		existing = Node2D.new()
+		existing.name = "TracksParent"
+		map_graph_generator.add_child(existing)
+	return existing
+
+
+func _place_train_on_active_route() -> void:
+	var marker := _resolve_train_marker()
+	if marker == null:
+		return
+
+	if map_graph != null:
+		var route: Array[MapLocation] = map_graph.get_main_route()
+		if route.size() >= 2:
+			var segment := _find_segment_between(route[0], route[1])
+			if segment != null:
+				assign_train_to_track(segment, marker)
+				marker.progress_ratio = 0.5
+				return
+
+	assign_train_to_legacy_route(marker)
+	marker.progress_ratio = 0.5
+
+
+func _find_segment_between(location_a: MapLocation, location_b: MapLocation) -> TrackSegment:
+	for segment in _track_segments:
+		if segment.connects(location_a, location_b):
+			return segment
+	return null
+
+func _update_train_position(progress: float) -> bool:
+	var marker := _resolve_train_marker()
+	if marker == null:
+		return false
+
+	if active_track != null and is_instance_valid(active_track):
+		active_track.update_train_pos(progress)
+		return true
+
+	if mainRoute == null:
+		return false
+
+	if mainRoute.trainMarker == null or not is_instance_valid(mainRoute.trainMarker):
+		assign_train_to_legacy_route(marker)
+
+	if mainRoute.trainMarker != null:
+		mainRoute.update_trainPos(progress)
+		return true
+
+	return false
+
+
 func select_new_train(newTrain : Train):
 	selectedTrain = newTrain
 
+
 func train_step():
-	mainRoute.update_trainPos(selectedTrain.speed * local_to_global_speed_conversion)
+	if not _update_train_position(selectedTrain.speed * local_to_global_speed_conversion):
+		return
 	sun1.progress -= sunspeed
 	sun2.progress -= sunspeed
 	update_time_to_sun()

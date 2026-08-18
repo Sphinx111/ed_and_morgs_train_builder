@@ -39,5 +39,8 @@ func can_switch() -> bool:
 	return true
 
 func transfer_train(trainMarker : PathFollow2D):
-	lines[selector].add_train(trainMarker)
-	get_parent().get_parent().mainRoute = lines[selector]
+	var handler: MapHandler = get_parent().get_parent()
+	if handler == null or lines.is_empty():
+		return
+	handler.mainRoute = lines[selector]
+	handler.assign_train_to_legacy_route(trainMarker)
