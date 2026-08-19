@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dvfa2mi1q8kyn"]
+[gd_scene load_steps=13 format=3 uid="uid://dvfa2mi1q8kyn"]
 
 [ext_resource type="Script" uid="uid://bq288wrgttmyx" path="res://game_manager.gd" id="1_o0k6p"]
 [ext_resource type="Script" uid="uid://bicwn3r1c7jbq" path="res://Train.gd" id="1_rq5f1"]
@@ -6,11 +6,12 @@
 [ext_resource type="Script" uid="uid://7uaxcahr5q1c" path="res://passengerManager.gd" id="3_ksonv"]
 [ext_resource type="Script" uid="uid://csq0nprbdyf3s" path="res://basic_ui.gd" id="4_fqnf8"]
 [ext_resource type="Script" uid="uid://c841d2swd3ym7" path="res://Scenes/construction_panel.gd" id="4_o0k6p"]
-[ext_resource type="Script" path="res://Scenes/debug_panel.gd" id="5_8ylg8"]
+[ext_resource type="Script" uid="uid://cuui40vdfntkr" path="res://Scenes/debug_panel.gd" id="5_8ylg8"]
 [ext_resource type="Script" uid="uid://b422owa3buotj" path="res://Scenes/resource_panel.gd" id="5_respnl"]
 [ext_resource type="Script" uid="uid://bgfikw40kx7qw" path="res://background_handler.gd" id="6_mscei"]
 [ext_resource type="PackedScene" uid="uid://bnmpeykxiku0" path="res://Scenes/LeverControl.tscn" id="6_u0kvb"]
 [ext_resource type="Script" uid="uid://76holwxha2tp" path="res://camera_controller.gd" id="7_camctl"]
+[ext_resource type="Script" uid="uid://c4cwovk0dbfwp" path="res://Scenes/stop_schedule_panel.gd" id="7_uef4u"]
 
 [node name="SceneRoot" type="Control"]
 layout_direction = 2
@@ -296,6 +297,24 @@ offset_top = 526.5
 offset_right = 65.099976
 offset_bottom = 549.5
 
+[node name="stopSchedulerButton" type="Button" parent="UICanvas/BasicUI"]
+layout_mode = 0
+offset_left = 1026.0
+offset_top = 116.0
+offset_right = 1139.0
+offset_bottom = 147.0
+toggle_mode = true
+text = "Schedule Stop"
+
+[node name="StopSchedulePanel" type="Panel" parent="UICanvas/BasicUI"]
+visible = false
+layout_mode = 0
+offset_left = 864.0
+offset_top = 115.0
+offset_right = 1012.0
+offset_bottom = 296.0
+script = ExtResource("7_uef4u")
+
 [node name="Train" type="Node2D" parent="."]
 position = Vector2(51, 340)
 script = ExtResource("1_rq5f1")
@@ -355,5 +374,6 @@ color = Color(1, 1, 0, 0.619608)
 [connection signal="pressed" from="UICanvas/BasicUI/DebugPanel/CarButton" to="UICanvas/BasicUI" method="_on_car_button_pressed"]
 [connection signal="toggled" from="UICanvas/BasicUI/ExpeditionsButton" to="UICanvas/BasicUI" method="_on_ExpeditionsController_open_toggled"]
 [connection signal="toggled" from="UICanvas/BasicUI/construct" to="UICanvas/BasicUI" method="_on_construct_toggled"]
+[connection signal="toggled" from="UICanvas/BasicUI/stopSchedulerButton" to="UICanvas/BasicUI" method="_on_stop_scheduler_button_toggled"]
 [connection signal="position_changed" from="Train/LeverControl" to="Train" method="_on_speed_lever_changed"]
 [connection signal="position_changed" from="Train/LeverControl" to="Background" method="set_temp_multiplier"]

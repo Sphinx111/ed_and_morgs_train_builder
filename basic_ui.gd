@@ -11,6 +11,7 @@ var tick_timer : Timer = Timer.new()
 
 @onready var thoughtsPanel : Panel = get_node("ThoughtsPanel")
 @onready var constructionPanel : ConstructionPanel = get_node("constructionPanel")
+@onready var stopSchedulePanel : StopSchedulePanel = get_node("StopSchedulePanel")
 @onready var thoughtsList : ItemList = thoughtsPanel.get_node("ThoughtsList")
 
 @onready var debug_slider : HSlider = get_node("DebugPanel/DebugSlider")
@@ -341,3 +342,12 @@ func _on_construct_toggled(toggled_on: bool) -> void:
 		_clear_placement_mode()
 		constructionPanel.hide()
 		constructionPanel.teardown()
+
+
+#func _on_schedule_toggled(toggled_on: bool) -> void:
+func _on_stop_scheduler_button_toggled(toggled_on: bool) -> void:
+	if toggled_on == true :
+		stopSchedulePanel.show()
+		stopSchedulePanel.setup()
+	else:
+		stopSchedulePanel.hide()
