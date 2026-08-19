@@ -61,6 +61,9 @@ const train_max_temp : float = 110.0
 const temp_increase_in_sun : float = 1
 const train_base_cooling : float = 2
 
+## enable event system
+var eventsEnabled : bool = false
+
 
 ## Resource storage variables
 # Minimum values to leave per passenger when doing production cycles

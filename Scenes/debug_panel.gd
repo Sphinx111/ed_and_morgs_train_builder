@@ -23,3 +23,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			else:
 				simSpeedSlider.value = saveSpeed
 			simSpeedSlider.drag_ended.emit(true)
+
+
+func _on_event_system_toggle_toggled(toggled_on: bool) -> void:
+	Globals.eventsEnabled = not Globals.eventsEnabled # Replace with function body.
+	print ("Debug:: events enabled %s. " % [Globals.eventsEnabled] )

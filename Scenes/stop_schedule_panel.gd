@@ -20,4 +20,8 @@ func setup() :
 func resourceSelectPress(resourceSelection) : 
 	var ourMap : MapHandler = get_parent().worldMap
 	#var nextResource : MapDestination = ourMap.get_next_resource_spot(resourceSelection)
-	print("Next %s Well is at %f" % [resourceSelection, ourMap.get_distance_to_next_resource(resourceSelection)])	
+	var resourceDist : float = ourMap.get_distance_to_next_resource(resourceSelection)
+	if resourceDist > -9990 :
+		print("Next %s Well is at %f" % [resourceSelection, resourceDist])	
+	else :
+		print ("No %s Well is available along current route" % [resourceSelection])

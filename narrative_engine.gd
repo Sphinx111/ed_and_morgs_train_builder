@@ -65,6 +65,8 @@ func _schedule_event(event_key: String, start_time: float) -> void:
 
 
 func _try_trigger_ready_event() -> void:
+	if !Globals.eventsEnabled :
+		return;
 	var best_index: int = -1
 	var best_time: float = INF
 	for i in range(_scheduled_events.size()):
