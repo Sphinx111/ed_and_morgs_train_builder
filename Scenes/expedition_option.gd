@@ -11,7 +11,7 @@ var controller : ExpeditionsController = null
 var min_pop : int = 4        ## Minimum number of people required for expedition
 var time_needed : int = 190  ## Time required for expedition, in game ticks
 var travel_time : int = 60
-var resource_spot : ResourceSpot = null
+var resource_spot : MapResourceContainer = null
 
 # List of resources which can be gained from the expedition
 #  [resource name, amount, chance to find, texture to use, and icon color modulate]
@@ -65,7 +65,7 @@ var decrease_button : Button = null
 
 var time_label : Label = null
 
-static func new_expedition(display_name : String, resource_to_gather : String, resource_spot : ResourceSpot) -> ExpeditionOption:
+static func new_expedition(display_name : String, resource_to_gather : String, resource_spot : MapResourceContainer) -> ExpeditionOption:
 	var new_option : ExpeditionOption = my_scene.instantiate()
 	new_option.display_name = display_name
 	new_option.resource_spot = resource_spot

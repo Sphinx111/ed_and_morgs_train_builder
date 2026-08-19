@@ -25,7 +25,7 @@ func _ready():
 	refresh_options()
 
 func refresh_options():
-	var result : Dictionary = selectedTrain.worldMap.query_resource_types()
+	var result : Dictionary[String, MapResourceContainer] = selectedTrain.worldMap.query_resource_types()
 	var resource_types_in_range : Array[String] = result.keys()
 	for child in available_expeditions_panel.get_children():
 		if child is ExpeditionOption:

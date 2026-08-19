@@ -17,18 +17,21 @@ var visual_radius : float = 8.0
 var type: TYPE = TYPE.MAP_LOOPER
 var edges: Array[MapGraphEdge] = []
 var track_segments: Array[TrackSegment] = []
-var track_selector: int = 0
-var last_changed_tick: int = 0
-var tick_cooldown: int = 10
+var track_switcher: TrackJunction
 var map_handler: MapHandler = null
-var resource_containers : Dictionary = {}
+var resource_containers : Dictionary[String, MapResourceContainer]= {}
 var _debug_label: Label = null
 var _click_area: Area2D = null
+var _selector_debug_line: Line2D = null
+
+const SELECTOR_DEBUG_LINE_LENGTH: float = 10.0
+const SELECTOR_DEBUG_LINE_Z_INDEX: int = 50
 
 
 func _init(new_type: TYPE, map_position: Vector2 = Vector2.ZERO) -> void:
 	type = new_type
 	position = map_position
+	track_switcher = TrackJunction.new(self)
 	_setup_visual()
 	_setup_click_area()
 
@@ -39,75 +42,41 @@ func register_edge(edge: MapGraphEdge) -> void:
 
 
 func register_track_segment(segment: TrackSegment) -> void:
-	if not track_segments.has(segment):
-		track_segments.append(segment)
+	track_switcher.register_segment(segment)
+	_refresh_selector_debug_line()
+
+
+func sort_track_segments_clockwise() -> void:
+	track_switcher.sort_segments_clockwise()
+	_refresh_selector_debug_line()
 
 
 func get_selected_track_segment() -> TrackSegment:
-	if track_segments.is_empty():
-		return null
-	return track_segments[track_selector]
+	return track_switcher.get_selected_segment()
 
 
-## When building the active route, pick a segment leaving this node.
-## If the current selection is the incoming segment, switch to another (trunks first).
-func select_outgoing_track(from_segment: TrackSegment) -> TrackSegment:
-	if track_segments.is_empty():
-		return null
-
-	var selected := get_selected_track_segment()
-	if from_segment == null or selected != from_segment:
-		return selected
-
-	if track_segments.size() <= 1:
-		return selected
-
-	var best_segment: TrackSegment = null
-	var best_rank: int = 999
-	for segment in track_segments:
-		if segment == from_segment:
-			continue
-		var rank := _get_track_edge_rank(segment)
-		if best_segment == null or rank < best_rank:
-			best_segment = segment
-			best_rank = rank
-
-	if best_segment != null:
-		track_selector = track_segments.find(best_segment)
-	return best_segment if best_segment != null else selected
-
-
-func _get_track_edge_rank(segment: TrackSegment) -> int:
-	if segment == null or segment.map_edge == null:
-		return 2
-	match segment.map_edge.type:
-		MapGraphEdge.EdgeType.TRUNK:
-			return 0
-		MapGraphEdge.EdgeType.BRANCH:
-			return 1
-		_:
-			return 2
-
-
-func highlight_track_selection() -> void:
-	pass
+func select_outgoing_track(from_segment: TrackSegment, travel_toward_end: bool = true) -> TrackSegment:
+	var segment := track_switcher.pick_outgoing(from_segment, travel_toward_end)
+	_refresh_selector_debug_line()
+	return segment
 
 
 func switch_track() -> void:
 	if not can_switch_track():
 		return
-	track_selector += 1
-	if track_selector >= track_segments.size():
-		track_selector = 0
-	last_changed_tick = Globals.game_tick
+	track_switcher.cycle_manual()
+	track_switcher.mark_switched()
+	_refresh_selector_debug_line()
 	if map_handler != null:
 		map_handler.recalculate_active_route_from_train()
 
 
 func can_switch_track() -> bool:
-	if Globals.game_tick < (last_changed_tick + tick_cooldown):
-		return false
-	if track_segments.size() < 2:
+	if not track_switcher.can_switch():
+		if track_segments.size() < 2:
+			print("MapLocation:: failed connections size check")
+		else:
+			print("MapLocation:: failed cooldown check")
 		return false
 	return true
 
@@ -117,15 +86,17 @@ func transfer_train(train_marker: PathFollow2D, from_segment: TrackSegment = nul
 		if map_handler.try_transfer_via_looper(train_marker as TrainMarker, self, from_segment):
 			return
 
-	var segment: TrackSegment = select_outgoing_track(from_segment)
+	var marker := train_marker as TrainMarker
+	var travel_toward_end := marker.travel_toward_end if marker != null else Globals.train_direction < 0
+	var segment: TrackSegment = select_outgoing_track(from_segment, travel_toward_end)
 	if segment == null:
 		return
 	if segment == from_segment:
 		return
 	if map_handler != null:
-		map_handler.assign_train_to_track(segment, train_marker as TrainMarker)
+		map_handler.assign_train_to_track(segment, train_marker as TrainMarker, -1.0, self)
 	elif train_marker is TrainMarker:
-		train_marker.enter_track(segment)
+		(train_marker as TrainMarker).enter_track(segment, -1.0, self)
 
 
 func _setup_visual() -> void:
@@ -194,7 +165,7 @@ func _make_circle_polygon(radius: float, segments: int) -> PackedVector2Array:
 		points.append(Vector2(cos(angle), sin(angle)) * radius)
 	return points
 
-func get_resource_containers() -> Dictionary:
+func get_resource_containers() -> Dictionary[String, MapResourceContainer]:
 	return resource_containers
 
 func add_resource_container(resourceType : String, container : MapResourceContainer) -> void:
@@ -213,6 +184,48 @@ func _refresh_debug_view() -> void:
 
 	_debug_label.text = _build_resource_debug_text()
 	_debug_label.visible = not _debug_label.text.is_empty()
+	_refresh_selector_debug_line()
+
+
+func _setup_selector_debug_line() -> void:
+	_selector_debug_line = Line2D.new()
+	_selector_debug_line.name = "SelectorDebugLine"
+	_selector_debug_line.width = 5
+	_selector_debug_line.default_color = Color(1.0, 1.0, 0.35, 0.95)
+	_selector_debug_line.visible = false
+	_selector_debug_line.z_index = SELECTOR_DEBUG_LINE_Z_INDEX
+	_selector_debug_line.z_as_relative = false
+	_selector_debug_line.points = PackedVector2Array([Vector2.ZERO, Vector2.RIGHT * SELECTOR_DEBUG_LINE_LENGTH])
+	add_child(_selector_debug_line)
+	move_child(_selector_debug_line, -1)
+
+
+func _refresh_selector_debug_line() -> void:
+	if _selector_debug_line == null:
+		_setup_selector_debug_line()
+	if not Globals.MAP_GEN_DEBUG:
+		_selector_debug_line.visible = false
+		return
+
+	var segment := get_selected_track_segment()
+	if segment == null:
+		_selector_debug_line.visible = false
+		return
+
+	var other_node := segment.get_other_node(self)
+	if other_node == null:
+		_selector_debug_line.visible = false
+		return
+
+	var direction := other_node.position - position
+	if direction.length_squared() <= 0.001:
+		_selector_debug_line.visible = false
+		return
+
+	_selector_debug_line.set_point_position(0, Vector2.ZERO)
+	_selector_debug_line.set_point_position(1, direction.normalized() * SELECTOR_DEBUG_LINE_LENGTH)
+	_selector_debug_line.visible = true
+	move_child(_selector_debug_line, -1)
 
 
 func _setup_debug_label() -> void:
@@ -237,10 +250,30 @@ func _build_resource_debug_text() -> String:
 		lines.append(container.get_debug_text())
 	return "\n".join(lines)
 
-func get_next_node_with_resource(_type : String, _attempts : int, _maxAttempts : int) -> MapLocation:
-	if _attempts < _maxAttempts or type == TYPE.MAP_LOOPER:
+func get_next_node_with_resource(
+	_type : String,
+	_attempts : int,
+	_maxAttempts : int,
+	_distance : float,
+	from_segment: TrackSegment = null,
+	travel_toward_end: bool = true
+) -> MapDestination:
+	if _attempts >= _maxAttempts or type == TYPE.MAP_LOOPER:
 		return null
 	if resource_containers.has(_type):
-		return self
-	var track : TrackSegment = track_segments[track_selector]
-	return track.get_other_node(self).get_next_node_with_resource(_type, _attempts + 1, _maxAttempts)
+		return MapDestination.new(_distance, self)
+
+	var outgoing: TrackSegment = select_outgoing_track(from_segment, travel_toward_end)
+	if outgoing == null:
+		return null
+	var next_node: MapLocation = outgoing.get_other_node(self)
+	if next_node == null:
+		return null
+	return next_node.get_next_node_with_resource(
+		_type,
+		_attempts + 1,
+		_maxAttempts,
+		_distance + outgoing.curve.get_baked_length(),
+		outgoing,
+		travel_toward_end
+	)

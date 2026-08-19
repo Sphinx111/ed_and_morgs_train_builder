@@ -9,7 +9,11 @@ var current_track: TrackSegment = null
 var travel_toward_end: bool = true
 
 
-func enter_track(segment: TrackSegment, progress_ratio: float = -1.0) -> void:
+func enter_track(
+	segment: TrackSegment,
+	_progress_ratio: float = -1.0,
+	from_node: MapLocation = null
+) -> void:
 	current_track = segment
 	if segment == null:
 		return
@@ -23,8 +27,10 @@ func enter_track(segment: TrackSegment, progress_ratio: float = -1.0) -> void:
 	if segment.curve == null or segment.curve.get_point_count() < 2:
 		return
 
-	if progress_ratio >= 0.0:
-		self.progress_ratio = progress_ratio
+	if _progress_ratio >= 0.0:
+		self.progress_ratio = _progress_ratio
+	elif from_node != null:
+		self.progress_ratio = 0.0 if segment.start_location == from_node else 1.0
 	elif Globals.train_direction < 0:
 		self.progress_ratio = 0.0
 	elif Globals.train_direction > 0:
@@ -49,9 +55,33 @@ func _update_travel_direction() -> void:
 func get_travel_exit_node() -> MapLocation:
 	if current_track == null:
 		return null
+	return current_track.get_node_ahead(travel_toward_end)
+
+
+func get_travel_entry_node() -> MapLocation:
+	if current_track == null:
+		return null
+	return current_track.get_node_behind(travel_toward_end)
+
+
+func get_distance_remaining_on_segment() -> float:
+	if current_track == null or current_track.curve == null:
+		return 0.0
+	var track_length := current_track.curve.get_baked_length()
 	if travel_toward_end:
+		return track_length - progress
+	return progress
+
+
+func get_nearby_node(_range: float) -> MapLocation:
+	if current_track == null or current_track.curve == null:
+		return null
+	var track_length := current_track.curve.get_baked_length()
+	if travel_toward_end and progress >= track_length - _range:
 		return current_track.end_location
-	return current_track.start_location
+	if not travel_toward_end and progress <= _range:
+		return current_track.start_location
+	return null
 
 
 func detach_to(holder: Node) -> void:
@@ -69,7 +99,10 @@ func advance(progress_delta: float) -> void:
 	if current_track == null:
 		return
 
-	progress = progress - (progress_delta * Globals.train_direction)
+	if travel_toward_end:
+		progress += progress_delta
+	else:
+		progress -= progress_delta
 	_check_segment_end()
 
 
@@ -78,9 +111,9 @@ func _check_segment_end() -> void:
 		return
 
 	var from_segment: TrackSegment = current_track
-	if Globals.train_direction < 0 and progress_ratio >= 1.0:
+	if travel_toward_end and progress_ratio >= 1.0:
 		current_track.end_location.transfer_train(self, from_segment)
-	elif Globals.train_direction > 0 and progress_ratio <= 0.0:
+	elif not travel_toward_end and progress_ratio <= 0.0:
 		current_track.start_location.transfer_train(self, from_segment)
 
 

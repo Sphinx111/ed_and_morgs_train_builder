@@ -10,7 +10,7 @@ var total_duration : int = 0
 var travel_time : int = 0
 var time_passed : int = 0
 var collection_time : int = 0
-var resource_spot : ResourceSpot = null
+var resource_spot : MapResourceContainer = null
 
 var target_resources : Array = []
 var resources_gathered : Dictionary = {}

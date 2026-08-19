@@ -50,11 +50,25 @@ func get_other_node(querying_node: MapLocation) -> MapLocation:
 	return null
 
 
-## Node ahead of the train when travelling with the given direction (-1 or 1).
+func is_entry_compatible(from_node: MapLocation, travel_toward_end: bool) -> bool:
+	if from_node == null:
+		return true
+	if travel_toward_end:
+		return start_location == from_node
+	return end_location == from_node
+
+
+func get_node_ahead(travel_toward_end: bool) -> MapLocation:
+	return end_location if travel_toward_end else start_location
+
+
+func get_node_behind(travel_toward_end: bool) -> MapLocation:
+	return start_location if travel_toward_end else end_location
+
+
+## Node ahead when travelling with Globals.train_direction (-1 toward end, 1 toward start).
 func get_next_node_for_travel(travel_direction: int) -> MapLocation:
-	if travel_direction < 0:
-		return end_location
-	return start_location
+	return get_node_ahead(travel_direction < 0)
 
 
 func _draw_route_visual() -> void:

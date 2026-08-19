@@ -109,6 +109,9 @@ func _build_track_segments_from_graph(graph: MapGraph) -> void:
 		edge.node1.register_track_segment(segment)
 		edge.node2.register_track_segment(segment)
 
+	for location in graph.nodes:
+		location.sort_track_segments_clockwise()
+
 	_deactivate_all_tracks()
 
 
@@ -150,13 +153,18 @@ func _detach_train_marker_from_routes() -> void:
 	_deactivate_all_tracks()
 
 
-func assign_train_to_track(segment: TrackSegment, marker: TrainMarker = null, progress_ratio: float = -1.0) -> void:
+func assign_train_to_track(
+	segment: TrackSegment,
+	marker: TrainMarker = null,
+	progress_ratio: float = -1.0,
+	from_node: MapLocation = null
+) -> void:
 	if marker == null:
 		marker = _resolve_train_marker()
 	if marker == null or segment == null:
 		return
 	active_track = segment
-	marker.enter_track(segment, progress_ratio)
+	marker.enter_track(segment, progress_ratio, from_node)
 	recalculate_active_route(segment, marker)
 
 
@@ -172,9 +180,7 @@ func recalculate_active_route(start_segment: TrackSegment, marker: TrainMarker =
 	if start_segment == null or not is_instance_valid(start_segment):
 		return
 
-	var travel_direction: int = Globals.train_direction
-	if marker != null:
-		travel_direction = -1 if marker.travel_toward_end else 1
+	var travel_toward_end := marker.travel_toward_end if marker != null else Globals.train_direction < 0
 
 	var current_segment: TrackSegment = start_segment
 	var entry_node: MapLocation = null
@@ -187,7 +193,7 @@ func recalculate_active_route(start_segment: TrackSegment, marker: TrainMarker =
 
 		var exit_node: MapLocation
 		if entry_node == null:
-			exit_node = current_segment.get_next_node_for_travel(travel_direction)
+			exit_node = current_segment.get_node_ahead(travel_toward_end)
 		else:
 			exit_node = current_segment.get_other_node(entry_node)
 
@@ -195,7 +201,7 @@ func recalculate_active_route(start_segment: TrackSegment, marker: TrainMarker =
 			break
 
 		if exit_node.type == MapLocation.TYPE.MAP_LOOPER:
-			var continue_segment := _get_continue_segment_after_looper(exit_node)
+			var continue_segment := _get_continue_segment_after_looper(exit_node, travel_toward_end)
 			if continue_segment == null:
 				_log_active_route_termination("looper")
 				break
@@ -206,7 +212,7 @@ func recalculate_active_route(start_segment: TrackSegment, marker: TrainMarker =
 			current_segment = continue_segment
 			continue
 
-		var next_segment: TrackSegment = exit_node.select_outgoing_track(current_segment)
+		var next_segment: TrackSegment = exit_node.select_outgoing_track(current_segment, travel_toward_end)
 		if next_segment == null or next_segment == current_segment:
 			break
 
@@ -226,7 +232,7 @@ func _log_active_route_termination(reason: String) -> void:
 	print("MapHandler: active route terminated at %s — %d active track segment(s)" % [reason, _count_active_track_segments()])
 
 
-func _get_continue_segment_after_looper(looper_reached: MapLocation) -> TrackSegment:
+func _get_continue_segment_after_looper(looper_reached: MapLocation, travel_toward_end: bool) -> TrackSegment:
 	if looper_reached == null or looper_reached.type != MapLocation.TYPE.MAP_LOOPER:
 		return null
 	if map_graph == null:
@@ -234,7 +240,7 @@ func _get_continue_segment_after_looper(looper_reached: MapLocation) -> TrackSeg
 	var other_looper := map_graph.get_other_looper(looper_reached)
 	if other_looper == null:
 		return null
-	return _find_continue_segment_from_looper(other_looper)
+	return _find_continue_segment_from_looper(other_looper, travel_toward_end)
 
 
 func try_transfer_via_looper(marker: TrainMarker, looper_reached: MapLocation, _from_segment: TrackSegment = null) -> bool:
@@ -243,21 +249,22 @@ func try_transfer_via_looper(marker: TrainMarker, looper_reached: MapLocation, _
 	if map_graph == null:
 		return false
 
-	var continue_segment := _get_continue_segment_after_looper(looper_reached)
+	var continue_segment := _get_continue_segment_after_looper(looper_reached, marker.travel_toward_end)
 	if continue_segment == null:
 		return false
 
-	var entry_progress: float = 0.0 if Globals.train_direction < 0 else 1.0
-	assign_train_to_track(continue_segment, marker, entry_progress)
+	var other_looper := map_graph.get_other_looper(looper_reached)
+	var entry_progress: float = 0.0 if continue_segment.start_location == other_looper else 1.0
+	assign_train_to_track(continue_segment, marker, entry_progress, other_looper)
 	return true
 
 
-func _find_continue_segment_from_looper(looper: MapLocation) -> TrackSegment:
+func _find_continue_segment_from_looper(looper: MapLocation, travel_toward_end: bool) -> TrackSegment:
 	var candidates: Array[TrackSegment] = []
 	for segment in looper.track_segments:
-		if Globals.train_direction < 0 and segment.start_location == looper:
+		if travel_toward_end and segment.start_location == looper:
 			candidates.append(segment)
-		elif Globals.train_direction > 0 and segment.end_location == looper:
+		elif not travel_toward_end and segment.end_location == looper:
 			candidates.append(segment)
 
 	for segment in candidates:
@@ -357,20 +364,15 @@ func train_step():
 	sun2.progress -= sunspeed
 	update_time_to_sun()
 	# Debug testing - Next oil spot
-	var nextOil : MapLocation = get_next_resource_spot("oil")
+	var nextOil : MapDestination = get_next_resource_spot("oil")
 	if nextOil != null:
-		print("Next Oil Well has %s units and is at %f" % [nextOil.resources.get("oil").quantity, nextOil.position])
+		print("Next Oil Well has %s units and is at %f" % [nextOil.target.resource_containers.get("oil").amount, nextOil.distance])
 		pass
 
 func get_node_in_range(_range : float) -> MapLocation:
-	var track := trainMarker.current_track if trainMarker != null else active_track
-	if track == null:
+	if trainMarker == null:
 		return null
-	if trainMarker.progress >= track.curve.get_baked_length() - _range:
-		return track.end_location
-	elif trainMarker.progress <= _range:
-		return track.start_location
-	return null
+	return trainMarker.get_nearby_node(_range)
 
 func request_resources(_wantedType : String) -> float:
 	return 0.0
@@ -378,17 +380,33 @@ func request_resources(_wantedType : String) -> float:
 func gather_resource(_wantedType : String, _amount : float) -> int:
 	return 0
 
-func query_resource_types() -> Dictionary:
+func query_resource_types() -> Dictionary[String, MapResourceContainer]:
 	var nearestLocation : MapLocation = get_node_in_range(collection_margin)
 	if nearestLocation != null:
 		return nearestLocation.get_resource_containers()
 	return {}
 
-func get_next_resource_spot(_type : String) -> MapLocation:
-	var track := trainMarker.current_track if trainMarker != null else active_track
-	if track == null:
+func get_next_resource_spot(_type : String) -> MapDestination:
+	if trainMarker == null or trainMarker.current_track == null:
 		return null
-	return track.end_location.get_next_node_with_resource(_type, 0, MAX_RECURSE_SEARCH)
+	var ahead_node := trainMarker.get_travel_exit_node()
+	var distance_remaining := trainMarker.get_distance_remaining_on_segment()
+	return ahead_node.get_next_node_with_resource(
+		_type,
+		0,
+		MAX_RECURSE_SEARCH,
+		distance_remaining,
+		trainMarker.current_track,
+		trainMarker.travel_toward_end
+	)
+
+func get_distance_to_next_resource(_type : String) -> float:
+	var nextDestination : MapDestination = get_next_resource_spot(_type)
+	if nextDestination == null:
+		return -9999
+	else:
+		return nextDestination.distance
+
 
 func is_train_in_sun() -> bool:
 	#print("trainPos: %f sun1pos: %f sun2pos: %f" % [trainMarker.position.x, sun1.position.x, sun2.position.x])
