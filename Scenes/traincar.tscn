@@ -312,7 +312,7 @@ layout_mode = 0
 offset_left = 864.0
 offset_top = 115.0
 offset_right = 1012.0
-offset_bottom = 296.0
+offset_bottom = 397.0
 script = ExtResource("7_uef4u")
 
 [node name="Train" type="Node2D" parent="."]
