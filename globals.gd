@@ -76,6 +76,7 @@ var resource_safety_ok : Dictionary[String, bool] = {}
 
 # Expedition Variables
 const max_expedition_size : int = 10      # Maximum passengers who can take part in an expedition
+const MAX_EXPEDITIONS : int = 4           # Maximum concurrent active expeditions
 
 # Common icon textures to use for Sprites
 const water_texture : Texture2D = preload("res://images/Water_Icon.png")
@@ -94,6 +95,7 @@ const SAFETY_CUTOFF = 4
 const USE_BOTH = 5
 const USE_EITHER = 6
 const EXCEEDS_MAX_SPEED = 7
+const EXCEEDS_MAX_EXPEDITIONS = 8
 const CUSTOMERS_FULL = 0
 const CUSTOMERS_HAS_SPACE = 1
 const WORKERS_FULL = 0

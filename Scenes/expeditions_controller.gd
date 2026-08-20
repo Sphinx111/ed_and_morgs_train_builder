@@ -8,8 +8,18 @@ var expeditions_awaiting_cleanup : Array[ActiveExpedition] = []
 var selectedTrain : Train = null
 var active_expeditions_panel : Panel = null
 var available_expeditions_panel : Panel = null
+var available_label : Label = null
+var active_label : Label = null
+
 const height_of_option : float = 31.0
 const separation_between_options : float = 4.0
+const panel_margin : float = 4.0
+const bottom_control_padding : float = 40.0
+const section_label_height : float = 23.0
+const section_label_gap : float = 3.0
+const section_spacing : float = 2.0
+const outer_panel_width : float = 652.0
+const inner_panel_width : float = 644.0
 
 signal expeditions_finished 
 signal expeditions_started
@@ -17,6 +27,8 @@ signal expeditions_started
 func _ready():
 	active_expeditions_panel = get_node("ActiveExpeditionsPanel")
 	available_expeditions_panel = get_node("OptionsPanel")
+	available_label = get_node("Label")
+	active_label = get_node("Label2")
 	selectedTrain = get_parent().selectedTrain
 	
 	expeditions_finished.connect(selectedTrain.receive_expeditions_finished_signal)
@@ -24,13 +36,42 @@ func _ready():
 	
 	refresh_options()
 
+func _panel_height_for_count(count : int) -> float:
+	return (count * (height_of_option + separation_between_options)) + separation_between_options
+
+func _update_panel_layout() -> void:
+	var option_count : int = maxi(1, options_available.size())
+	var active_count : int = clampi(maxi(1, expeditions_active.size()), 1, Globals.MAX_EXPEDITIONS)
+	
+	var options_height : float = _panel_height_for_count(option_count)
+	var active_height : float = _panel_height_for_count(active_count)
+	
+	var y : float = panel_margin
+	available_label.position = Vector2(panel_margin, y)
+	y += section_label_height + section_label_gap
+	
+	available_expeditions_panel.position = Vector2(panel_margin, y)
+	available_expeditions_panel.size = Vector2(inner_panel_width, options_height)
+	y += options_height + section_spacing
+	
+	active_label.position = Vector2(panel_margin, y)
+	y += section_label_height + section_label_gap
+	
+	active_expeditions_panel.position = Vector2(panel_margin, y)
+	active_expeditions_panel.size = Vector2(inner_panel_width, active_height)
+	y += active_height + bottom_control_padding
+	
+	size = Vector2(outer_panel_width, y)
+
 func refresh_options():
+	options_available.clear()
 	var result : Dictionary[String, MapResourceContainer] = selectedTrain.worldMap.query_resource_types()
 	var resource_types_in_range : Array[String] = result.keys()
 	for child in available_expeditions_panel.get_children():
 		if child is ExpeditionOption:
 			child.queue_free()
 	
+	var option_index : int = 0
 	for i in range(resource_types_in_range.size()):
 		var resourceType : String = resource_types_in_range[i]
 		var expedition_name : String = ""
@@ -47,7 +88,10 @@ func refresh_options():
 			var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceType, result.get(resourceType))
 			options_available.append(newOption)
 			available_expeditions_panel.add_child(newOption)
-			newOption.position.y = (i * (height_of_option + separation_between_options)) + separation_between_options
+			newOption.position.y = (option_index * (height_of_option + separation_between_options)) + separation_between_options
+			option_index += 1
+	
+	_update_panel_layout()
 
 func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
 	# an expidition can only be launched when the train is stopped
@@ -63,6 +107,9 @@ func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
 	if can_launch == false:
 		return Globals.NO_RESOURCES
 	
+	if expeditions_active.size() >= Globals.MAX_EXPEDITIONS:
+		return Globals.EXCEEDS_MAX_EXPEDITIONS
+	
 	if expeditions_active.size() == 0:
 		expeditions_started.emit()
 	
@@ -77,8 +124,13 @@ func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
 	var new_expedition : ActiveExpedition = ActiveExpedition.new_expedition(index_to_use, typeToStart, passengersArray)
 	expeditions_active.append(new_expedition)
 	active_expeditions_panel.add_child(new_expedition)
-	new_expedition.position.y = ((expeditions_active.size() - 1) * (height_of_option + separation_between_options)) + separation_between_options
+	_reposition_active_expeditions()
+	_update_panel_layout()
 	return Globals.RESULT_OK
+
+func _reposition_active_expeditions() -> void:
+	for i in range(expeditions_active.size()):
+		expeditions_active[i].position.y = (i * (height_of_option + separation_between_options)) + separation_between_options
 
 func train_tick():
 	var initial_count : int = expeditions_active.size()
@@ -89,10 +141,15 @@ func train_tick():
 			complete_expedition(expedition)
 			expeditions_awaiting_cleanup.append(expedition)
 	
+	var cleanup_count : int = expeditions_awaiting_cleanup.size()
 	for toDelete in expeditions_awaiting_cleanup:
 		expeditions_active.erase(toDelete)
 		toDelete.queue_free()
 	expeditions_awaiting_cleanup = []
+	
+	if cleanup_count > 0:
+		_reposition_active_expeditions()
+		_update_panel_layout()
 	
 	if initial_count > 0 and expeditions_active.size() == 0:
 		expeditions_finished.emit()              ## If we have just finished all expeditions, emit a signal
@@ -107,3 +164,5 @@ func abandon_expedition(abandoned : ActiveExpedition):
 	if expeditions_active.size() == 0:
 		expeditions_finished.emit()
 	abandoned.queue_free()
+	_reposition_active_expeditions()
+	_update_panel_layout()
