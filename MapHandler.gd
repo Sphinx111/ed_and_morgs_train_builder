@@ -354,6 +354,10 @@ func _update_train_position(progress: float) -> bool:
 func select_new_train(newTrain : Train) -> void:
 	selectedTrain = newTrain
 
+var scheduleStop : String = ""
+
+func set_schedule_stop(resourceType):
+	scheduleStop = resourceType
 
 func train_step():
 	if selectedTrain == null:
@@ -364,10 +368,14 @@ func train_step():
 	sun2.progress -= sunspeed
 	update_time_to_sun()
 	# Debug testing - Next oil spot
-	var nextOil : MapDestination = get_next_resource_spot("oil")
-	if nextOil != null:
-		print("Next Oil Well has %s units and is at %f" % [nextOil.target.resource_containers.get("oil").amount, nextOil.distance])
-		pass
+	if scheduleStop != "" :
+		var nextTarget : MapDestination = get_next_resource_spot(scheduleStop)
+		if nextTarget != null:
+			print("Next %s Well has %s units and is at %f" % [scheduleStop, nextTarget.target.resource_containers.get(scheduleStop).amount, nextTarget.distance])
+			if nextTarget.distance <100 :
+				selectedTrain.target_speed = 100
+			if nextTarget.distance < 50 : 
+				selectedTrain.target_speed = 0 
 
 func get_node_in_range(_range : float) -> MapLocation:
 	if trainMarker == null:
