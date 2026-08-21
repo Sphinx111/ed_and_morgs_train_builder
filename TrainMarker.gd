@@ -74,14 +74,47 @@ func get_distance_remaining_on_segment() -> float:
 
 
 func get_nearby_node(_range: float) -> MapLocation:
-	if current_track == null or current_track.curve == null:
+	var nearby_nodes := get_nearby_nodes(_range)
+	if nearby_nodes.is_empty():
 		return null
+	if nearby_nodes.size() == 1:
+		return nearby_nodes[0]
+	return _get_closest_nearby_node(nearby_nodes)
+
+
+func get_nearby_nodes(_range: float) -> Array[MapLocation]:
+	var result: Array[MapLocation] = []
+	if current_track == null or current_track.curve == null:
+		return result
 	var track_length := current_track.curve.get_baked_length()
-	if travel_toward_end and progress >= track_length - _range:
-		return current_track.end_location
-	if not travel_toward_end and progress <= _range:
-		return current_track.start_location
-	return null
+	if progress <= _range:
+		result.append(current_track.start_location)
+	if progress >= track_length - _range:
+		result.append(current_track.end_location)
+	return result
+
+
+func _get_closest_nearby_node(nearby_nodes: Array[MapLocation]) -> MapLocation:
+	var closest_node: MapLocation = nearby_nodes[0]
+	var closest_distance := _distance_to_location(closest_node)
+	for i in range(1, nearby_nodes.size()):
+		var candidate := nearby_nodes[i]
+		var candidate_distance := _distance_to_location(candidate)
+		if candidate_distance < closest_distance:
+			closest_node = candidate
+			closest_distance = candidate_distance
+	return closest_node
+
+
+func _distance_to_location(location: MapLocation) -> float:
+	if current_track == null or current_track.curve == null:
+		return INF
+	var track_length := current_track.curve.get_baked_length()
+	if location == current_track.start_location:
+		return progress
+	if location == current_track.end_location:
+		return track_length - progress
+	return INF
 
 
 func detach_to(holder: Node) -> void:

@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://ccgqeutqtn8jk" path="res://Scenes/expeditions_controller.gd" id="1_bmukf"]
 
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sj53q"]
 bg_color = Color(0.0770544, 0.124854, 0.161623, 1)
 

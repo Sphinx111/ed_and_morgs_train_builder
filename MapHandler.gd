@@ -374,6 +374,11 @@ func get_node_in_range(_range : float) -> MapLocation:
 		return null
 	return trainMarker.get_nearby_node(_range)
 
+func get_nodes_in_range(_range : float) -> Array[MapLocation]:
+	if trainMarker == null:
+		return []
+	return trainMarker.get_nearby_nodes(_range)
+
 func request_resources(_wantedType : String) -> float:
 	return 0.0
 
@@ -381,10 +386,28 @@ func gather_resource(_wantedType : String, _amount : float) -> int:
 	return 0
 
 func query_resource_types() -> Dictionary[String, MapResourceContainer]:
-	var nearestLocation : MapLocation = get_node_in_range(collection_margin)
-	if nearestLocation != null:
-		return nearestLocation.get_resource_containers()
-	return {}
+	var result : Dictionary[String, MapResourceContainer] = {}
+	var closest_distance_by_type : Dictionary[String, float] = {}
+	for location in get_nodes_in_range(collection_margin):
+		var location_distance := _distance_to_track_end(location)
+		for resource_type in location.get_resource_containers():
+			var container : MapResourceContainer = location.get_resource_containers()[resource_type]
+			if container.is_empty():
+				continue
+			if not result.has(resource_type) or location_distance < closest_distance_by_type[resource_type]:
+				result[resource_type] = container
+				closest_distance_by_type[resource_type] = location_distance
+	return result
+
+func _distance_to_track_end(location: MapLocation) -> float:
+	if trainMarker == null or trainMarker.current_track == null or trainMarker.current_track.curve == null:
+		return INF
+	var track_length := trainMarker.current_track.curve.get_baked_length()
+	if location == trainMarker.current_track.start_location:
+		return trainMarker.progress
+	if location == trainMarker.current_track.end_location:
+		return track_length - trainMarker.progress
+	return INF
 
 func get_next_resource_spot(_type : String) -> MapDestination:
 	if trainMarker == null or trainMarker.current_track == null:

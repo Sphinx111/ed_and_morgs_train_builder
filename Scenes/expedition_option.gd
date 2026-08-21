@@ -21,10 +21,12 @@ const default_gains : Dictionary = {
 	"scrap" : ["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE],
 	"grey_water" : ["grey_water", 15, 1.0, Globals.water_texture, Color.AQUA],
 	"pop" : ["pop", 2, 1.0, Globals.pop_texture, Color.WHITE],
-	"oil" : ["oil", 10, 1.0, Globals.water_texture, Color.BLACK]
+	"oil" : ["oil", 10, 1.0, Globals.water_texture, Color.BLACK],
+	"mech_parts" : ["mech_parts", 5, 1.0, Globals.blank_texture, Color.CORAL],
+	"food1" : ["food1", 10, 1.0, Globals.blank_texture, Color.LIME_GREEN]
 }
 
-# List of resources required to launch the expedition, per person
+# List of resources per person if not using the default costs in default_costs 
 #  [resource name, amount, texture to use, icon color modulate
 var costs : Array = [["pop", 1, Globals.pop_texture, Color.WHITE],
 					 ["clean_water", 2, Globals.water_texture, Color.AQUA],
@@ -82,26 +84,27 @@ static func get_default_gain_from_type(typeWanted : String):
 
 static func get_default_costs_from_type(typeWanted : String) -> Array:
 	var result = []
-	if typeWanted == "scrap":
-		result.append(default_costs["pop"])
-		result.append(default_costs["clean_water"])
-		result.append(default_costs["food1"])
-	elif typeWanted == "grey_water":
-		result.append(default_costs["pop"])
-		result.append(default_costs["clean_water"].duplicate())
-		result[1][1] = 2      # Increased cost for water missions
-		result.append(default_costs["food1"])
-	elif typeWanted == "pop":
-		result.append(default_costs["pop"])
-		result.append(default_costs["clean_water"].duplicate())
-		result[1][1] = 4
-		result.append(default_costs["food1"].duplicate())
-		result[2][1] = 2
-	elif typeWanted == "oil":
-		result.append(default_costs["pop"])
-		result.append(default_costs["clean_water"])
-		result.append(default_costs["food1"].duplicate())
-		result[2][1] = 2
+	match typeWanted:
+		"grey_water":
+			result.append(default_costs["pop"])
+			result.append(default_costs["clean_water"].duplicate())
+			result[1][1] = 2      # Increased cost for water missions
+			result.append(default_costs["food1"])
+		"pop":
+			result.append(default_costs["pop"])
+			result.append(default_costs["clean_water"].duplicate())
+			result[1][1] = 4
+			result.append(default_costs["food1"].duplicate())
+			result[2][1] = 2
+		"oil":
+			result.append(default_costs["pop"])
+			result.append(default_costs["clean_water"])
+			result.append(default_costs["food1"].duplicate())
+			result[2][1] = 2
+		_:
+			result.append(default_costs["pop"])
+			result.append(default_costs["clean_water"])
+			result.append(default_costs["food1"])
 	return result
 
 func _ready():

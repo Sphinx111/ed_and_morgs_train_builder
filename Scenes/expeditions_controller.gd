@@ -75,21 +75,17 @@ func refresh_options():
 	for i in range(resource_types_in_range.size()):
 		var resourceType : String = resource_types_in_range[i]
 		var expedition_name : String = ""
-		if resourceType == "pop":
-			expedition_name = "Find Survivors"
-		elif resourceType == "scrap":
-			expedition_name = "Fetch Scrap"
-		elif resourceType == "grey_water":
-			expedition_name = "Fetch Water"
-		elif resourceType == "oil":
-			expedition_name = "Fetch Oil"
+		match resourceType:
+			"pop":
+				expedition_name = "Find Survivors"
+			_:
+				expedition_name = "Fetch %s" % resourceType
 		
-		if resourceType == "pop" or resourceType == "scrap" or resourceType == "grey_water" or resourceType == "oil":
-			var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceType, result.get(resourceType))
-			options_available.append(newOption)
-			available_expeditions_panel.add_child(newOption)
-			newOption.position.y = (option_index * (height_of_option + separation_between_options)) + separation_between_options
-			option_index += 1
+		var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceType, result.get(resourceType))
+		options_available.append(newOption)
+		available_expeditions_panel.add_child(newOption)
+		newOption.position.y = (option_index * (height_of_option + separation_between_options)) + separation_between_options
+		option_index += 1
 	
 	_update_panel_layout()
 
