@@ -92,6 +92,7 @@ func collect_resources():
 		var resourceType = target_resources[i][0]
 		var max_per_person = target_resources[i][1]
 		var amount_to_add : float = max_per_person * float(pop) / collection_time
+		amount_to_add = min(amount_to_add, resource_spot.amount)
 		if resources_gathered.has(resourceType):
 			resources_gathered[resourceType] = resources_gathered[resourceType] + amount_to_add
 		else:
@@ -102,6 +103,12 @@ func collect_resources():
 			label1.text = Helpers.pretty_print_float(resources_gathered[resourceType])
 		elif i == 1:
 			label2.text = Helpers.pretty_print_float(resources_gathered[resourceType])
+		
+		## Remove the resources from the MapResourceContainer, end expedition if resource is empty
+		resource_spot.amount -= amount_to_add
+		if (resource_spot.amount  <= 0):
+			print("Location is out of this resource!")
+			_on_return_button_pressed()
 
 func _on_return_button_pressed():
 	if time_passed < travel_time + collection_time:

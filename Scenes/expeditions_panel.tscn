@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://ccgqeutqtn8jk" path="res://Scenes/expeditions_controller.gd" id="1_bmukf"]
 
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sj53q"]
 bg_color = Color(0.0770544, 0.124854, 0.161623, 1)
 
@@ -13,7 +12,7 @@ bg_color = Color(0.298039, 0.298039, 0.298039, 1)
 offset_left = 7.0
 offset_top = 91.0
 offset_right = 659.0
-offset_bottom = 361.0
+offset_bottom = 208.0
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_sj53q")
 script = ExtResource("1_bmukf")
@@ -29,9 +28,9 @@ text = "Available Expeditions"
 [node name="Label2" type="Label" parent="."]
 layout_mode = 0
 offset_left = 6.0
-offset_top = 105.0
+offset_top = 71.0
 offset_right = 96.0
-offset_bottom = 128.0
+offset_bottom = 94.0
 text = "Active Expeditions"
 
 [node name="OptionsPanel" type="Panel" parent="."]
@@ -39,13 +38,13 @@ layout_mode = 0
 offset_left = 4.0
 offset_top = 30.0
 offset_right = 648.0
-offset_bottom = 103.0
+offset_bottom = 69.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_o0k6p")
 
 [node name="ActiveExpeditionsPanel" type="Panel" parent="."]
 layout_mode = 0
 offset_left = 4.0
-offset_top = 131.0
+offset_top = 97.0
 offset_right = 648.0
-offset_bottom = 204.0
+offset_bottom = 136.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_o0k6p")
