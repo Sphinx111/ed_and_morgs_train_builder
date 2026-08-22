@@ -40,7 +40,7 @@ static func new_expedition(index : int, optionSelected : ExpeditionOption, passe
 	new_expedition.pop = optionSelected.pop_allocated
 	new_expedition.total_duration = optionSelected.time_needed
 	new_expedition.travel_time = optionSelected.travel_time
-	new_expedition.target_resources = optionSelected.max_gain
+	new_expedition.target_resources = optionSelected.gains_per_pop
 	new_expedition.passengers = passengersArray
 	new_expedition.resource_spot = optionSelected.resource_spot
 	return new_expedition

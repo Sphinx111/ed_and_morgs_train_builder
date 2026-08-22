@@ -186,9 +186,9 @@ func _speed_tick() -> void:
 
 func _process(delta):
 	if is_accelerating:
-		speed = move_toward(speed,target_speed,get_acceleration(engine_thrust)*delta)
+		speed = move_toward(speed,target_speed,get_acceleration(engine_thrust) * delta * Globals.time_factor)
 	elif is_decelerating:
-		speed = move_toward(speed,target_speed,get_acceleration(braking_force) * delta)
+		speed = move_toward(speed,target_speed,get_acceleration(braking_force) * delta * Globals.time_factor)
 
 func get_acceleration(moving_force : float) -> float:
 	var train_mass : float = 0

@@ -15,7 +15,7 @@ var resource_spot : MapResourceContainer = null
 
 # List of resources which can be gained from the expedition
 #  [resource name, amount, chance to find, texture to use, and icon color modulate]
-var max_gain : Array = [["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE]]
+var gains_per_pop : Array = [["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE]]
 
 const default_gains : Dictionary = {
 	"scrap" : ["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE],
@@ -67,12 +67,12 @@ var decrease_button : Button = null
 
 var time_label : Label = null
 
-static func new_expedition(display_name : String, resource_to_gather : String, resource_spot : MapResourceContainer) -> ExpeditionOption:
+static func new_expedition(_display_name : String, resource_to_gather : String, _resource_spot : MapResourceContainer) -> ExpeditionOption:
 	var new_option : ExpeditionOption = my_scene.instantiate()
-	new_option.display_name = display_name
-	new_option.resource_spot = resource_spot
+	new_option.display_name = _display_name
+	new_option.resource_spot = _resource_spot
 	
-	new_option.max_gain = get_default_gain_from_type(resource_to_gather)
+	new_option.gains_per_pop = get_default_gain_from_type(resource_to_gather)
 	new_option.costs = get_default_costs_from_type(resource_to_gather)
 	return new_option
 
@@ -133,13 +133,14 @@ func update_full_option():
 	time_label.text = Helpers.seconds_to_mm_ss(time_needed)
 	name_label.text = display_name
 	
-	gain_panel.size.x = 10.0 + (max_gain.size() * width_per_cost)
-	for i in range(max_gain.size()):
-		var gainArray = max_gain[i] 
+	gain_panel.size.x = 10.0 + (gains_per_pop.size() * width_per_cost)
+	for i in range(gains_per_pop.size()):
+		var gainArray = gains_per_pop[i] 
 		if i == 0:
 			gain_sprite.texture = gainArray[3]
 			gain_sprite.modulate = gainArray[4]
-			gain_label.text = "%d" % (gainArray[1] * pop_allocated)
+			var max_gain : float = min(resource_spot.amount, gainArray[1] * pop_allocated)
+			gain_label.text = "%d" % (max_gain)
 		else:
 			print_debug("Unused gain for expedition option")
 	
@@ -165,37 +166,22 @@ func update_full_option():
 	elif costs.size() < 2:
 		cost1_sprite.hide()
 		cost1_label.hide()
+	
 
-func set_basic_params(display_name : String, min_pop : int, time_needed : int, travel_time : int):
-	self.display_name = display_name
-	self.min_pop = min_pop
-	self.time_needed = time_needed
-	self.travel_time = travel_time
-
-func clear_gains():
-	max_gain = []
-
-## Set the item to be gained
-func add_gain_params(resourceCollected : String, collectionChance : float, amount_per_person : float, icon_to_use : Texture2D, icon_modulate : Color):
-	if costs.size() < limit_gain_items:
-		max_gain.append([resourceCollected, collectionChance, amount_per_person, icon_to_use, icon_modulate])
-
-## Remove all costs except the basic population cost
-func clear_costs():
-	costs = [["pop", 1, Globals.pop_texture, Color.WHITE]]
-
-## Add a new cost
-func add_cost(resourceRequired : String, cost_per_person : float, icon_texture : Texture2D, icon_modulate : Color):
-	if costs.size() < limit_cost_items:
-		costs.append([resourceRequired, cost_per_person, icon_texture, icon_modulate])
+func set_basic_params(_display_name : String, _min_pop : int, _time_needed : int, _travel_time : int):
+	self.display_name = _display_name
+	self.min_pop = _min_pop
+	self.time_needed = _time_needed
+	self.travel_time = _travel_time
 
 func _on_add_pop_button_pressed() -> void:
 	if pop_allocated >= Globals.max_expedition_size:
 		return
 	pop_allocated += 1
 	explorers_label.text = "%d" % pop_allocated
-	if max_gain.size() == 1:
-		gain_label.text = "%d" % (pop_allocated * max_gain[0][1])
+	if gains_per_pop.size() == 1:
+		var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
+		gain_label.text = "%d" % (max_gain)
 	
 	if costs.size() >= 2:
 		cost1_label.text = "%d" % (pop_allocated * costs[1][1])
@@ -208,8 +194,9 @@ func _on_remove_pop_button_pressed() -> void:
 		return
 	pop_allocated -= 1
 	explorers_label.text = "%d" % pop_allocated
-	if max_gain.size() == 1:
-		gain_label.text = "%d" % (pop_allocated * max_gain[0][1])
+	if gains_per_pop.size() == 1:
+		var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
+		gain_label.text = "%d" % (max_gain)
 	
 	if costs.size() >= 2:
 		cost1_label.text = "%d" % (pop_allocated * costs[1][1])
