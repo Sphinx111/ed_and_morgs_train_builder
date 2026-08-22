@@ -65,15 +65,14 @@ func _update_panel_layout() -> void:
 
 func refresh_options():
 	options_available.clear()
-	var result : Dictionary[String, MapResourceContainer] = selectedTrain.worldMap.query_resource_types()
-	var resource_types_in_range : Array[String] = result.keys()
+	var containers_in_range : Array[MapResourceContainer] = selectedTrain.worldMap.query_resource_types()
 	for child in available_expeditions_panel.get_children():
 		if child is ExpeditionOption:
 			child.queue_free()
 	
 	var option_index : int = 0
-	for i in range(resource_types_in_range.size()):
-		var resourceType : String = resource_types_in_range[i]
+	for container in containers_in_range:
+		var resourceType : String = container.resource_type
 		var expedition_name : String = ""
 		match resourceType:
 			"pop":
@@ -81,10 +80,17 @@ func refresh_options():
 			_:
 				expedition_name = "Fetch %s" % resourceType
 		
-		var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceType, result.get(resourceType))
+		var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceType, container)
 		options_available.append(newOption)
 		available_expeditions_panel.add_child(newOption)
 		newOption.position.y = (option_index * (height_of_option + separation_between_options)) + separation_between_options
+		option_index += 1
+	
+	for location in selectedTrain.worldMap.query_scavenge_locations():
+		var scavengeOption : ExpeditionOption = ExpeditionOption.new_scavenge_expedition(location)
+		options_available.append(scavengeOption)
+		available_expeditions_panel.add_child(scavengeOption)
+		scavengeOption.position.y = (option_index * (height_of_option + separation_between_options)) + separation_between_options
 		option_index += 1
 	
 	_update_panel_layout()
@@ -151,8 +157,13 @@ func train_tick():
 		expeditions_finished.emit()              ## If we have just finished all expeditions, emit a signal
 
 func complete_expedition(completed : ActiveExpedition):
-	for key in completed.resources_gathered.keys():
-		selectedTrain.add_res(key, completed.resources_gathered[key])
+	if completed.is_scavenge:
+		if completed.scavenge_location != null:
+			completed.scavenge_location.discover_random_resource()
+		refresh_options()
+	else:
+		for key in completed.resources_gathered.keys():
+			selectedTrain.add_res(key, completed.resources_gathered[key])
 	selectedTrain.recover_expedition(completed.passengers)
 
 func abandon_expedition(abandoned : ActiveExpedition):

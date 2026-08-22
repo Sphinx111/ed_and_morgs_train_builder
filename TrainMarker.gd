@@ -9,6 +9,10 @@ var current_track: TrackSegment = null
 var travel_toward_end: bool = true
 
 
+static func travels_toward_end_on_map() -> bool:
+	return Globals.train_direction > 0
+
+
 func enter_track(
 	segment: TrackSegment,
 	_progress_ratio: float = -1.0,
@@ -27,26 +31,41 @@ func enter_track(
 	if segment.curve == null or segment.curve.get_point_count() < 2:
 		return
 
-	if _progress_ratio >= 0.0:
+	if from_node != null:
+		_apply_entry_at_node(segment, from_node)
+	elif _progress_ratio >= 0.0:
 		self.progress_ratio = _progress_ratio
-	elif from_node != null:
-		self.progress_ratio = 0.0 if segment.start_location == from_node else 1.0
-	elif Globals.train_direction < 0:
+		_update_travel_direction_from_map()
+	elif travels_toward_end_on_map():
 		self.progress_ratio = 0.0
-	elif Globals.train_direction > 0:
+		_update_travel_direction_from_map()
+	elif Globals.train_direction < 0:
 		self.progress_ratio = 1.0
+		_update_travel_direction_from_map()
 	else:
 		self.progress_ratio = 0.5
+		_update_travel_direction_from_map()
 
-	_update_travel_direction()
+
+func _apply_entry_at_node(segment: TrackSegment, from_node: MapLocation) -> void:
+	if segment.start_location == from_node:
+		progress_ratio = 0.0
+		travel_toward_end = true
+	elif segment.end_location == from_node:
+		progress_ratio = 1.0
+		travel_toward_end = false
+	else:
+		push_warning("TrainMarker: entry node is not connected to segment")
+		progress_ratio = 0.5
+		_update_travel_direction_from_map()
 
 
-func _update_travel_direction() -> void:
+func _update_travel_direction_from_map() -> void:
 	if current_track == null:
 		return
-	if Globals.train_direction < 0:
+	if travels_toward_end_on_map():
 		travel_toward_end = true
-	elif Globals.train_direction > 0:
+	elif Globals.train_direction < 0:
 		travel_toward_end = false
 	else:
 		travel_toward_end = progress_ratio <= 0.5

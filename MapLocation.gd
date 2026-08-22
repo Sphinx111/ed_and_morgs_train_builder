@@ -19,7 +19,7 @@ var edges: Array[MapGraphEdge] = []
 var track_segments: Array[TrackSegment] = []
 var track_switcher: TrackJunction
 var map_handler: MapHandler = null
-var resource_containers : Dictionary[String, MapResourceContainer]= {}
+var resource_containers : Array[MapResourceContainer] = []
 var _debug_label: Label = null
 var _click_area: Area2D = null
 var _selector_debug_line: Line2D = null
@@ -87,7 +87,7 @@ func transfer_train(train_marker: PathFollow2D, from_segment: TrackSegment = nul
 			return
 
 	var marker := train_marker as TrainMarker
-	var travel_toward_end := marker.travel_toward_end if marker != null else Globals.train_direction < 0
+	var travel_toward_end := marker.travel_toward_end if marker != null else TrainMarker.travels_toward_end_on_map()
 	var segment: TrackSegment = select_outgoing_track(from_segment, travel_toward_end)
 	if segment == null:
 		return
@@ -165,12 +165,66 @@ func _make_circle_polygon(radius: float, segments: int) -> PackedVector2Array:
 		points.append(Vector2(cos(angle), sin(angle)) * radius)
 	return points
 
-func get_resource_containers() -> Dictionary[String, MapResourceContainer]:
+func get_resource_containers() -> Array[MapResourceContainer]:
 	return resource_containers
 
-func add_resource_container(resourceType : String, container : MapResourceContainer) -> void:
-	resource_containers.set(resourceType, container)
+func add_resource_container(container : MapResourceContainer) -> void:
+	resource_containers.append(container)
 	_refresh_debug_view()
+
+func has_resource_type(_type : String) -> bool:
+	for container in resource_containers:
+		if container.resource_type == _type and not container.is_empty() and container.discovered:
+			return true
+	return false
+
+func get_resource_container_of_type(_type : String) -> MapResourceContainer:
+	for container in resource_containers:
+		if container.resource_type == _type and not container.is_empty() and container.discovered:
+			return container
+	return null
+
+func has_undiscovered_resources() -> bool:
+	for container in resource_containers:
+		if not container.discovered and not container.is_empty():
+			return true
+	return false
+
+func discover_undiscovered_resources() -> void:
+	for container in resource_containers:
+		if not container.discovered and not container.is_empty():
+			container.discovered = true
+	_refresh_debug_view()
+
+func discover_random_resource() -> MapResourceContainer:
+	var candidates : Array[MapResourceContainer] = []
+	for container in resource_containers:
+		if not container.discovered and not container.is_empty():
+			candidates.append(container)
+	if candidates.is_empty():
+		return null
+	
+	var total_weight : float = 0.0
+	for container in candidates:
+		total_weight += container.rarity
+	
+	var chosen : MapResourceContainer = null
+	if total_weight <= 0.0:
+		chosen = candidates[randi() % candidates.size()]
+	else:
+		var roll : float = randf() * total_weight
+		var cumulative : float = 0.0
+		for container in candidates:
+			cumulative += container.rarity
+			if roll < cumulative:
+				chosen = container
+				break
+		if chosen == null:
+			chosen = candidates[candidates.size() - 1]
+	
+	chosen.discovered = true
+	_refresh_debug_view()
+	return chosen
 
 
 func _refresh_debug_view() -> void:
@@ -243,8 +297,7 @@ func _setup_debug_label() -> void:
 
 func _build_resource_debug_text() -> String:
 	var lines: PackedStringArray = PackedStringArray()
-	for resource_type in resource_containers:
-		var container: MapResourceContainer = resource_containers[resource_type]
+	for container in resource_containers:
 		if container == null:
 			continue
 		lines.append(container.get_debug_text())
@@ -260,7 +313,7 @@ func get_next_node_with_resource(
 ) -> MapDestination:
 	if _attempts >= _maxAttempts or type == TYPE.MAP_LOOPER:
 		return null
-	if resource_containers.has(_type):
+	if has_resource_type(_type):
 		return MapDestination.new(_distance, self)
 
 	var outgoing: TrackSegment = select_outgoing_track(from_segment, travel_toward_end)

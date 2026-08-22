@@ -12,6 +12,7 @@ var game_tick : int = 0
 const tick_duration : float = 2.0
 
 var time_factor : float = 1.0
+var local_to_global_speed_conversion : float = 0.005
 
 # Car variables
 const car_length : float = 200

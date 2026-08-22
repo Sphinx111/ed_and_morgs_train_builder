@@ -11,6 +11,8 @@ var travel_time : int = 0
 var time_passed : int = 0
 var collection_time : int = 0
 var resource_spot : MapResourceContainer = null
+var is_scavenge : bool = false
+var scavenge_location : MapLocation = null
 
 var target_resources : Array = []
 var resources_gathered : Dictionary = {}
@@ -43,6 +45,8 @@ static func new_expedition(index : int, optionSelected : ExpeditionOption, passe
 	new_expedition.target_resources = optionSelected.gains_per_pop
 	new_expedition.passengers = passengersArray
 	new_expedition.resource_spot = optionSelected.resource_spot
+	new_expedition.is_scavenge = optionSelected.is_scavenge
+	new_expedition.scavenge_location = optionSelected.scavenge_location
 	return new_expedition
 
 func _ready():
@@ -70,7 +74,7 @@ func _ready():
 		if i == 0:
 			sprite1.texture = target[3]
 			sprite1.modulate = target[4]
-			label1.text = ""
+			label1.text = "?" if is_scavenge else ""
 			sprite1.show()
 			label1.show()
 		elif i == 1:
@@ -82,7 +86,7 @@ func _ready():
 
 func train_tick():
 	time_passed += 1
-	if time_passed >= travel_time and time_passed < (total_duration - travel_time):
+	if not is_scavenge and time_passed >= travel_time and time_passed < (total_duration - travel_time):
 		collect_resources()
 	self.time_label.text = "%s" % Helpers.seconds_to_mm_ss(total_duration - time_passed)
 	progress_bar.size.x = (progress_background_width / total_duration * time_passed)

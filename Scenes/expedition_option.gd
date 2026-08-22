@@ -12,6 +12,8 @@ var min_pop : int = 4        ## Minimum number of people required for expedition
 var time_needed : int = 190  ## Time required for expedition, in game ticks
 var travel_time : int = 60
 var resource_spot : MapResourceContainer = null
+var is_scavenge : bool = false
+var scavenge_location : MapLocation = null
 
 # List of resources which can be gained from the expedition
 #  [resource name, amount, chance to find, texture to use, and icon color modulate]
@@ -74,6 +76,15 @@ static func new_expedition(_display_name : String, resource_to_gather : String, 
 	
 	new_option.gains_per_pop = get_default_gain_from_type(resource_to_gather)
 	new_option.costs = get_default_costs_from_type(resource_to_gather)
+	return new_option
+
+static func new_scavenge_expedition(location : MapLocation) -> ExpeditionOption:
+	var new_option : ExpeditionOption = my_scene.instantiate()
+	new_option.display_name = "Scavenge"
+	new_option.is_scavenge = true
+	new_option.scavenge_location = location
+	new_option.gains_per_pop = [["unknown", 0, 1.0, Globals.blank_texture, Color.WHITE]]
+	new_option.costs = get_default_costs_from_type("scrap")
 	return new_option
 
 static func get_default_gain_from_type(typeWanted : String):
@@ -139,8 +150,11 @@ func update_full_option():
 		if i == 0:
 			gain_sprite.texture = gainArray[3]
 			gain_sprite.modulate = gainArray[4]
-			var max_gain : float = min(resource_spot.amount, gainArray[1] * pop_allocated)
-			gain_label.text = "%d" % (max_gain)
+			if is_scavenge:
+				gain_label.text = "?"
+			else:
+				var max_gain : float = min(resource_spot.amount, gainArray[1] * pop_allocated)
+				gain_label.text = "%d" % (max_gain)
 		else:
 			print_debug("Unused gain for expedition option")
 	
@@ -180,8 +194,11 @@ func _on_add_pop_button_pressed() -> void:
 	pop_allocated += 1
 	explorers_label.text = "%d" % pop_allocated
 	if gains_per_pop.size() == 1:
-		var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
-		gain_label.text = "%d" % (max_gain)
+		if is_scavenge:
+			gain_label.text = "?"
+		else:
+			var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
+			gain_label.text = "%d" % (max_gain)
 	
 	if costs.size() >= 2:
 		cost1_label.text = "%d" % (pop_allocated * costs[1][1])
@@ -195,8 +212,11 @@ func _on_remove_pop_button_pressed() -> void:
 	pop_allocated -= 1
 	explorers_label.text = "%d" % pop_allocated
 	if gains_per_pop.size() == 1:
-		var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
-		gain_label.text = "%d" % (max_gain)
+		if is_scavenge:
+			gain_label.text = "?"
+		else:
+			var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
+			gain_label.text = "%d" % (max_gain)
 	
 	if costs.size() >= 2:
 		cost1_label.text = "%d" % (pop_allocated * costs[1][1])

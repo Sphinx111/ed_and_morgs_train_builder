@@ -74,9 +74,10 @@ func cities_first_pass():
 				resourceSpec.resource_type,
 				amount_to_place
 			)
+			resource_container.rarity = resourceSpec.rarity
 			remainingLocations -= 1
 			total_remaining -= amount_to_place
-			location.add_resource_container(resourceSpec.resource_type, resource_container)
+			location.add_resource_container(resource_container)
 
 
 func nodes_second_pass() -> void:
@@ -116,6 +117,7 @@ func nodes_second_pass() -> void:
 				resourceSpec.resource_type,
 				amount_to_place
 			)
-			location.add_resource_container(resourceSpec.resource_type, resource_container)
+			resource_container.rarity = resourceSpec.rarity
+			location.add_resource_container(resource_container)
 			remainingLocations -= 1
 			total_remaining -= amount_to_place

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dve3f2r47q48u" path="res://images/Pixel_world_map.jpg" id="2_4ojr4"]
 [ext_resource type="Script" uid="uid://c4vqpjq4nfrxx" path="res://TrainMarker.gd" id="3_train"]
 [ext_resource type="Script" uid="uid://xw62eb0m2po0" path="res://MapGraphGenerator.gd" id="5_67byq"]
+[ext_resource type="Script" path="res://MapSun.gd" id="6_mapsun"]
 
 [sub_resource type="Curve2D" id="Curve2D_1huhg"]
 _data = {
@@ -42,6 +43,7 @@ color = Color(1, 1, 1, 0.16470589)
 
 [node name="Sunpath" type="Path2D" parent="MapMask"]
 curve = SubResource("Curve2D_1huhg")
+script = ExtResource("6_mapsun")
 
 [node name="Sun1" type="PathFollow2D" parent="MapMask/Sunpath"]
 position = Vector2(-512, 395)

@@ -118,20 +118,20 @@ func _rebuild_work_map(work_type : String) -> void:
 
 
 func _update_need_location(need : String, train_pos : Array[int], new_state : int) -> void:
-	if _should_patch_location(need, train_pos, new_state, false):
+	if _should_patch_location(need, train_pos, false):
 		_set_location_cell(needs_locations_map[need], train_pos, new_state)
 	else:
 		needs_locations_map[need] = train.get_location_map_for_type(need)
 
 
 func _update_work_location(work_type : String, train_pos : Array[int], new_state : int) -> void:
-	if _should_patch_location(work_type, train_pos, new_state, true):
+	if _should_patch_location(work_type, train_pos, true):
 		_set_location_cell(work_locations_map[work_type], train_pos, new_state)
 	else:
 		work_locations_map[work_type] = train.get_work_location_map_for_type(work_type)
 
 
-func _should_patch_location(type_key : String, train_pos : Array[int], new_state : int, is_work : bool) -> bool:
+func _should_patch_location(type_key : String, train_pos : Array[int], is_work : bool) -> bool:
 	var module : ModuleBase = _get_module_at(train_pos)
 	if module == null:
 		return false

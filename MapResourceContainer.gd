@@ -6,6 +6,8 @@ class_name MapResourceContainer
 @export var resource_type : String
 @export var amount : float
 @export var travel_time : float
+@export var discovered : bool = false
+@export var rarity : float = 0.0
 
 func _init(_resource_type : String = "", _amount : float = 0.0, _travel_time : float = 0.0):
 	resource_type = _resource_type

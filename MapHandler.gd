@@ -8,28 +8,23 @@ var map_graph : MapGraph = null
 var active_track : TrackSegment = null
 var _track_segments : Array[TrackSegment] = []
 
+@onready var sun : MapSun = $MapMask/Sunpath
+@onready var _time_to_sun_label : Label = $TimeToSun
+
 var trainMarker : TrainMarker = null      ## A visual marker for the train's position on the route
 var selectedTrain : Train = null           ## A pointer to the player's train
 
 var collection_margin : float = 30   ## Range at which resources can be collected
-var local_to_global_speed_conversion : float = 0.005     # Multiple train's speed value by this to get worldmap pixels per tick
+@export var local_to_global_speed_conversion : float = Globals.local_to_global_speed_conversion     # Multiple train's speed value by this to get worldmap pixels per tick
 
-var sun1 : PathFollow2D = null
-var sun2 : PathFollow2D = null
-var sunradius : float = 512.0
-var sun_path_length : float = 2048.0
-var map_width : float = 1024.0
 const MAP_CONTENT_SIZE : Vector2 = Vector2(1024.0, 723.0)
 const MAX_RECURSE_SEARCH : int = 50
-var sunspeed : float = 1.0
 var map_node_clicks_enabled : bool = false
 
 func _ready():
 	trainMarker = get_node("TrainMarker") as TrainMarker
 	trainMarker.map_handler = self
 	trainMarker.loop = false
-	sun1 = get_node("MapMask/Sunpath/Sun1")
-	sun2 = get_node("MapMask/Sunpath/Sun2")
 	_generate_and_apply_map()
 
 
@@ -180,7 +175,7 @@ func recalculate_active_route(start_segment: TrackSegment, marker: TrainMarker =
 	if start_segment == null or not is_instance_valid(start_segment):
 		return
 
-	var travel_toward_end := marker.travel_toward_end if marker != null else Globals.train_direction < 0
+	var travel_toward_end := marker.travel_toward_end if marker != null else TrainMarker.travels_toward_end_on_map()
 
 	var current_segment: TrackSegment = start_segment
 	var entry_node: MapLocation = null
@@ -364,14 +359,15 @@ func train_step():
 		return
 	if not _update_train_position(selectedTrain.speed * local_to_global_speed_conversion):
 		return
-	sun1.progress -= sunspeed
-	sun2.progress -= sunspeed
-	update_time_to_sun()
+	sun.advance()
+	sun.update_time_label(trainMarker.position, _time_to_sun_label)
 	# Debug testing - Next oil spot
 	if scheduleStop != "" :
 		var nextTarget : MapDestination = get_next_resource_spot(scheduleStop)
 		if nextTarget != null:
-			print("Next %s Well has %s units and is at %f" % [scheduleStop, nextTarget.target.resource_containers.get(scheduleStop).amount, nextTarget.distance])
+			var scheduled_container : MapResourceContainer = nextTarget.target.get_resource_container_of_type(scheduleStop)
+			if scheduled_container != null:
+				print("Next %s Well has %s units and is at %f" % [scheduleStop, scheduled_container.amount, nextTarget.distance])
 			if nextTarget.distance <100 :
 				selectedTrain.target_speed = 100
 			if nextTarget.distance < 50 : 
@@ -393,29 +389,21 @@ func request_resources(_wantedType : String) -> float:
 func gather_resource(_wantedType : String, _amount : float) -> int:
 	return 0
 
-func query_resource_types() -> Dictionary[String, MapResourceContainer]:
-	var result : Dictionary[String, MapResourceContainer] = {}
-	var closest_distance_by_type : Dictionary[String, float] = {}
+func query_resource_types() -> Array[MapResourceContainer]:
+	var result : Array[MapResourceContainer] = []
 	for location in get_nodes_in_range(collection_margin):
-		var location_distance := _distance_to_track_end(location)
-		for resource_type in location.get_resource_containers():
-			var container : MapResourceContainer = location.get_resource_containers()[resource_type]
-			if container.is_empty():
+		for container in location.get_resource_containers():
+			if container.is_empty() or not container.discovered:
 				continue
-			if not result.has(resource_type) or location_distance < closest_distance_by_type[resource_type]:
-				result[resource_type] = container
-				closest_distance_by_type[resource_type] = location_distance
+			result.append(container)
 	return result
 
-func _distance_to_track_end(location: MapLocation) -> float:
-	if trainMarker == null or trainMarker.current_track == null or trainMarker.current_track.curve == null:
-		return INF
-	var track_length := trainMarker.current_track.curve.get_baked_length()
-	if location == trainMarker.current_track.start_location:
-		return trainMarker.progress
-	if location == trainMarker.current_track.end_location:
-		return track_length - trainMarker.progress
-	return INF
+func query_scavenge_locations() -> Array[MapLocation]:
+	var result : Array[MapLocation] = []
+	for location in get_nodes_in_range(collection_margin):
+		if location.has_undiscovered_resources() and not result.has(location):
+			result.append(location)
+	return result
 
 func get_next_resource_spot(_type : String) -> MapDestination:
 	if trainMarker == null or trainMarker.current_track == null:
@@ -439,74 +427,24 @@ func get_distance_to_next_resource(_type : String) -> float:
 		return nextDestination.distance
 
 
-func is_train_in_sun() -> bool:
-	#print("trainPos: %f sun1pos: %f sun2pos: %f" % [trainMarker.position.x, sun1.position.x, sun2.position.x])
-	if trainMarker.position.x > sun1.position.x and trainMarker.position.x < sun1.position.x + sunradius:
-		print("train is in sunlight")
-		return true
-	elif trainMarker.position.x > sun2.position.x and trainMarker.position.x < sun2.position.x + sunradius:
-		print("train is in sunlight")
-		return true
-	return false
-
-func is_position_in_sun(testPos : Vector2) -> bool:
-	if testPos.x > sun1.position.x and testPos.x < sun1.position.x + sunradius:
-		return true
-	elif testPos.x > sun2.position.x and testPos.x < sun2.position.x + sunradius:
-		return true
-	return false
-
 func get_sun_height_for_train() -> float:
-	return get_sun_height(trainMarker.position)
+	if trainMarker == null:
+		return -1.0
+	return sun.get_sun_height(trainMarker.position)
 
-## Get the sun's height in the sky from a given position.
-## Returns -1 when not in sunlight, otherwise 0.0 (left horizon) to 2.0 (right horizon),
-## with 1.0 at the seam where the two sun objects meet.
-func get_sun_height(testPosition : Vector2) -> float:
-	var test_x : float = testPosition.x
+func get_sun_height(map_position : Vector2) -> float:
+	return sun.get_sun_height(map_position)
 
-	if test_x >= sun1.position.x and test_x < sun1.position.x + sunradius:
-		return (test_x - sun1.position.x) / sunradius
+func is_position_in_sun(map_position : Vector2) -> bool:
+	return sun.is_position_in_sun(map_position)
 
-	if test_x >= sun2.position.x and test_x < sun2.position.x + sunradius:
-		return 1.0 + (test_x - sun2.position.x) / sunradius
+func get_sun_temperature_at(map_position : Vector2) -> float:
+	return sun.get_temperature_at(map_position)
 
-	return -1.0
+func get_sun_temperature_for_train() -> float:
+	if trainMarker == null:
+		return Globals.train_base_temp
+	return sun.get_temperature_at(trainMarker.position)
 
-## Important: Returns distance to midpoint of a sun
-func get_distance_to_any_sun(testPosition : Vector2) -> float:
-	var distance_in_pixels : float = 0
-	var dist_to_sun1 : float = sun1.position.x + (sunradius/2) - testPosition.x
-	var dist_to_sun2 : float = sun2.position.x + (sunradius/2) - testPosition.x
-	# If sun 1 is the closest sun, return distance to it
-	if abs(dist_to_sun1) <  abs(dist_to_sun2):
-		distance_in_pixels = sun1.position.x + (sunradius/2) - testPosition.x
-	else:
-		distance_in_pixels = sun2.position.x + (sunradius/2) - testPosition.x
-
-	return distance_in_pixels
-
-func get_distance_to_next_sun(testPosition : Vector2) -> float:
-	var distance_in_pixels : float = 0
-	var dist_to_sun1 : float = sun1.position.x - testPosition.x
-	var dist_to_sun2 : float = sun2.position.x - testPosition.x
-	if dist_to_sun1 > 0 and dist_to_sun2 > 0:
-		distance_in_pixels = min(sun1.position.x - testPosition.x, sun2.position.x - testPosition.x)
-	elif dist_to_sun1 > 0:
-		distance_in_pixels = sun1.position.x - testPosition.x
-	else:
-		distance_in_pixels = sun2.position.x - testPosition.x
-	return distance_in_pixels
-
-func update_time_to_sun():
-	#var train_speed_in_pixels : float = local_to_global_speed_conversion * selectedTrain.speed
-	#train_speed_in_pixels = cos(abs(trainMarker.rotation)) * train_speed_in_pixels
-	var sun_speed_in_pixels : float = sunspeed
-	var distance_in_pixels : float = 0.0
-	distance_in_pixels = get_distance_to_next_sun(trainMarker.position)
-	var time_to_sun =  distance_in_pixels / (sun_speed_in_pixels) #- train_speed_in_pixels)
-	if time_to_sun > 0:
-		var displayText = Helpers.seconds_to_mm_ss(time_to_sun)
-		get_node("TimeToSun").text = displayText
-	else:
-		get_node("TimeToSun").text = "N/A"
+func get_time_until_sun_reaches(map_position : Vector2) -> float:
+	return sun.get_time_until_reaches(map_position)
