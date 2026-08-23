@@ -11,3 +11,4 @@ input_1_from_map = true
 output_type_1 = ExtResource("2_grey_water")
 output_1_amount = 10.0
 max_speed = 0.0
+process_name = "Grey Water"

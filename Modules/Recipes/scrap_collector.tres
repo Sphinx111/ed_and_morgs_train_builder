@@ -11,3 +11,4 @@ input_1_from_map = true
 output_type_1 = ExtResource("2_scrap")
 output_1_amount = 5.0
 max_speed = 110.0
+process_name = "Scrap"

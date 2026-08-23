@@ -24,6 +24,10 @@ var max_speed: float = -1.0
 var input_type_2: ResourceType = null
 var input2_needed: float = 0.0
 
+var process_name: String = ""
+var input1_consumed: bool = false
+var input2_consumed: bool = false
+
 
 static func from_recipe(recipe: ProductionRecipe) -> ProductionProvider:
 	var producer := ProductionProvider.new()
@@ -39,6 +43,9 @@ static func from_recipe(recipe: ProductionRecipe) -> ProductionProvider:
 	producer.output_type_2 = recipe.output_type_2
 	producer.output2_amount = recipe.output_2_amount
 	producer.max_speed = recipe.max_speed
+	producer.process_name = recipe.process_name
+	if producer.process_name == "" and recipe.output_type_1 != null:
+		producer.process_name = recipe.output_type_1.display_name
 	return producer
 
 
@@ -76,6 +83,24 @@ func produce(train: Train, worker_modifier: float) -> int:
 	return result
 
 
+func cancel_process(train: Train) -> void:
+	if progress > 0.0 and not input1_from_map:
+		if input1_consumed and input_type_1 != null:
+			train.add_res(input_type_1.type_name, input1_needed)
+		if input2_consumed and input_type_2 != null:
+			train.add_res(input_type_2.type_name, input2_needed)
+	_reset_cycle_state()
+
+
+func _reset_cycle_state() -> void:
+	progress = 0.0
+	carryOver = 0.0
+	output1_backlog = 0.0
+	output2_backlog = 0.0
+	input1_consumed = false
+	input2_consumed = false
+
+
 func start_cycle_both(train: Train, worker_modifier: float) -> int:
 	var result = Globals.RESULT_OK
 
@@ -103,8 +128,10 @@ func start_cycle_both(train: Train, worker_modifier: float) -> int:
 	if result == Globals.RESULT_OK:
 		if input1_from_map == false and input_type_1 != null:
 			train.add_res(input_type_1.type_name, -1 * input1_needed)
+			input1_consumed = true
 			if input_type_2 != null:
 				train.add_res(input_type_2.type_name, -1 * input2_needed)
+				input2_consumed = true
 		progress = progress + (worker_modifier / cycleTime)
 	return result
 
@@ -130,6 +157,7 @@ func start_cycle_either(train: Train, worker_modifier: float) -> int:
 	if result == Globals.RESULT_OK:
 		if input1_from_map == false and input_type_1 != null:
 			train.add_res(input_type_1.type_name, -1 * input1_needed)
+			input1_consumed = true
 		progress = progress + (1.0 / cycleTime)
 		return Globals.RESULT_OK
 
@@ -146,6 +174,7 @@ func start_cycle_either(train: Train, worker_modifier: float) -> int:
 	if result == Globals.RESULT_OK:
 		if input_type_2 != null:
 			train.add_res(input_type_2.type_name, -1 * input2_needed)
+			input2_consumed = true
 		progress = progress + (worker_modifier / cycleTime)
 
 	return result
@@ -167,6 +196,8 @@ func make_progress(train: Train, worker_modifier: float) -> void:
 func finish_cycle(train: Train) -> void:
 	carryOver = max(0, progress - 1.0)
 	progress = 0.0
+	input1_consumed = false
+	input2_consumed = false
 	if output_type_1 != null:
 		if output_type_1.type_name == "pop":
 			train.passengerManager.add_passenger()

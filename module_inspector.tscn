@@ -3,9 +3,143 @@
 [ext_resource type="Script" uid="uid://607fj72gm18a" path="res://module_inspector.gd" id="1_nwufn"]
 
 [node name="ModuleInspector" type="Panel"]
+z_index = 200
+custom_minimum_size = Vector2(280, 320)
 offset_right = 373.0
 offset_bottom = 348.0
 script = ExtResource("1_nwufn")
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="HeaderSection" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 2
+
+[node name="ModuleNameLabel" type="RichTextLabel" parent="MainVBox/HeaderSection"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 16
+text = "Workshop"
+scroll_active = false
+mouse_filter = 2
+
+[node name="CostLabel" type="RichTextLabel" parent="MainVBox/HeaderSection"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 14
+text = "Sell: +5 parts"
+scroll_active = false
+mouse_filter = 2
+
+[node name="ProductionSection" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="ProductionLabel" type="RichTextLabel" parent="MainVBox/ProductionSection"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/normal_font_size = 14
+text = "Production:"
+scroll_active = false
+mouse_filter = 2
+
+[node name="ProductionRow" type="HBoxContainer" parent="MainVBox/ProductionSection"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="InputResources" type="VBoxContainer" parent="MainVBox/ProductionSection/ProductionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="MainVBox/ProductionSection/ProductionRow"]
+custom_minimum_size = Vector2(80, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 2.0
+
+[node name="OutputResources" type="VBoxContainer" parent="MainVBox/ProductionSection/ProductionRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 2
+
+[node name="WorkersAndCustomers" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="WorkersSection" type="VBoxContainer" parent="MainVBox/WorkersAndCustomers"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 2
+
+[node name="WorkersLabel" type="RichTextLabel" parent="MainVBox/WorkersAndCustomers/WorkersSection"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/normal_font_size = 14
+text = "Workers"
+scroll_active = false
+mouse_filter = 2
+
+[node name="WorkersScroll" type="ScrollContainer" parent="MainVBox/WorkersAndCustomers/WorkersSection"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="WorkersList" type="VBoxContainer" parent="MainVBox/WorkersAndCustomers/WorkersSection/WorkersScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="CustomersSection" type="VBoxContainer" parent="MainVBox/WorkersAndCustomers"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 2
+
+[node name="CustomersLabel" type="RichTextLabel" parent="MainVBox/WorkersAndCustomers/CustomersSection"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_font_sizes/normal_font_size = 14
+text = "Customers"
+scroll_active = false
+horizontal_alignment = 2
+mouse_filter = 2
+
+[node name="CustomersScroll" type="ScrollContainer" parent="MainVBox/WorkersAndCustomers/CustomersSection"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CustomersList" type="VBoxContainer" parent="MainVBox/WorkersAndCustomers/CustomersSection/CustomersScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
 
 [node name="ControlsSection" type="Control" parent="."]
 layout_mode = 1
@@ -30,6 +164,7 @@ offset_top = 42.0
 offset_right = 83.0
 offset_bottom = 69.0
 text = "Mode"
+mouse_filter = 2
 
 [node name="ToggleButton" type="CheckButton" parent="ControlsSection"]
 layout_mode = 0
@@ -47,180 +182,16 @@ offset_right = 85.0
 offset_bottom = 35.0
 text = "Enabled
 "
+mouse_filter = 2
 
-[node name="ModuleNameLabel" type="RichTextLabel" parent="."]
-layout_mode = 1
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 160.0
-offset_bottom = 30.0
-text = "Workshop"
-
-[node name="CostLabel" type="RichTextLabel" parent="."]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 31.0
-offset_right = 119.0
-offset_bottom = 60.0
-text = "Sell: +5 parts"
-
-[node name="WorkersSection" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -165.0
-offset_right = 195.0
-grow_vertical = 0
-
-[node name="WorkersLabel" type="RichTextLabel" parent="WorkersSection"]
-layout_mode = 1
-offset_left = 6.0
-offset_top = -2.0
-offset_right = 170.0
-offset_bottom = 23.0
-text = "Workers"
-
-[node name="WorkersList" type="VBoxContainer" parent="WorkersSection"]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -142.0
-offset_right = 197.0
-grow_vertical = 0
-
-[node name="CustomersSection" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -201.0
-offset_top = -166.0
-grow_horizontal = 0
-grow_vertical = 0
-
-[node name="CustomersLabel" type="RichTextLabel" parent="CustomersSection"]
+[node name="ExitButton" type="Button" parent="ControlsSection"]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -116.0
-offset_top = -2.0
+offset_left = -40.0
+offset_top = 4.0
 offset_right = -4.0
-offset_bottom = 23.0
+offset_bottom = 28.0
 grow_horizontal = 0
-text = "Customers"
-horizontal_alignment = 2
-
-[node name="CustomersList" type="VBoxContainer" parent="CustomersSection"]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -193.0
-offset_top = -142.0
-grow_horizontal = 0
-grow_vertical = 0
-
-[node name="Panel" type="Panel" parent="CustomersSection/CustomersList"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="RichTextLabel" type="RichTextLabel" parent="CustomersSection/CustomersList/Panel"]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 2.0
-offset_right = 184.0
-offset_bottom = 31.0
-text = "Johnson T Johnson"
-
-[node name="Panel2" type="Panel" parent="CustomersSection/CustomersList"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="RichTextLabel" type="RichTextLabel" parent="CustomersSection/CustomersList/Panel2"]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 2.0
-offset_right = 184.0
-offset_bottom = 31.0
-text = "Jeremiah Jacobs"
-
-[node name="Panel3" type="Panel" parent="CustomersSection/CustomersList"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="RichTextLabel" type="RichTextLabel" parent="CustomersSection/CustomersList/Panel3"]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 2.0
-offset_right = 184.0
-offset_bottom = 31.0
-text = "James Johncobs"
-
-[node name="Panel4" type="Panel" parent="CustomersSection/CustomersList"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="RichTextLabel" type="RichTextLabel" parent="CustomersSection/CustomersList/Panel4"]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 2.0
-offset_right = 184.0
-offset_bottom = 31.0
-text = "John Jameriah"
-
-[node name="ProductionSection" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_top = -62.0
-offset_bottom = 10.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="RichTextLabel" type="RichTextLabel" parent="ProductionSection"]
-layout_mode = 0
-offset_left = 5.0
-offset_top = -23.0
-offset_right = 182.0
-offset_bottom = 3.0
-text = "Production:"
-
-[node name="ProductionRow" type="HBoxContainer" parent="ProductionSection"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 5.0
-offset_top = 8.0
-offset_right = -5.0
-offset_bottom = 37.0
-grow_horizontal = 2
-theme_override_constants/separation = 6
-alignment = 1
-
-[node name="InputResources" type="VBoxContainer" parent="ProductionSection/ProductionRow"]
-layout_mode = 2
-size_flags_horizontal = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 2
-
-[node name="ProgressBar" type="ProgressBar" parent="ProductionSection/ProductionRow"]
-custom_minimum_size = Vector2(80, 22)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-size_flags_stretch_ratio = 2.0
-
-[node name="OutputResources" type="VBoxContainer" parent="ProductionSection/ProductionRow"]
-layout_mode = 2
-size_flags_horizontal = 10
-size_flags_vertical = 4
-theme_override_constants/separation = 2
+text = "x"

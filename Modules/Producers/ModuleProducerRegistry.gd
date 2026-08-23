@@ -4,6 +4,7 @@ class_name ModuleProducerRegistry
 
 const RECIPE_CLEAN_WATER: ProductionRecipe = preload("res://Modules/Recipes/clean_water.tres")
 const RECIPE_FOOD1: ProductionRecipe = preload("res://Modules/Recipes/food1.tres")
+const RECIPE_FOOD2: ProductionRecipe = preload("res://Modules/Recipes/food2.tres")
 const RECIPE_SCRAP_COLLECTOR: ProductionRecipe = preload("res://Modules/Recipes/scrap_collector.tres")
 const RECIPE_SCRAP_TO_MECH: ProductionRecipe = preload("res://Modules/Recipes/scrap_to_mech.tres")
 const RECIPE_PASSENGER_COLLECTOR: ProductionRecipe = preload("res://Modules/Recipes/passenger_collector.tres")
@@ -12,7 +13,7 @@ const RECIPE_FUEL: ProductionRecipe = preload("res://Modules/Recipes/fuel.tres")
 
 const MODULE_PRODUCERS: Dictionary = {
 	"clean_water": [RECIPE_CLEAN_WATER],
-	"farm": [RECIPE_FOOD1],
+	"farm": [RECIPE_FOOD1, RECIPE_FOOD2],
 	"scrap_arm": [RECIPE_SCRAP_COLLECTOR],
 	"mech_parts": [RECIPE_SCRAP_TO_MECH],
 	"passenger_door": [RECIPE_PASSENGER_COLLECTOR],

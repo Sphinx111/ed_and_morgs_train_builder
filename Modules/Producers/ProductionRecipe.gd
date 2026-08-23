@@ -21,3 +21,5 @@ enum UsageMode { NONE, BOTH, EITHER }
 @export var output_2_amount: float = 0.0
 
 @export var max_speed: float = -1.0
+
+@export var process_name: String = ""

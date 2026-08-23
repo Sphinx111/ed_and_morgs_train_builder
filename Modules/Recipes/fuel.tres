@@ -18,3 +18,4 @@ output_type_1 = ExtResource("4_fuel")
 output_1_amount = 5.0
 output_type_2 = ExtResource("5_grey_water")
 output_2_amount = 1.0
+process_name = "Fuel"

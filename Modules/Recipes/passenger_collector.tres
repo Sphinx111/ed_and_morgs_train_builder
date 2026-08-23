@@ -10,3 +10,4 @@ input_1_needed = 1.0
 input_1_from_map = true
 output_type_1 = ExtResource("2_pop")
 output_1_amount = 1.0
+process_name = "Population"

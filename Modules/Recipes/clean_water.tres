@@ -15,3 +15,4 @@ input_type_2 = ExtResource("3_grey_water")
 input_2_needed = 0.5
 output_type_1 = ExtResource("4_clean_water")
 output_1_amount = 0.45
+process_name = "Clean Water"

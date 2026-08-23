@@ -15,3 +15,4 @@ input_type_2 = ExtResource("3_clean_water")
 input_2_needed = 5.0
 output_type_1 = ExtResource("3_tkaam")
 output_1_amount = 5.0
+process_name = "Food 2"

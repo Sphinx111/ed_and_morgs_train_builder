@@ -33,7 +33,8 @@ var maxCustomers : int = 0
 var customers_per_adjacency : int = floor(maxCustomers / (1 / Globals.ADJACENCY_BONUS))
 
 # Production Variables
-var producers : Array[ProductionProvider] = [] 
+var producers : Array[ProductionProvider] = []
+var active_producer : ProductionProvider = null
 var workers_needed : int = 0
 var workers : Array[Passenger] = []
 var work_types : Array[String] = []
@@ -59,6 +60,8 @@ func _ready():
 	_setup_click_area()
 
 func can_enter(_myPassenger : Passenger) -> bool:
+	if enabled == false:
+		return false
 	if maxCustomers == 0 or customers.size() < maxCustomers:
 		return true
 	return false
@@ -150,6 +153,62 @@ func notify_remove_worker(oldWorker : Passenger):
 func _eject_worker(oldWorker : Passenger):
 	oldWorker.worker_ejected_from_module()
 
+
+func set_enabled(is_enabled: bool) -> void:
+	if enabled == is_enabled:
+		return
+	enabled = is_enabled
+	if not enabled:
+		_disable_module()
+	else:
+		_enable_module()
+	if _inspector != null and is_instance_valid(_inspector):
+		_inspector.sync_enabled_toggle()
+		_inspector.tick()
+
+
+func _disable_module() -> void:
+	if active_producer != null:
+		active_producer.cancel_process(parentTrain)
+	_update_production_progress(0.0)
+	_eject_all_occupants()
+	_update_nav_maps_for_disabled()
+
+
+func _enable_module() -> void:
+	_update_nav_maps_for_enabled()
+
+
+func _eject_all_occupants() -> void:
+	for customer in customers.duplicate():
+		if is_instance_valid(customer):
+			_eject_customer(customer)
+	for worker in workers.duplicate():
+		if is_instance_valid(worker):
+			worker.worker_ejected_from_module()
+			notify_remove_worker(worker)
+
+
+func _update_nav_maps_for_disabled() -> void:
+	if not serves_needs.is_empty():
+		parentCar.update_needs_maps(serves_needs, sequence, Globals.CUSTOMERS_FULL)
+	if workers_needed > 0:
+		parentCar.update_work_maps(work_types, sequence, Globals.WORKERS_FULL)
+
+
+func _update_nav_maps_for_enabled() -> void:
+	if not serves_needs.is_empty():
+		var needs_state := Globals.CUSTOMERS_HAS_SPACE
+		if maxCustomers > 0 and customers.size() >= maxCustomers:
+			needs_state = Globals.CUSTOMERS_FULL
+		parentCar.update_needs_maps(serves_needs, sequence, needs_state)
+	if workers_needed > 0:
+		var work_state := Globals.WORKERS_HAS_SPACE
+		if workers.size() >= workers_needed:
+			work_state = Globals.WORKERS_FULL
+		parentCar.update_work_maps(work_types, sequence, work_state)
+
+
 func add_service_from_recipe(recipe: ServiceRecipe) -> void:
 	var provider := ServiceProvider.from_recipe(recipe)
 	services.append(provider)
@@ -166,9 +225,25 @@ func add_services_for_type(module_type: String) -> void:
 func add_producer_from_recipe(recipe: ProductionRecipe) -> void:
 	var producer := ProductionProvider.from_recipe(recipe)
 	producers.append(producer)
+	if active_producer == null:
+		active_producer = producer
 	for new_type in producer.get_work_types():
 		if not work_types.has(new_type):
 			work_types.append(new_type)
+
+
+func set_active_producer_index(index: int) -> void:
+	if index < 0 or index >= producers.size():
+		return
+	var new_producer := producers[index]
+	if new_producer == active_producer:
+		return
+	if active_producer != null:
+		active_producer.cancel_process(parentTrain)
+	active_producer = new_producer
+	_update_production_progress(active_producer.progress)
+	if _inspector != null and is_instance_valid(_inspector):
+		_inspector.on_active_producer_changed()
 
 
 func add_producers_for_type(module_type: String) -> void:
@@ -186,15 +261,17 @@ func add_custom_storage(storageDict : Dictionary):
 ## Cycle through producers and run their production cycle
 func produce_resources():
 	_remove_invalid_workers()
+	if active_producer == null:
+		_update_production_progress(0.0)
+		return
 	# Producing materials requires workers
 	if workers_needed == 0 or workers.size() > 0:
-		for producer in producers:
-			var worker_modifier = 1.0
-			if workers_needed > 0:
-				worker_modifier = float(workers.size()) / float(workers_needed)
-			worker_modifier += (adjacencies * Globals.ADJACENCY_BONUS)
-			producer.produce(parentTrain, worker_modifier)
-			_update_production_progress(producer.progress)
+		var worker_modifier = 1.0
+		if workers_needed > 0:
+			worker_modifier = float(workers.size()) / float(workers_needed)
+		worker_modifier += (adjacencies * Globals.ADJACENCY_BONUS)
+		active_producer.produce(parentTrain, worker_modifier)
+		_update_production_progress(active_producer.progress)
 	else:
 		_update_production_progress(0.0)
 
@@ -237,8 +314,10 @@ func _remove_invalid_workers() -> void:
 
 func reset_module():
 	hide_module_inspector()
+	enabled = true
 	services = []
 	producers = []
+	active_producer = null
 	serves_needs = []
 	work_types = ["any"]
 	workers_needed = 0
@@ -290,7 +369,7 @@ func set_type(newType : String):
 		baseCustomers = 5
 		add_producers_for_type(newType)
 		workers_needed = 5
-		add_custom_storage({"food1" : 50.0})
+		add_custom_storage({"food1" : 50.0, "food2" : 50.0})
 	elif newType == "scrap_arm":
 		$Outline.color = Color.SANDY_BROWN
 		add_producers_for_type(newType)
@@ -355,6 +434,8 @@ func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: 
 		return
 	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
 		if _inspector != null and is_instance_valid(_inspector):
+			if _inspector.get_global_rect().has_point(event.global_position):
+				return
 			hide_module_inspector()
 		else:
 			show_module_inspector()
@@ -368,7 +449,9 @@ func show_module_inspector() -> void:
 		parentTrain.close_module_inspectors(self)
 	hide_module_inspector()
 	_inspector = INSPECTOR_SCENE.instantiate()
-	add_child(_inspector)
+	_inspector.parentModule = self
+	var basic_ui: Control = get_tree().current_scene.get_node("UICanvas/BasicUI")
+	basic_ui.add_child(_inspector)
 
 
 func hide_module_inspector() -> void:
@@ -377,9 +460,6 @@ func hide_module_inspector() -> void:
 	_inspector = null
 
 func get_production_progress() -> float:
-	if producers.is_empty():
-		print("ModuleBase:: no producers to get progress from")
+	if active_producer == null:
 		return 0.0
-	# For now only get the first production producer, assuming one per module
-	var res : float = producers.get(0).progress
-	return res
+	return active_producer.progress
