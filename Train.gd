@@ -231,6 +231,15 @@ func close_module_inspectors(except_module : ModuleBase = null) -> void:
 				module.hide_module_inspector()
 
 
+func refresh_module_click_areas() -> void:
+	for carriage in carriages:
+		if carriage == null:
+			continue
+		for module in carriage.modules:
+			if module != null:
+				module.update_click_area()
+
+
 func remove_module(carNum : int, slot : int):
 	if carriages.size() <= slot or carriages[carNum] == null:
 		print_debug("Error: attempting to remove module from nonexistent car: " + String.num_int64(carNum))

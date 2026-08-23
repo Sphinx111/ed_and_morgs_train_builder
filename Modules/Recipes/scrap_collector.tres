@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ProductionRecipe" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Modules/Producers/ProductionRecipe.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+input_type_1 = "scrap"
+input_1_needed = 5.0
+input_1_from_map = true
+output_type_1 = "scrap"
+output_1_amount = 5.0
+max_speed = 110.0

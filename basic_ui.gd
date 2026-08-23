@@ -108,20 +108,28 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_construction_placement_requested(module_type: String) -> void:
 	pending_module_type = module_type
+	selectedTrain.refresh_module_click_areas()
 	add_thought("Select a slot on the train to place %s." % module_type)
+
+func place_module_at_slot(car_num: int, slot: int) -> void:
+	if pending_module_type == "":
+		return
+	selectedTrain.add_module(pending_module_type, car_num, slot)
+	_clear_placement_mode()
 
 func _place_module_at_click(viewport_position: Vector2) -> void:
 	var world_pos: Vector2 = TrainCamera.viewport_to_world(get_viewport(), viewport_position)
 	var placement_local_pos: Vector2 = selectedTrain.passengerManager.to_local(world_pos)
 	var train_pos: Array[int] = Helpers.get_trainpos_from_coords(placement_local_pos)
-	selectedTrain.add_module(pending_module_type, train_pos[0], train_pos[1])
-	_clear_placement_mode()
+	place_module_at_slot(train_pos[0], train_pos[1])
 
 func _is_click_over_ui(global_position: Vector2) -> bool:
 	return constructionPanel.get_global_rect().has_point(global_position)
 
 func _clear_placement_mode() -> void:
 	pending_module_type = ""
+	if selectedTrain != null:
+		selectedTrain.refresh_module_click_areas()
 
 func resource_panel_update() -> void:
 	resource_panel.update_from_train(selectedTrain)

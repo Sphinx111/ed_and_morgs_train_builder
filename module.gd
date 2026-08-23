@@ -158,12 +158,17 @@ func add_service(newProvider : ServiceProvider):
 		if not work_types.has(newType):
 			work_types.append(newType)
 
-func add_producer(newProducer : ProductionProvider):
-	newProducer.init()	# Setup initial variables
-	producers.append(newProducer)
-	for newType in newProducer.get_work_types():
-		if not work_types.has(newType):
-			work_types.append(newType)
+func add_producer_from_recipe(recipe: ProductionRecipe) -> void:
+	var producer := ProductionProvider.from_recipe(recipe)
+	producers.append(producer)
+	for new_type in producer.get_work_types():
+		if not work_types.has(new_type):
+			work_types.append(new_type)
+
+
+func add_producers_for_type(module_type: String) -> void:
+	for recipe in ModuleProducerRegistry.get_recipes_for_module(module_type):
+		add_producer_from_recipe(recipe)
 
 func add_custom_storage(storageDict : Dictionary):
 	var newStorage = GenericStorageProvider.new()
@@ -262,16 +267,8 @@ func set_type(newType : String):
 		return
 	if newType == "clean_water":
 		$Outline.color = Color.AQUA
-		#var basicWaterProvider = BasicWaterProvider.new()
-		#add_service(basicWaterProvider)
-		#maxCustomers = 4
-		
-		# Setup production
-		var basicCleanWaterProducer = BasicCleanWaterProducer.new()
-		add_producer(basicCleanWaterProducer)
+		add_producers_for_type(newType)
 		workers_needed = 1
-
-		# Setup storagge
 		add_custom_storage({"clean_water" : 50.0,"grey_water" : 50.0, "black_water" : 10.0})
 	elif newType == "cabin":
 		$Outline.color = Color.BROWN
@@ -293,41 +290,31 @@ func set_type(newType : String):
 		var basicFoodProvider = BasicFoodServiceProvider.new()
 		add_service(basicFoodProvider)
 		baseCustomers = 5
-		
-		# Setup production
-		var food1Producer = BasicFood1Producer.new()
-		add_producer(food1Producer)
+		add_producers_for_type(newType)
 		workers_needed = 5
-		
-		# Setup storage
 		add_custom_storage({"food1" : 50.0})
 	elif newType == "scrap_arm":
 		$Outline.color = Color.SANDY_BROWN
-		var scrapCollector = BasicScrapCollector.new()
-		add_producer(scrapCollector)#
+		add_producers_for_type(newType)
 		workers_needed = 1
 		add_custom_storage({"scrap" : 50.0})
 	elif newType == "mech_parts":
 		$Outline.color = Color.SANDY_BROWN
-		var partsProducer = ScrapToMechProducer.new()
-		add_producer(partsProducer)
+		add_producers_for_type(newType)
 		workers_needed = 1
 		add_custom_storage({"mech_parts" : 50.0})
 	elif newType == "passenger_door":
 		$Outline.color = Color.CORNFLOWER_BLUE
-		var passengerCollector = BasicPassengerCollector.new()
-		add_producer(passengerCollector)
+		add_producers_for_type(newType)
 	elif newType == "water_collector":
 		$Outline.color = Color.CADET_BLUE
-		var waterCollector = BasicWaterCollector.new()
-		add_producer(waterCollector)
+		add_producers_for_type(newType)
 		workers_needed = 1
 		add_custom_storage({"grey_water" : 100.0})
 	elif newType == "fuel_refinery":
 		$Outline.color = Color.DARK_SLATE_GRAY
 		workers_needed = 8
-		var fuelProducer = BasicFuelProducer.new()
-		add_producer(fuelProducer)
+		add_producers_for_type(newType)
 		add_custom_storage({"oil" : 100.0, "fuel" : 100.0})
 	$Label.text = newType
 	maxCustomers = baseCustomers
@@ -350,15 +337,23 @@ func _setup_click_area() -> void:
 	_update_click_area_enabled()
 
 
+func update_click_area() -> void:
+	_update_click_area_enabled()
+
+
 func _update_click_area_enabled() -> void:
 	if _click_area != null:
-		_click_area.input_pickable = type != "empty"
+		var in_placement := Globals.activeUI is TrainUI and Globals.activeUI.pending_module_type != ""
+		_click_area.input_pickable = type != "empty" or in_placement
 
 
 func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	if type == "empty":
-		return
 	if Globals.activeUI is TrainUI and Globals.activeUI.pending_module_type != "":
+		if event is InputEventMouseButton and event.is_action_pressed("left_click"):
+			Globals.activeUI.place_module_at_slot(parentCar.sequence, sequence)
+			get_viewport().set_input_as_handled()
+		return
+	if type == "empty":
 		return
 	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
 		if _inspector != null and is_instance_valid(_inspector):
