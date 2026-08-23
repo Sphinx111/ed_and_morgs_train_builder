@@ -73,14 +73,7 @@ func refresh_options():
 	var option_index : int = 0
 	for container in containers_in_range:
 		var resourceType : String = container.resource_type
-		var expedition_name : String = ""
-		match resourceType:
-			"pop":
-				expedition_name = "Find Survivors"
-			_:
-				expedition_name = "Fetch %s" % resourceType
-		
-		var newOption : ExpeditionOption = ExpeditionOption.new_expedition(expedition_name, resourceType, container)
+		var newOption : ExpeditionOption = ExpeditionOption.new_expedition(resourceType, container)
 		options_available.append(newOption)
 		available_expeditions_panel.add_child(newOption)
 		newOption.position.y = (option_index * (height_of_option + separation_between_options)) + separation_between_options

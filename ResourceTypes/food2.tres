@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ResourceType" load_steps=3 format=3 uid="uid://dvdxcg2bu7jm4"]
+
+[ext_resource type="Script" uid="uid://d0cgr273iacgn" path="res://ResourceTypes/ResourceType.gd" id="1_type"]
+[ext_resource type="Texture2D" uid="uid://cla8b6uc21p5v" path="res://images/food_icon.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_type")
+type_name = "food2"
+display_name = "Food 2"
+iconTexture = ExtResource("2_icon")
+iconModulate = Color(0.24943626, 0.57381856, 3.85046e-07, 1)

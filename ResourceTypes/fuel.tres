@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ResourceType" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ResourceTypes/ResourceType.gd" id="1_type"]
+[ext_resource type="Texture2D" path="res://images/Icon_background.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_type")
+type_name = "fuel"
+display_name = "Fuel"
+iconTexture = ExtResource("2_icon")
+iconModulate = Color(0.184314, 0.309804, 0.309804, 1)

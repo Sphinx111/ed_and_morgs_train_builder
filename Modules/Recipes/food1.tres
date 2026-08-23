@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="ProductionRecipe" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ProductionRecipe" load_steps=2 format=3 uid="uid://cukj176tasnx7"]
 
-[ext_resource type="Script" path="res://Modules/Producers/ProductionRecipe.gd" id="1_recipe"]
+[ext_resource type="Script" uid="uid://b67infwsvsouv" path="res://Modules/Producers/ProductionRecipe.gd" id="1_recipe"]
 
 [resource]
 script = ExtResource("1_recipe")
 cycle_time = 30
 input_mode = 2
 input_type_1 = "grey_water"
-input_1_needed = 5.0
+input_1_needed = 10.0
 input_type_2 = "clean_water"
 input_2_needed = 5.0
-output_type_1 = "food1"
+output_type_1 = "food2"
 output_1_amount = 5.0

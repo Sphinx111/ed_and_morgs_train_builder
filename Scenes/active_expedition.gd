@@ -71,15 +71,14 @@ func _ready():
 	
 	for i in range(target_resources.size()):
 		var target = target_resources[i]
+		var type_name: String = target[0]
 		if i == 0:
-			sprite1.texture = target[3]
-			sprite1.modulate = target[4]
+			_apply_resource_icon(sprite1, type_name)
 			label1.text = "?" if is_scavenge else ""
 			sprite1.show()
 			label1.show()
 		elif i == 1:
-			sprite2.texture = target[3]
-			sprite2.modulate = target[4]
+			_apply_resource_icon(sprite2, type_name)
 			label2.text = ""
 			sprite2.show()
 			label2.show()
@@ -104,9 +103,9 @@ func collect_resources():
 		
 		## Update display labels with new values
 		if i == 0:
-			label1.text = Helpers.pretty_print_float(resources_gathered[resourceType])
+			label1.text = ResourceTypeRegistry.format_amount(resourceType, resources_gathered[resourceType])
 		elif i == 1:
-			label2.text = Helpers.pretty_print_float(resources_gathered[resourceType])
+			label2.text = ResourceTypeRegistry.format_amount(resourceType, resources_gathered[resourceType])
 		
 		## Remove the resources from the MapResourceContainer, end expedition if resource is empty
 		resource_spot.amount -= amount_to_add
@@ -123,3 +122,9 @@ func _on_return_button_pressed():
 
 func _on_abandon_button_pressed():
 	get_parent().get_parent().abandon_expedition(self)
+
+
+func _apply_resource_icon(sprite: Sprite2D, type_name: String) -> void:
+	var resource_type := ResourceTypeRegistry.get_type(type_name)
+	sprite.texture = resource_type.iconTexture
+	sprite.modulate = resource_type.iconModulate

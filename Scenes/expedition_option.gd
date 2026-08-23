@@ -17,28 +17,29 @@ var scavenge_location : MapLocation = null
 
 # List of resources which can be gained from the expedition
 #  [resource name, amount, chance to find, texture to use, and icon color modulate]
-var gains_per_pop : Array = [["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE]]
+var gains_per_pop : Array = [_build_gain_row("scrap", 25)]
 
 const default_gains : Dictionary = {
-	"scrap" : ["scrap", 25, 1.0, Globals.scrap_texture, Color.WHITE],
-	"grey_water" : ["grey_water", 15, 1.0, Globals.water_texture, Color.AQUA],
-	"pop" : ["pop", 2, 1.0, Globals.pop_texture, Color.WHITE],
-	"oil" : ["oil", 10, 1.0, Globals.water_texture, Color.BLACK],
-	"mech_parts" : ["mech_parts", 5, 1.0, Globals.blank_texture, Color.CORAL],
-	"food1" : ["food1", 10, 1.0, Globals.blank_texture, Color.LIME_GREEN]
+	"scrap": {"amount": 25, "chance": 1.0},
+	"grey_water": {"amount": 15, "chance": 1.0},
+	"pop": {"amount": 2, "chance": 1.0},
+	"oil": {"amount": 10, "chance": 1.0},
+	"mech_parts": {"amount": 5, "chance": 1.0},
+	"food1": {"amount": 10, "chance": 1.0},
 }
 
-# List of resources per person if not using the default costs in default_costs 
-#  [resource name, amount, texture to use, icon color modulate
-var costs : Array = [["pop", 1, Globals.pop_texture, Color.WHITE],
-					 ["clean_water", 2, Globals.water_texture, Color.AQUA],
-					 ["food1", 1, Globals.food_texture, Color.SADDLE_BROWN]]
+# List of resources per person if not using the default costs in default_costs
+#  [resource name, amount, texture to use, icon color modulate]
+var costs : Array = [
+	_build_cost_row("pop", 1),
+	_build_cost_row("clean_water", 2),
+	_build_cost_row("food1", 1),
+]
 
-# The default resource costs needed to launch an expedition
-const default_costs : Dictionary = {
-	"pop" : ["pop", 1, Globals.pop_texture, Color.WHITE],
-	"clean_water" : ["clean_water", 2, Globals.water_texture, Color.AQUA],
-	"food1" : ["food1", 1, Globals.food_texture, Color.SADDLE_BROWN]
+const default_cost_amounts : Dictionary = {
+	"pop": 1,
+	"clean_water": 2,
+	"food1": 1,
 }
 
 # Tracking variables
@@ -69,9 +70,19 @@ var decrease_button : Button = null
 
 var time_label : Label = null
 
-static func new_expedition(_display_name : String, resource_to_gather : String, _resource_spot : MapResourceContainer) -> ExpeditionOption:
+static func _build_gain_row(type_name: String, amount: float, chance: float = 1.0) -> Array:
+	var resource_type : ResourceType = ResourceTypeRegistry.get_type(type_name)
+	return [type_name, amount, chance, resource_type.iconTexture, resource_type.iconModulate]
+
+
+static func _build_cost_row(type_name: String, amount: float) -> Array:
+	var resource_type := ResourceTypeRegistry.get_type(type_name)
+	return [type_name, amount, resource_type.iconTexture, resource_type.iconModulate]
+
+
+static func new_expedition(resource_to_gather: String, _resource_spot: MapResourceContainer) -> ExpeditionOption:
 	var new_option : ExpeditionOption = my_scene.instantiate()
-	new_option.display_name = _display_name
+	new_option.display_name = ResourceTypeRegistry.get_type(resource_to_gather).display_name
 	new_option.resource_spot = _resource_spot
 	
 	new_option.gains_per_pop = get_default_gain_from_type(resource_to_gather)
@@ -80,42 +91,38 @@ static func new_expedition(_display_name : String, resource_to_gather : String, 
 
 static func new_scavenge_expedition(location : MapLocation) -> ExpeditionOption:
 	var new_option : ExpeditionOption = my_scene.instantiate()
-	new_option.display_name = "Scavenge"
+	new_option.display_name = ResourceTypeRegistry.get_type("unknown").display_name
 	new_option.is_scavenge = true
 	new_option.scavenge_location = location
-	new_option.gains_per_pop = [["unknown", 0, 1.0, Globals.blank_texture, Color.WHITE]]
+	new_option.gains_per_pop = [_build_gain_row("unknown", 0)]
 	new_option.costs = get_default_costs_from_type("scrap")
 	return new_option
 
-static func get_default_gain_from_type(typeWanted : String):
-	if default_gains.has(typeWanted):
-		return [default_gains[typeWanted]]
-	else:
-		return [[typeWanted, 1.0, 1.0, Globals.blank_texture, Color.WHITE]]
+static func get_default_gain_from_type(type_wanted : String) -> Array:
+	if default_gains.has(type_wanted):
+		var gain_data: Dictionary = default_gains[type_wanted]
+		return [_build_gain_row(type_wanted, gain_data.amount, gain_data.chance)]
+	return [_build_gain_row(type_wanted, 1.0)]
 
-static func get_default_costs_from_type(typeWanted : String) -> Array:
-	var result = []
-	match typeWanted:
+static func get_default_costs_from_type(type_wanted : String) -> Array:
+	var result: Array = []
+	match type_wanted:
 		"grey_water":
-			result.append(default_costs["pop"])
-			result.append(default_costs["clean_water"].duplicate())
-			result[1][1] = 2      # Increased cost for water missions
-			result.append(default_costs["food1"])
+			result.append(_build_cost_row("pop", default_cost_amounts["pop"]))
+			result.append(_build_cost_row("clean_water", 2))
+			result.append(_build_cost_row("food1", default_cost_amounts["food1"]))
 		"pop":
-			result.append(default_costs["pop"])
-			result.append(default_costs["clean_water"].duplicate())
-			result[1][1] = 4
-			result.append(default_costs["food1"].duplicate())
-			result[2][1] = 2
+			result.append(_build_cost_row("pop", default_cost_amounts["pop"]))
+			result.append(_build_cost_row("clean_water", 4))
+			result.append(_build_cost_row("food1", 2))
 		"oil":
-			result.append(default_costs["pop"])
-			result.append(default_costs["clean_water"])
-			result.append(default_costs["food1"].duplicate())
-			result[2][1] = 2
+			result.append(_build_cost_row("pop", default_cost_amounts["pop"]))
+			result.append(_build_cost_row("clean_water", default_cost_amounts["clean_water"]))
+			result.append(_build_cost_row("food1", 2))
 		_:
-			result.append(default_costs["pop"])
-			result.append(default_costs["clean_water"])
-			result.append(default_costs["food1"])
+			result.append(_build_cost_row("pop", default_cost_amounts["pop"]))
+			result.append(_build_cost_row("clean_water", default_cost_amounts["clean_water"]))
+			result.append(_build_cost_row("food1", default_cost_amounts["food1"]))
 	return result
 
 func _ready():
@@ -146,15 +153,14 @@ func update_full_option():
 	
 	gain_panel.size.x = 10.0 + (gains_per_pop.size() * width_per_cost)
 	for i in range(gains_per_pop.size()):
-		var gainArray = gains_per_pop[i] 
+		var gain_array = gains_per_pop[i]
 		if i == 0:
-			gain_sprite.texture = gainArray[3]
-			gain_sprite.modulate = gainArray[4]
+			_apply_resource_icon(gain_sprite, gain_array[0])
 			if is_scavenge:
 				gain_label.text = "?"
 			else:
-				var max_gain : float = min(resource_spot.amount, gainArray[1] * pop_allocated)
-				gain_label.text = "%d" % (max_gain)
+				var max_gain : float = min(resource_spot.amount, gain_array[1] * pop_allocated)
+				gain_label.text = ResourceTypeRegistry.format_amount(gain_array[0], max_gain)
 		else:
 			print_debug("Unused gain for expedition option")
 	
@@ -162,17 +168,14 @@ func update_full_option():
 	for i in range (costs.size()):
 		var cost : Array = costs[i]
 		if i == 0:
-			explorers_sprite.texture = cost[2]
-			explorers_sprite.modulate = cost[3]
-			explorers_label.text = "%d" % (cost[1] * pop_allocated)
+			_apply_resource_icon(explorers_sprite, cost[0])
+			explorers_label.text = ResourceTypeRegistry.format_amount(cost[0], cost[1] * pop_allocated)
 		elif i == 1:
-			cost1_sprite.texture = cost[2]
-			cost1_sprite.modulate = cost[3]
-			cost1_label.text = "%d" % (cost[1] * pop_allocated)
+			_apply_resource_icon(cost1_sprite, cost[0])
+			cost1_label.text = ResourceTypeRegistry.format_amount(cost[0], cost[1] * pop_allocated)
 		elif i == 2:
-			cost2_sprite.texture = cost[2]
-			cost2_sprite.modulate = cost[3]
-			cost2_label.text = "%d" % (cost[1] * pop_allocated)
+			_apply_resource_icon(cost2_sprite, cost[0])
+			cost2_label.text = ResourceTypeRegistry.format_amount(cost[0], cost[1] * pop_allocated)
 	
 	if costs.size() < 3:
 		cost2_sprite.hide()
@@ -180,7 +183,13 @@ func update_full_option():
 	elif costs.size() < 2:
 		cost1_sprite.hide()
 		cost1_label.hide()
-	
+
+
+func _apply_resource_icon(sprite: Sprite2D, type_name: String) -> void:
+	var resource_type := ResourceTypeRegistry.get_type(type_name)
+	sprite.texture = resource_type.iconTexture
+	sprite.modulate = resource_type.iconModulate
+
 
 func set_basic_params(_display_name : String, _min_pop : int, _time_needed : int, _travel_time : int):
 	self.display_name = _display_name
@@ -192,36 +201,36 @@ func _on_add_pop_button_pressed() -> void:
 	if pop_allocated >= Globals.max_expedition_size:
 		return
 	pop_allocated += 1
-	explorers_label.text = "%d" % pop_allocated
+	explorers_label.text = ResourceTypeRegistry.format_amount("pop", pop_allocated)
 	if gains_per_pop.size() == 1:
 		if is_scavenge:
 			gain_label.text = "?"
 		else:
 			var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
-			gain_label.text = "%d" % (max_gain)
+			gain_label.text = ResourceTypeRegistry.format_amount(gains_per_pop[0][0], max_gain)
 	
 	if costs.size() >= 2:
-		cost1_label.text = "%d" % (pop_allocated * costs[1][1])
+		cost1_label.text = ResourceTypeRegistry.format_amount(costs[1][0], pop_allocated * costs[1][1])
 	if costs.size() >= 3:
-		cost2_label.text = "%d" % (pop_allocated * costs[2][1])
+		cost2_label.text = ResourceTypeRegistry.format_amount(costs[2][0], pop_allocated * costs[2][1])
 
 
 func _on_remove_pop_button_pressed() -> void:
 	if pop_allocated <= min_pop:
 		return
 	pop_allocated -= 1
-	explorers_label.text = "%d" % pop_allocated
+	explorers_label.text = ResourceTypeRegistry.format_amount("pop", pop_allocated)
 	if gains_per_pop.size() == 1:
 		if is_scavenge:
 			gain_label.text = "?"
 		else:
 			var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
-			gain_label.text = "%d" % (max_gain)
+			gain_label.text = ResourceTypeRegistry.format_amount(gains_per_pop[0][0], max_gain)
 	
 	if costs.size() >= 2:
-		cost1_label.text = "%d" % (pop_allocated * costs[1][1])
+		cost1_label.text = ResourceTypeRegistry.format_amount(costs[1][0], pop_allocated * costs[1][1])
 	if costs.size() >= 3:
-		cost2_label.text = "%d" % (pop_allocated * costs[2][1])
+		cost2_label.text = ResourceTypeRegistry.format_amount(costs[2][0], pop_allocated * costs[2][1])
 
 
 func _on_dispatch_button_pressed() -> void:

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ResourceType" load_steps=3 format=3 uid="uid://bky4hj8up8m3s"]
+
+[ext_resource type="Script" uid="uid://d0cgr273iacgn" path="res://ResourceTypes/ResourceType.gd" id="1_type"]
+[ext_resource type="Texture2D" uid="uid://dreadage4q14n" path="res://images/Water_Icon.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_type")
+type_name = "clean_water"
+display_name = "Clean Water"
+iconTexture = ExtResource("2_icon")
+iconModulate = Color(0, 0.85795265, 0.8439528, 1)
