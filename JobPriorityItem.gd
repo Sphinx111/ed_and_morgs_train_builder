@@ -22,11 +22,18 @@ func _ready():
 	plus_button = get_node("IncreasePriority")
 	minus_button = get_node("ReducePriority")
 	type_label = get_node("TypeLabel")
-	type_label.text = myType
+	type_label.text = _format_category_label(myType)
 	increase_priority_callable = jobsController._on_job_increase_pressed.bind(myIndex)
 	decrease_priority_callable = jobsController._on_job_decrease_pressed.bind(myIndex)
 	plus_button.pressed.connect(increase_priority_callable)
 	minus_button.pressed.connect(decrease_priority_callable)
+
+
+func _format_category_label(category: String) -> String:
+	if category == "":
+		return ""
+	return category.replace("_", " ").capitalize()
+
 
 ## Visual movement and index change
 func _change_index(new_index : int):

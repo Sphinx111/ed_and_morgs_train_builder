@@ -29,7 +29,7 @@ offset_top = 40.0
 offset_right = 362.0
 offset_bottom = 65.0
 script = ExtResource("2_k76hm")
-myType = "clean_water"
+myType = "water"
 
 [node name="IncreasePriority" type="Button" parent="JobPriorityItem"]
 layout_mode = 0
@@ -57,7 +57,7 @@ offset_left = 4.0
 offset_top = -1.0
 offset_right = 97.0
 offset_bottom = 22.0
-text = "clean_water"
+text = "Water"
 
 [node name="JobPriorityItem2" type="Panel" parent="."]
 layout_mode = 0
@@ -66,7 +66,7 @@ offset_top = 71.0
 offset_right = 362.0
 offset_bottom = 96.0
 script = ExtResource("2_k76hm")
-myType = "scrap"
+myType = "food"
 
 [node name="IncreasePriority" type="Button" parent="JobPriorityItem2"]
 layout_mode = 0
@@ -94,7 +94,7 @@ offset_left = 4.0
 offset_top = -1.0
 offset_right = 97.0
 offset_bottom = 22.0
-text = "clean_water"
+text = "Food"
 
 [node name="JobPriorityItem3" type="Panel" parent="."]
 layout_mode = 0
@@ -103,7 +103,7 @@ offset_top = 101.0
 offset_right = 362.0
 offset_bottom = 126.0
 script = ExtResource("2_k76hm")
-myType = "mech_parts"
+myType = "scrap"
 
 [node name="IncreasePriority" type="Button" parent="JobPriorityItem3"]
 layout_mode = 0
@@ -131,7 +131,7 @@ offset_left = 4.0
 offset_top = -1.0
 offset_right = 97.0
 offset_bottom = 22.0
-text = "clean_water"
+text = "Scrap"
 
 [node name="JobPriorityItem4" type="Panel" parent="."]
 layout_mode = 0
@@ -140,7 +140,7 @@ offset_top = 131.0
 offset_right = 362.0
 offset_bottom = 156.0
 script = ExtResource("2_k76hm")
-myType = "food1"
+myType = "mech_parts"
 
 [node name="IncreasePriority" type="Button" parent="JobPriorityItem4"]
 layout_mode = 0
@@ -168,7 +168,7 @@ offset_left = 4.0
 offset_top = -1.0
 offset_right = 97.0
 offset_bottom = 22.0
-text = "clean_water"
+text = "Mech parts"
 
 [node name="JobPriorityItem5" type="Panel" parent="."]
 layout_mode = 0
@@ -177,7 +177,7 @@ offset_top = 161.0
 offset_right = 362.0
 offset_bottom = 186.0
 script = ExtResource("2_k76hm")
-myType = "grey_water"
+myType = "fuel"
 
 [node name="IncreasePriority" type="Button" parent="JobPriorityItem5"]
 layout_mode = 0
@@ -205,41 +205,4 @@ offset_left = 4.0
 offset_top = -1.0
 offset_right = 97.0
 offset_bottom = 22.0
-text = "clean_water"
-
-[node name="JobPriorityItem6" type="Panel" parent="."]
-layout_mode = 0
-offset_left = 3.0
-offset_top = 190.0
-offset_right = 362.0
-offset_bottom = 215.0
-script = ExtResource("2_k76hm")
-myType = "fuel"
-
-[node name="IncreasePriority" type="Button" parent="JobPriorityItem6"]
-layout_mode = 0
-offset_left = 138.0
-offset_top = 3.0
-offset_right = 176.0
-offset_bottom = 41.0
-scale = Vector2(0.5, 0.5)
-theme_override_font_sizes/font_size = 21
-text = "+"
-
-[node name="ReducePriority" type="Button" parent="JobPriorityItem6"]
-layout_mode = 0
-offset_left = 160.0
-offset_top = 3.0
-offset_right = 198.0
-offset_bottom = 41.0
-scale = Vector2(0.5, 0.5)
-theme_override_font_sizes/font_size = 21
-text = "-"
-
-[node name="TypeLabel" type="Label" parent="JobPriorityItem6"]
-layout_mode = 0
-offset_left = 4.0
-offset_top = -1.0
-offset_right = 97.0
-offset_bottom = 22.0
-text = "clean_water"
+text = "Fuel"

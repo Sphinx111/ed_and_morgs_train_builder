@@ -15,7 +15,7 @@ const firstNamesList = ["David", "Elias", "Jenny", "Emma", "Sally", "Uzbel", "Dm
 const lastNamesList  = ["Smith", "Jones", "LeClair", "McGilligan", "Cuttier", "Founderson", "Embraer", "Einstein", "Damon", "Cruise"]
 
 var available_workers : int = 0
-var work_priorities : Array[String]= ["clean_water", "food1", "grey_water", "scrap", "mech_parts", "fuel", "any"]
+var work_priorities : Array[String]= ["water", "food", "scrap", "mech_parts", "fuel", "any"]
 
 func _ready():
 	for i in range(Globals.passengers_initial_count):
