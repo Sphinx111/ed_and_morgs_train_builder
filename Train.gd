@@ -38,7 +38,7 @@ var res = {
 	"food4" : 0.0,
 	"food5" : 0.0,
 	"food6" : 0.0,
-	"clean_water" : 100.0,
+	"clean_water" : 200.0,
 	"grey_water" : 0.0,
 	"black_water" : 0.0,
 	"mech_parts" : 100.0,
@@ -221,6 +221,15 @@ func add_car():
 		minXpos -= Globals.car_length + Globals.car_separation
 	elif Globals.train_direction < 0:
 		maxXpos += Globals.car_length + Globals.car_separation
+
+func close_module_inspectors(except_module : ModuleBase = null) -> void:
+	for carriage in carriages:
+		if carriage == null:
+			continue
+		for module in carriage.modules:
+			if module != null and module != except_module:
+				module.hide_module_inspector()
+
 
 func remove_module(carNum : int, slot : int):
 	if carriages.size() <= slot or carriages[carNum] == null:

@@ -35,19 +35,19 @@ var time_label : Label = null
 var progress_bar : Panel = null
 var return_button : Button = null
 
-static func new_expedition(index : int, optionSelected : ExpeditionOption, passengersArray : Array[Passenger]):
-	var new_expedition : ActiveExpedition = my_scene.instantiate()
-	new_expedition.index = index
-	new_expedition.original_name = optionSelected.display_name
-	new_expedition.pop = optionSelected.pop_allocated
-	new_expedition.total_duration = optionSelected.time_needed
-	new_expedition.travel_time = optionSelected.travel_time
-	new_expedition.target_resources = optionSelected.gains_per_pop
-	new_expedition.passengers = passengersArray
-	new_expedition.resource_spot = optionSelected.resource_spot
-	new_expedition.is_scavenge = optionSelected.is_scavenge
-	new_expedition.scavenge_location = optionSelected.scavenge_location
-	return new_expedition
+static func new_expedition(_index : int, optionSelected : ExpeditionOption, passengersArray : Array[Passenger]):
+	var _new_expedition : ActiveExpedition = my_scene.instantiate()
+	_new_expedition.index = _index
+	_new_expedition.original_name = optionSelected.display_name
+	_new_expedition.pop = optionSelected.pop_allocated
+	_new_expedition.total_duration = optionSelected.time_needed
+	_new_expedition.travel_time = optionSelected.travel_time
+	_new_expedition.target_resources = optionSelected.gains_per_pop
+	_new_expedition.passengers = passengersArray
+	_new_expedition.resource_spot = optionSelected.resource_spot
+	_new_expedition.is_scavenge = optionSelected.is_scavenge
+	_new_expedition.scavenge_location = optionSelected.scavenge_location
+	return _new_expedition
 
 func _ready():
 	name_label = get_node("NameLabel")
@@ -111,7 +111,7 @@ func collect_resources():
 		## Remove the resources from the MapResourceContainer, end expedition if resource is empty
 		resource_spot.amount -= amount_to_add
 		if (resource_spot.amount  <= 0):
-			print("Location is out of this resource!")
+			print("Location has run out of this resource!")
 			_on_return_button_pressed()
 
 func _on_return_button_pressed():

@@ -15,4 +15,4 @@ func init() -> void:
 	outputType1 = "food1"
 	output1_amount = 5.0
 	
-	cycleTime = 10
+	cycleTime = 30

@@ -43,6 +43,10 @@ var storages : Array[GenericStorageProvider] = []
 
 const PRODUCTION_PROGRESS_HEIGHT : float = 50.0
 const PRODUCTION_PROGRESS_BOTTOM : float = 80.0
+const INSPECTOR_SCENE : PackedScene = preload("res://module_inspector.tscn")
+
+var _click_area : Area2D = null
+var _inspector : ModuleInspector = null
 
 # All modules should know their parents and set position
 func _ready():
@@ -52,6 +56,7 @@ func _ready():
 		position.x = sequence * Globals.module_width
 	else:
 		position.x = Globals.car_length - ((sequence + 1) * Globals.module_width)
+	_setup_click_area()
 
 func can_enter(_myPassenger : Passenger) -> bool:
 	if maxCustomers == 0 or customers.size() < maxCustomers:
@@ -90,6 +95,9 @@ func resource_tick():
 	else:
 		_update_production_progress(0.0)
 		return
+	
+	if _inspector != null and is_instance_valid(_inspector):
+		_inspector.tick()
 
 func set_sequence(newSequence : int):
 	sequence = newSequence
@@ -218,6 +226,7 @@ func _remove_invalid_workers() -> void:
 			$DebugWorkerCount.text = "" + String.num_int64(workers.size())
 
 func reset_module():
+	hide_module_inspector()
 	services = []
 	producers = []
 	serves_needs = []
@@ -249,6 +258,7 @@ func set_type(newType : String):
 	reset_module()                    # Start from state of an 'empty' module
 	self.type = newType
 	if newType == "empty":
+		_update_click_area_enabled()
 		return
 	if newType == "clean_water":
 		$Outline.color = Color.AQUA
@@ -262,7 +272,7 @@ func set_type(newType : String):
 		workers_needed = 1
 
 		# Setup storagge
-		add_custom_storage({"clean_water" : 25.0,"grey_water" : 25.0, "black_water" : 10.0})
+		add_custom_storage({"clean_water" : 50.0,"grey_water" : 50.0, "black_water" : 10.0})
 	elif newType == "cabin":
 		$Outline.color = Color.BROWN
 		var showerProvider = ShowerServiceProvider.new()
@@ -323,3 +333,60 @@ func set_type(newType : String):
 	maxCustomers = baseCustomers
 	if workers_needed > 0:
 		parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)
+	_update_click_area_enabled()
+
+
+func _setup_click_area() -> void:
+	_click_area = Area2D.new()
+	_click_area.name = "ClickArea"
+	var shape_node := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = Vector2(Globals.module_width, Globals.module_height)
+	shape_node.shape = shape
+	shape_node.position = Vector2(Globals.module_width * 0.5, 30.0 + Globals.module_height * 0.5)
+	_click_area.add_child(shape_node)
+	add_child(_click_area)
+	_click_area.input_event.connect(_on_click_area_input_event)
+	_update_click_area_enabled()
+
+
+func _update_click_area_enabled() -> void:
+	if _click_area != null:
+		_click_area.input_pickable = type != "empty"
+
+
+func _on_click_area_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if type == "empty":
+		return
+	if Globals.activeUI is TrainUI and Globals.activeUI.pending_module_type != "":
+		return
+	if event is InputEventMouseButton and event.is_action_pressed("left_click"):
+		if _inspector != null and is_instance_valid(_inspector):
+			hide_module_inspector()
+		else:
+			show_module_inspector()
+		get_viewport().set_input_as_handled()
+
+
+func show_module_inspector() -> void:
+	if type == "empty":
+		return
+	if parentTrain != null:
+		parentTrain.close_module_inspectors(self)
+	hide_module_inspector()
+	_inspector = INSPECTOR_SCENE.instantiate()
+	add_child(_inspector)
+
+
+func hide_module_inspector() -> void:
+	if _inspector != null and is_instance_valid(_inspector):
+		_inspector.queue_free()
+	_inspector = null
+
+func get_production_progress() -> float:
+	if producers.is_empty():
+		print("ModuleBase:: no producers to get progress from")
+		return 0.0
+	# For now only get the first production producer, assuming one per module
+	var res : float = producers.get(0).progress
+	return res
