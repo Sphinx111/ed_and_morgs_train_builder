@@ -43,7 +43,7 @@ var passenger_seeks_threshold : float = 0.65
 var idle_wander_chance : float = 0.3    # Chance that passenger picks a random location to move to if they have no targetNeed
 const aliterating_name_chance : float = .5
 const needs_groups : Array[String] = ["thirst", "hunger", "rest"]
-const work_types : Array[String] = ["any", "clean_water", "grey_water", "food1", "scrap", "mech_parts", "fuel", "oil"]
+const work_types : Array[String] = ["any", "water", "food", "scrap", "mech_parts", "fuel"]
 const resource_groups : Array[String] = ["clean_water", "grey_water", "black_water", "food", "scrap", "mech_parts", "oil", "fuel"]
 const need_growth_rates : Dictionary[String, float] = {
 	"thirst" : 0.01,

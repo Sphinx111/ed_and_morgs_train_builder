@@ -1,11 +1,12 @@
-[gd_resource type="Resource" script_class="ProductionRecipe" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ProductionRecipe" load_steps=3 format=3 uid="uid://b6wytlwjagoh0"]
 
-[ext_resource type="Script" path="res://Modules/Producers/ProductionRecipe.gd" id="1_recipe"]
+[ext_resource type="Script" uid="uid://b67infwsvsouv" path="res://Modules/Producers/ProductionRecipe.gd" id="1_recipe"]
+[ext_resource type="Resource" uid="uid://dtf20h72fvoql" path="res://ResourceTypes/pop.tres" id="2_pop"]
 
 [resource]
 script = ExtResource("1_recipe")
-input_type_1 = "pop"
+input_type_1 = ExtResource("2_pop")
 input_1_needed = 1.0
 input_1_from_map = true
-output_type_1 = "pop"
+output_type_1 = ExtResource("2_pop")
 output_1_amount = 1.0

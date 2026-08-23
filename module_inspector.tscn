@@ -1,12 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://deh8wxih4emgx"]
+[gd_scene load_steps=2 format=3 uid="uid://deh8wxih4emgx"]
 
 [ext_resource type="Script" uid="uid://607fj72gm18a" path="res://module_inspector.gd" id="1_nwufn"]
-[ext_resource type="Texture2D" uid="uid://dbqhndenl23nt" path="res://images/scrap_icon.png" id="1_w0omu"]
-[ext_resource type="Texture2D" uid="uid://cwl3yi8u2ehqy" path="res://images/mech_parts_icon.png" id="2_nwufn"]
 
 [node name="ModuleInspector" type="Panel"]
 offset_right = 373.0
-offset_bottom = 332.0
+offset_bottom = 348.0
 script = ExtResource("1_nwufn")
 
 [node name="ControlsSection" type="Control" parent="."]
@@ -184,24 +182,9 @@ anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
 offset_top = -62.0
+offset_bottom = 10.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="InputSprite1" type="Sprite2D" parent="ProductionSection"]
-position = Vector2(25, 27)
-scale = Vector2(0.24999997, 0.24999997)
-texture = ExtResource("1_w0omu")
-
-[node name="ProgressBar" type="ProgressBar" parent="ProductionSection"]
-layout_mode = 1
-anchors_preset = -1
-anchor_right = 0.011000001
-anchor_bottom = 0.08400001
-offset_left = 92.0
-offset_top = 15.0
-offset_right = 278.831
-offset_bottom = 36.792
-value = 45.0
 
 [node name="RichTextLabel" type="RichTextLabel" parent="ProductionSection"]
 layout_mode = 0
@@ -211,23 +194,33 @@ offset_right = 182.0
 offset_bottom = 3.0
 text = "Production:"
 
-[node name="OutputSprite1" type="Sprite2D" parent="ProductionSection"]
-position = Vector2(307.99997, 28.00003)
-scale = Vector2(0.20000051, 0.20000051)
-texture = ExtResource("2_nwufn")
+[node name="ProductionRow" type="HBoxContainer" parent="ProductionSection"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 8.0
+offset_right = -5.0
+offset_bottom = 37.0
+grow_horizontal = 2
+theme_override_constants/separation = 6
+alignment = 1
 
-[node name="InputLabel1" type="RichTextLabel" parent="ProductionSection"]
-layout_mode = 0
-offset_left = 42.0
-offset_top = 16.0
-offset_right = 75.0
-offset_bottom = 42.0
-text = "x10"
+[node name="InputResources" type="VBoxContainer" parent="ProductionSection/ProductionRow"]
+layout_mode = 2
+size_flags_horizontal = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 2
 
-[node name="OutputLabel1" type="RichTextLabel" parent="ProductionSection"]
-layout_mode = 0
-offset_left = 329.0
-offset_top = 16.0
-offset_right = 362.0
-offset_bottom = 42.0
-text = "x1"
+[node name="ProgressBar" type="ProgressBar" parent="ProductionSection/ProductionRow"]
+custom_minimum_size = Vector2(80, 22)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 2.0
+
+[node name="OutputResources" type="VBoxContainer" parent="ProductionSection/ProductionRow"]
+layout_mode = 2
+size_flags_horizontal = 10
+size_flags_vertical = 4
+theme_override_constants/separation = 2

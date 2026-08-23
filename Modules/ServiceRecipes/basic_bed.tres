@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ServiceRecipe" load_steps=2 format=3 uid="uid://5yb2nu50c4my"]
+
+[ext_resource type="Script" uid="uid://bk25jb6hmaxiy" path="res://Modules/Services/ServiceRecipe.gd" id="1_recipe"]
+
+[resource]
+script = ExtResource("1_recipe")
+output_need = "rest"
+output_rate = 0.05

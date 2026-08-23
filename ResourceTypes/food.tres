@@ -1,11 +1,11 @@
-[gd_resource type="Resource" script_class="ResourceType" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="ResourceType" load_steps=3 format=3 uid="uid://cq4u3oy0dmf7i"]
 
-[ext_resource type="Script" path="res://ResourceTypes/ResourceType.gd" id="1_type"]
-[ext_resource type="Texture2D" path="res://images/food_icon.png" id="2_icon"]
+[ext_resource type="Script" uid="uid://d0cgr273iacgn" path="res://ResourceTypes/ResourceType.gd" id="1_type"]
+[ext_resource type="Texture2D" uid="uid://cla8b6uc21p5v" path="res://images/food_icon.png" id="2_icon"]
 
 [resource]
 script = ExtResource("1_type")
 type_name = "food"
 display_name = "Food"
+category = "food"
 iconTexture = ExtResource("2_icon")
-iconModulate = Color(1, 1, 1, 1)

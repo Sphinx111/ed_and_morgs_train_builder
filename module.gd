@@ -150,13 +150,18 @@ func notify_remove_worker(oldWorker : Passenger):
 func _eject_worker(oldWorker : Passenger):
 	oldWorker.worker_ejected_from_module()
 
-func add_service(newProvider : ServiceProvider):
-	newProvider.init()	# Setup its initial variables
-	services.append(newProvider)
-	serves_needs.append(newProvider.outputType)
-	for newType in newProvider.get_work_types():
-		if not work_types.has(newType):
-			work_types.append(newType)
+func add_service_from_recipe(recipe: ServiceRecipe) -> void:
+	var provider := ServiceProvider.from_recipe(recipe)
+	services.append(provider)
+	serves_needs.append(provider.output_need)
+	for new_type in provider.get_work_types():
+		if not work_types.has(new_type):
+			work_types.append(new_type)
+
+
+func add_services_for_type(module_type: String) -> void:
+	for recipe in ServiceProviderRegistry.get_recipes_for_module(module_type):
+		add_service_from_recipe(recipe)
 
 func add_producer_from_recipe(recipe: ProductionRecipe) -> void:
 	var producer := ProductionProvider.from_recipe(recipe)
@@ -272,23 +277,16 @@ func set_type(newType : String):
 		add_custom_storage({"clean_water" : 50.0,"grey_water" : 50.0, "black_water" : 10.0})
 	elif newType == "cabin":
 		$Outline.color = Color.BROWN
-		var showerProvider = ShowerServiceProvider.new()
-		var basicBedProvider = BasicBedServiceProvider.new()
-		add_service(showerProvider)
-		add_service(basicBedProvider)
+		add_services_for_type(newType)
 		baseCustomers = 4
 	elif newType == "kitchen":
 		$Outline.color = Color.BISQUE
-		var basicFoodProvider = BasicFoodServiceProvider.new()
-		var fastWaterProvider = FastWaterServiceProvider.new()
-		add_service(basicFoodProvider)
-		add_service(fastWaterProvider)
+		add_services_for_type(newType)
 		add_custom_storage({"clean_water" : 20.0,"food1" : 10.0,"food2" : 10.0})
 		baseCustomers = 3
 	elif newType == "farm":
 		$Outline.color = Color.SEA_GREEN
-		var basicFoodProvider = BasicFoodServiceProvider.new()
-		add_service(basicFoodProvider)
+		add_services_for_type(newType)
 		baseCustomers = 5
 		add_producers_for_type(newType)
 		workers_needed = 5

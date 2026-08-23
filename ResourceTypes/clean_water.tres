@@ -7,5 +7,6 @@
 script = ExtResource("1_type")
 type_name = "clean_water"
 display_name = "Clean Water"
+category = "water"
 iconTexture = ExtResource("2_icon")
 iconModulate = Color(0, 0.85795265, 0.8439528, 1)

@@ -7,5 +7,6 @@
 script = ExtResource("1_type")
 type_name = "food2"
 display_name = "Food 2"
+category = "food"
 iconTexture = ExtResource("2_icon")
 iconModulate = Color(0.24943626, 0.57381856, 3.85046e-07, 1)
