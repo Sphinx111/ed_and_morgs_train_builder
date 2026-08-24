@@ -11,7 +11,7 @@ const MODULE_DISPLAY_LABELS: Dictionary[String, String] = {
 	"scrap_arm": "Scrap",
 	"kitchen": "Kitchen",
 	"cabin": "Cabin",
-	"passenger_door": "Door",
+	"expedition_room": "Expedition Room",
 	"water_collector": "H2O Scoop",
 	"fuel_refinery": "Refinery",
 }

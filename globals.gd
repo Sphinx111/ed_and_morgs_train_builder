@@ -76,8 +76,9 @@ const safety_margins : Dictionary = {
 var resource_safety_ok : Dictionary[String, bool] = {}
 
 # Expedition Variables
+const BASE_MAX_EXPEDITIONS : int = 4           # Base concurrent active expeditions without modules
+var max_expeditions : int = BASE_MAX_EXPEDITIONS
 const max_expedition_size : int = 10      # Maximum passengers who can take part in an expedition
-const MAX_EXPEDITIONS : int = 4           # Maximum concurrent active expeditions
 
 # Common icon textures to use for Sprites
 const water_texture : Texture2D = preload("res://images/Water_Icon.png")

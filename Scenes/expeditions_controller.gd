@@ -41,7 +41,7 @@ func _panel_height_for_count(count : int) -> float:
 
 func _update_panel_layout() -> void:
 	var option_count : int = maxi(1, options_available.size())
-	var active_count : int = clampi(maxi(1, expeditions_active.size()), 1, Globals.MAX_EXPEDITIONS)
+	var active_count : int = clampi(maxi(1, expeditions_active.size()), 1, Globals.max_expeditions)
 	
 	var options_height : float = _panel_height_for_count(option_count)
 	var active_height : float = _panel_height_for_count(active_count)
@@ -102,7 +102,7 @@ func dispatch_expedition(typeToStart : ExpeditionOption) -> int:
 	if can_launch == false:
 		return Globals.NO_RESOURCES
 	
-	if expeditions_active.size() >= Globals.MAX_EXPEDITIONS:
+	if expeditions_active.size() >= Globals.max_expeditions:
 		return Globals.EXCEEDS_MAX_EXPEDITIONS
 	
 	if expeditions_active.size() == 0:

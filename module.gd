@@ -18,7 +18,7 @@ const build_cost : Dictionary[String, float] = {
 	"scrap_arm" : 10.0,
 	"kitchen" : 5.0,
 	"cabin" : 2.0,
-	"passenger_door" : 5.0,
+	"expedition_room" : 5.0,
 	"water_collector" : 25.0,
 	"fuel_refinery" : 50.0
 }
@@ -41,6 +41,11 @@ var work_types : Array[String] = []
 
 # Storage Variables
 var storages : Array[GenericStorageProvider] = []
+
+# Train capability granted while this module is active
+var capability_feature : String = ""
+var capability_amount : int = 0
+var _capability_applied : bool = false
 
 const PRODUCTION_PROGRESS_HEIGHT : float = 50.0
 const PRODUCTION_PROGRESS_BOTTOM : float = 80.0
@@ -314,6 +319,9 @@ func _remove_invalid_workers() -> void:
 
 func reset_module():
 	hide_module_inspector()
+	_remove_capability()
+	capability_feature = ""
+	capability_amount = 0
 	enabled = true
 	services = []
 	producers = []
@@ -380,9 +388,8 @@ func set_type(newType : String):
 		add_producers_for_type(newType)
 		workers_needed = 1
 		add_custom_storage({"mech_parts" : 50.0})
-	elif newType == "passenger_door":
-		$Outline.color = Color.CORNFLOWER_BLUE
-		add_producers_for_type(newType)
+	elif newType == "expedition_room":
+		$Outline.color = Color.MEDIUM_PURPLE
 	elif newType == "water_collector":
 		$Outline.color = Color.CADET_BLUE
 		add_producers_for_type(newType)
@@ -397,7 +404,31 @@ func set_type(newType : String):
 	maxCustomers = baseCustomers
 	if workers_needed > 0:
 		parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)
+	_configure_capability(newType)
 	_update_click_area_enabled()
+
+
+func _configure_capability(module_type: String) -> void:
+	if not ModuleCapabilityRegistry.has_capability(module_type):
+		return
+	var config: Dictionary = ModuleCapabilityRegistry.get_config(module_type)
+	capability_feature = config.get("feature", "")
+	capability_amount = config.get("amount", 0)
+	_apply_capability()
+
+
+func _apply_capability() -> void:
+	if capability_feature == "" or capability_amount == 0 or _capability_applied:
+		return
+	TrainCapability.apply(capability_feature, capability_amount)
+	_capability_applied = true
+
+
+func _remove_capability() -> void:
+	if not _capability_applied:
+		return
+	TrainCapability.remove(capability_feature, capability_amount)
+	_capability_applied = false
 
 
 func _setup_click_area() -> void:

@@ -189,8 +189,11 @@ func parse_text_input():
 			subject = "empty"
 		elif words[i] == "cabin":
 			subject = "cabin"
-		elif words[i] == "door":
-			subject = "passenger_door"
+		elif words[i] == "expedition" and i + 1 < words.size() and words[i + 1] == "room":
+			subject = "expedition_room"
+			wordsRead = 2
+		elif words[i] == "door" or words[i] == "expedition":
+			subject = "expedition_room"
 		elif words[i] == "greywater" or words[i] == "graywater" or words[i] == "grey_water":
 			subject = "grey_water"
 		elif words[i] == "grey" and words[i+1] == "water":
