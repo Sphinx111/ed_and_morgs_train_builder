@@ -9,3 +9,4 @@ type_name = "grey_water"
 display_name = "Grey Water"
 category = "water"
 iconTexture = ExtResource("2_icon")
+water_content = 1.0

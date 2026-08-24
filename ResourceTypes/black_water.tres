@@ -10,3 +10,4 @@ display_name = "Black Water"
 category = "water"
 iconTexture = ExtResource("2_icon")
 iconModulate = Color(0.25, 0.15, 0.1, 1)
+water_content = 1.0

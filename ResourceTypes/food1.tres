@@ -10,3 +10,4 @@ display_name = "Food"
 category = "food"
 iconTexture = ExtResource("2_icon")
 iconModulate = Color(0.545098, 0.270588, 0.0745098, 1)
+water_content = 2.0

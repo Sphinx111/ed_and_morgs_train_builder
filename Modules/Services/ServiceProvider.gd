@@ -70,8 +70,12 @@ func serve_customer(customer: Passenger, train: Train, module: ModuleBase) -> in
 	if percent_to_fulfill == 0.0:
 		return Globals.NO_RESOURCES
 
-	_spend_resources(train, percent_to_fulfill, amount_wanted)
-	_output_waste(train, percent_to_fulfill, amount_wanted)
+	var water_content_added : float = _spend_resources(train, percent_to_fulfill, amount_wanted)
+	customer.adjust_water_content(water_content_added)
+	if waste_type_1 != null && waste_type_1.type_name == "black_water":
+		_output_water_waste(train, customer)
+	else:
+		_output_waste(train, percent_to_fulfill, amount_wanted)
 	var remaining_need := customer.adjust_need(output_need, amount_wanted * percent_to_fulfill)
 
 	if remaining_need == 0.0:
@@ -91,13 +95,25 @@ func _calc_input2_success(train: Train, amount_wanted: float) -> float:
 	return min(res_available / res_wanted, 1.0)
 
 
-func _spend_resources(train: Train, percent_to_spend: float, amount_served: float) -> void:
+func _spend_resources(train: Train, percent_to_spend: float, amount_served: float) -> float:
 	if input_type_1 != null:
-		train.add_res(input_type_1.type_name, -1 * input1_needed * percent_to_spend * amount_served)
-		if input_type_2 != null:
-			train.add_res(input_type_2.type_name, -1 * input2_needed * percent_to_spend * amount_served)
+		var amount_to_spend : float = input1_needed * percent_to_spend * amount_served 
+		train.add_res(input_type_1.type_name, -1 * amount_to_spend)
+		return amount_to_spend * input_type_1.water_content
+	elif input_type_2 != null:
+		var amount_to_spend : float = input2_needed * percent_to_spend * amount_served 
+		train.add_res(input_type_2.type_name, -1 * input2_needed * percent_to_spend * amount_served)
+		return amount_to_spend * input_type_2.water_content
+	return 0.0
 
 
 func _output_waste(train: Train, percent_to_produce: float, amount_served: float) -> void:
 	if waste_type_1 != null:
 		train.add_res(waste_type_1.type_name, waste1_produced * percent_to_produce * amount_served)
+
+func _output_water_waste(train : Train, customer : Passenger) -> void:
+	if waste_type_1.type_name != "black_water":
+		push_error("_output_water_waste used by wrong module type")
+	if customer.water_content > 0.0:
+		train.add_res(waste_type_1.type_name, customer.water_content)
+		customer.adjust_water_content(-1 * customer.water_content)

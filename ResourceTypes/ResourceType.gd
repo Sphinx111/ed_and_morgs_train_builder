@@ -8,3 +8,4 @@ class_name ResourceType
 @export var is_integer: bool = false
 @export var iconTexture: Texture2D
 @export var iconModulate: Color = Color.WHITE
+@export var water_content: float = 0.0

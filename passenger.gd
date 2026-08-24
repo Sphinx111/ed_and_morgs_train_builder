@@ -26,6 +26,7 @@ var is_on_expedition : bool = false
 var foodsEaten = {
 	"food1" : 0
 }
+var water_content : float = 0.0
 
 var displayNeeds : bool = false
 var displayNeedsScene : PackedScene = preload("res://Scenes/passenger_panel.tscn")
@@ -76,6 +77,7 @@ func _ready_debug_displays():
 func _init_random_needs():
 	for key in needs:
 		needs[key] = randf_range(0.0, 0.5)
+	water_content = randf_range(0.0, 0.5)
 
 func _process(delta: float) -> void:
 	if is_in_module or is_on_expedition:
@@ -311,6 +313,12 @@ func _travel_pull_to_direction(travel_pull : float) -> int:
 func adjust_need(type : String, amount : float) -> float:
 	needs[type] = max(needs[type] - amount, 0)
 	return needs[type]
+
+# adjust the water_content, and return the new value
+func adjust_water_content(amount : float) -> float:
+	water_content += amount
+	return water_content
+	
 
 func new_thought(text : String):
 	if thoughts.size() > 0 and thoughts.get(thoughts.size() - 1) == text:
