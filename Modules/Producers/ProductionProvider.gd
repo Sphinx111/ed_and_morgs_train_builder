@@ -73,8 +73,9 @@ func produce(train: Train, worker_modifier: float) -> int:
 			result = start_cycle_both(train, worker_modifier)
 		elif input_mode == ProductionRecipe.UsageMode.EITHER:
 			result = start_cycle_either(train, worker_modifier)
-		progress += carryOver
-		carryOver = 0.0
+		if (result == Globals.RESULT_OK):
+			progress += carryOver
+			carryOver = 0.0
 	if progress > 0.0 and progress < 1.0:
 		make_progress(train, worker_modifier)
 	if progress >= 1.0:
@@ -132,7 +133,7 @@ func start_cycle_both(train: Train, worker_modifier: float) -> int:
 			if input_type_2 != null:
 				train.add_res(input_type_2.type_name, -1 * input2_needed)
 				input2_consumed = true
-		progress = progress + (worker_modifier / cycleTime)
+				progress = progress + (worker_modifier / cycleTime)
 	return result
 
 

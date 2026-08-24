@@ -9,7 +9,6 @@
 [resource]
 script = ExtResource("1_recipe")
 cycle_time = 10
-input_mode = 2
 input_type_1 = ExtResource("2_oil")
 input_1_needed = 5.0
 input_type_2 = ExtResource("3_clean_water")
