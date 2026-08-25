@@ -12,6 +12,8 @@ enum TYPE {
 	CITY = 3,
 }
 
+var connectingLooper : MapLocation = null
+
 var visual_radius : float = 8.0
 
 var type: TYPE = TYPE.MAP_LOOPER
@@ -313,12 +315,22 @@ func get_next_node_with_resource(
 	from_segment: TrackSegment = null,
 	travel_toward_end: bool = true
 ) -> MapDestination:
-	if _attempts >= _maxAttempts or type == TYPE.MAP_LOOPER:
+	if _attempts >= _maxAttempts:
 		return null
 	if has_resource_type(_type):
 		return MapDestination.new(_distance, self)
 
 	var outgoing: TrackSegment = select_outgoing_track(from_segment, travel_toward_end)
+	
+	if type== TYPE.MAP_LOOPER and outgoing == null :
+		return connectingLooper.get_next_node_with_resource(
+		_type,
+		_attempts + 1,
+		_maxAttempts,
+		_distance + 0,
+		outgoing,
+		travel_toward_end
+		)
 	if outgoing == null:
 		return null
 	var next_node: MapLocation = outgoing.get_other_node(self)

@@ -171,6 +171,8 @@ func connect_loopers_across_map() -> void:
 
 	var left_looper: MapLocation = loopers[0]
 	var right_looper: MapLocation = loopers[loopers.size() - 1]
+	left_looper.connectingLooper = right_looper
+	right_looper.connectingLooper = left_looper
 	var cities: Array[MapLocation] = _get_city_nodes()
 	var route: Array[MapLocation] = _build_non_crossing_route(left_looper, cities, right_looper)
 
