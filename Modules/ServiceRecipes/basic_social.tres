@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ServiceRecipe" load_steps=2 format=3 uid="uid://cfjiu7ira0b7t"]
+
+[ext_resource type="Script" uid="uid://bk25jb6hmaxiy" path="res://Modules/Services/ServiceRecipe.gd" id="2_rrk2k"]
+
+[resource]
+script = ExtResource("2_rrk2k")
+output_need = "social"
+output_rate = 0.1

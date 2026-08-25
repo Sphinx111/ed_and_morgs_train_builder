@@ -2,17 +2,18 @@ extends Panel
 
 class_name ResourcePanel
 
-const ROWS: Array[Dictionary] = [
-	{"node_name": "Speed", "display_label": "Speed", "type": "speed"},
-	{"node_name": "Fuel", "display_label": "Fuel", "type": "resource", "key": "fuel"},
-	{"node_name": "Pop", "display_label": "Pop", "type": "pop"},
-	{"node_name": "CleanWater", "display_label": "Water", "type": "resource", "key": "clean_water"},
-	{"node_name": "GreyWater", "display_label": "Grey", "type": "resource", "key": "grey_water"},
-	{"node_name": "BlackWater", "display_label": "Black", "type": "resource", "key": "black_water"},
-	{"node_name": "MechParts", "display_label": "Parts", "type": "resource", "key": "mech_parts"},
-	{"node_name": "Food", "display_label": "Food", "type": "resource", "key": "food1"},
-	{"node_name": "Scrap", "display_label": "Scrap", "type": "resource", "key": "scrap"},
-	{"node_name": "Oil", "display_label": "Oil", "type": "resource", "key": "oil"},
+const RESOURCE_SUMMARY_SCENE: PackedScene = preload("res://Scenes/resource_summary.tscn")
+
+const RESOURCE_ROWS: Array[ResourceType] = [
+	ResourceTypeRegistry.TYPE_FUEL,
+	ResourceTypeRegistry.TYPE_POP,
+	ResourceTypeRegistry.TYPE_CLEAN_WATER,
+	ResourceTypeRegistry.TYPE_GREY_WATER,
+	ResourceTypeRegistry.TYPE_BLACK_WATER,
+	ResourceTypeRegistry.TYPE_MECH_PARTS,
+	ResourceTypeRegistry.TYPE_FOOD1,
+	ResourceTypeRegistry.TYPE_SCRAP,
+	ResourceTypeRegistry.TYPE_OIL,
 ]
 
 @onready var _resource_rows: HBoxContainer = $ResourceRows
@@ -21,12 +22,16 @@ const ROWS: Array[Dictionary] = [
 @onready var _value_label: Label = $ResourceDetailPanel/ValueLabel
 
 var _train: Train = null
+var _speed_label: RichTextLabel = null
+var _summaries: Dictionary = {}
+var _hover_signals_connected: bool = false
 
 
 func _ready() -> void:
 	apply_panel_width()
 	_detail_panel.hide()
-	_configure_row_labels()
+	_detail_panel.z_index = 1
+	_build_resource_rows()
 
 
 func apply_panel_width() -> void:
@@ -43,64 +48,93 @@ func apply_panel_width() -> void:
 func setup(train: Train) -> void:
 	_train = train
 	_setup_hover_signals()
+	update_from_train(train)
 
 
 func update_from_train(train: Train) -> void:
 	_train = train
-	for row in ROWS:
-		var label: RichTextLabel = _get_row_label(row["node_name"])
-		label.text = _format_row(row, train)
-
-func _process(delta : float) -> void:
-	if _train != null:
-		var label : RichTextLabel = _get_row_label("Speed")
-		if label!= null:
-			label.text = _format_row(ROWS[0], _train)
-
-func _configure_row_labels() -> void:
-	for row in ROWS:
-		var label: RichTextLabel = _get_row_label(row["node_name"])
-		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.mouse_filter = Control.MOUSE_FILTER_STOP
-		label.scroll_active = false
+	if _speed_label != null:
+		_speed_label.text = _format_speed(train)
+	for resource_type in RESOURCE_ROWS:
+		var summary: ResourceSummary = _summaries.get(resource_type.type_name)
+		if summary == null:
+			continue
+		summary.setup(resource_type, _get_row_amount(resource_type, train), false)
 
 
-func _format_row(row: Dictionary, train: Train) -> String:
-	match row["type"]:
-		"speed":
-			return "%s: %s" % [row["display_label"], Helpers.pretty_print_float(train.speed)]
-		"pop":
-			return "%s: %s" % [row["display_label"], String.num_int64(train.passengerManager.passengers.size())]
-		"resource":
-			return "%s: %s" % [row["display_label"], Helpers.pretty_print_float(train.get_res(row["key"]))]
-	return ""
+func _process(_delta: float) -> void:
+	if _train != null and _speed_label != null:
+		_speed_label.text = _format_speed(_train)
+
+
+func _build_resource_rows() -> void:
+	for child in _resource_rows.get_children():
+		child.queue_free()
+	_summaries.clear()
+	_hover_signals_connected = false
+
+	_speed_label = RichTextLabel.new()
+	_speed_label.name = "Speed"
+	_speed_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_speed_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_speed_label.scroll_active = false
+	_speed_label.fit_content = true
+	_resource_rows.add_child(_speed_label)
+
+	for resource_type in RESOURCE_ROWS:
+		var summary: ResourceSummary = RESOURCE_SUMMARY_SCENE.instantiate()
+		summary.name = resource_type.type_name
+		summary.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		summary.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		_resource_rows.add_child(summary)
+		_summaries[resource_type.type_name] = summary
+
+
+func _format_speed(train: Train) -> String:
+	return "Speed: %s" % Helpers.pretty_print_float(train.speed)
+
+
+func _get_row_amount(resource_type: ResourceType, train: Train) -> float:
+	if train == null or resource_type == null:
+		return 0.0
+	return train.get_res(resource_type.type_name)
 
 
 func _setup_hover_signals() -> void:
-	for row in ROWS:
-		if row["type"] != "resource":
+	if _hover_signals_connected:
+		return
+	for resource_type in RESOURCE_ROWS:
+		var summary: ResourceSummary = _summaries.get(resource_type.type_name)
+		if summary == null:
 			continue
-		var label: RichTextLabel = _get_row_label(row["node_name"])
-		var resource_key: String = row["key"]
-		label.mouse_entered.connect(_on_resource_hover.bind(resource_key, label))
-		label.mouse_exited.connect(_on_resource_leave)
+		summary.mouse_entered.connect(_on_resource_hover.bind(resource_type, summary))
+		summary.mouse_exited.connect(_on_resource_leave)
+	_hover_signals_connected = true
 
 
-func _on_resource_hover(resource_key: String, label: RichTextLabel) -> void:
-	_detail_panel.position.x = label.position.x
-	_type_label.text = resource_key
+func _format_detail_value(resource_type: ResourceType) -> String:
+	var type_name := resource_type.type_name
+	var current := _train.get_res(type_name)
+	var current_text := ResourceTypeRegistry.format_amount(type_name, current)
+	if _train.max_res.has(type_name):
+		var max_text := ResourceTypeRegistry.format_amount(type_name, _train.max_res[type_name])
+		return "%s / %s" % [current_text, max_text]
+	return current_text
 
-	if _train.res.has(resource_key) and _train.max_res.has(resource_key):
-		_value_label.text = "%s / %s" % [
-			Helpers.pretty_print_float(_train.res[resource_key]),
-			Helpers.pretty_print_float(_train.max_res[resource_key]),
-		]
-		_detail_panel.show()
+
+func _position_detail_panel(summary: ResourceSummary) -> void:
+	_detail_panel.position.x = _resource_rows.position.x + summary.position.x
+	_detail_panel.position.y = _resource_rows.position.y + _resource_rows.size.y
+
+
+func _on_resource_hover(resource_type: ResourceType, summary: ResourceSummary) -> void:
+	if _train == null:
+		return
+	_position_detail_panel(summary)
+	_type_label.text = resource_type.display_name
+	_value_label.text = _format_detail_value(resource_type)
+	_detail_panel.show()
 
 
 func _on_resource_leave() -> void:
 	_detail_panel.hide()
-
-
-func _get_row_label(node_name: String) -> RichTextLabel:
-	return _resource_rows.get_node(node_name) as RichTextLabel

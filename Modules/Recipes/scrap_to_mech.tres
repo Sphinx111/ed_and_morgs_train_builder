@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("1_recipe")
 cycle_time = 2
+input_mode = 2
 input_type_1 = ExtResource("2_scrap")
 input_1_needed = 5.0
 output_type_1 = ExtResource("3_mech_parts")

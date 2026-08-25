@@ -42,9 +42,9 @@ var needs = {
 const maxNeeds = {
 	"thirst" : 1.0,
 	"hunger" : 1.0,
-	"rest" : 2.0,
+	"rest" : 1.0,
 	"illness" : 1.0,
-	"social" : 1.0
+	"social" : 99.0
 }
 const WANDER_DURATION : float = 2.0
 
@@ -241,6 +241,8 @@ func check_for_work():
 
 ## Allows different results from hitting max need. Not all needs will be fatal
 func hit_max_need(needType : String) -> int:
+	if needType == "social":
+		return Globals.RESULT_OK
 	print("%s %s: Oh no! I am dying of %s" % [firstname, lastname, needType])
 	return Globals.RESULT_FATAL
 

@@ -14,6 +14,7 @@ const MODULE_DISPLAY_LABELS: Dictionary[String, String] = {
 	"expedition_room": "Expedition Room",
 	"water_collector": "H2O Scoop",
 	"fuel_refinery": "Refinery",
+	"lounge" : "Lounge"
 }
 
 @onready var _module_buttons: HBoxContainer = $ModuleButtons

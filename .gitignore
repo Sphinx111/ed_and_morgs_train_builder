@@ -2,4 +2,6 @@
 .godot/
 /android/
 /addons/godot-git-plugin
+/addons/resources_spreadsheet_view
+/example/
 *.import

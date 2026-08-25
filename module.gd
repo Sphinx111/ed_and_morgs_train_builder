@@ -15,12 +15,13 @@ const build_cost : Dictionary[String, float] = {
 	"clean_water" : 25.0,
 	"mech_parts" : 20.0,
 	"farm" : 10.0,
-	"scrap_arm" : 10.0,
+	"scrap_arm" : 50.0,
 	"kitchen" : 5.0,
 	"cabin" : 2.0,
-	"expedition_room" : 5.0,
+	"expedition_room" : 20.0,
 	"water_collector" : 25.0,
-	"fuel_refinery" : 50.0
+	"fuel_refinery" : 50.0,
+	"lounge" : 10.0
 }
 
 # Service variables
@@ -30,6 +31,7 @@ var customers : Array[Passenger] = []
 var service_speed_modifier = 1.0
 var baseCustomers : int = 0
 var maxCustomers : int = 0
+var min_customers_for_service : int = 0
 var customers_per_adjacency : int = floor(maxCustomers / (1 / Globals.ADJACENCY_BONUS))
 
 # Production Variables
@@ -121,7 +123,7 @@ func add_customer(newCustomer : Passenger):
 		if customers.size() == maxCustomers:
 			parentCar.update_needs_maps(serves_needs, sequence, Globals.CUSTOMERS_FULL)
 		for service in services:
-			if service.trigger_once == true:
+			if service.trigger_once == true and _has_enough_customers_for_service():
 				service.serve_customer(newCustomer, parentTrain, self)
 
 ## Used by module to remove its own passengers
@@ -290,6 +292,8 @@ func _update_production_progress(progress : float) -> void:
 ## For each customer in the module, run through the repeatable services and attempt to provide them
 func serve_customers() -> void:
 	_remove_invalid_customers()
+	if not _has_enough_customers_for_service():
+		return
 	for i in range(customers.size() - 1, -1, -1):
 		var customer: Passenger = customers[i]
 		var services_finished := 0
@@ -303,6 +307,10 @@ func serve_customers() -> void:
 
 		if services_finished >= services.size():
 			_eject_customer(customer)
+
+
+func _has_enough_customers_for_service() -> bool:
+	return customers.size() >= min_customers_for_service
 
 
 func _remove_invalid_customers() -> void:
@@ -329,6 +337,7 @@ func reset_module():
 	serves_needs = []
 	work_types = ["any"]
 	workers_needed = 0
+	min_customers_for_service = 0
 	$Outline.color = Color.GRAY
 	
 	# Kick out any customers and workers when module type changes
@@ -370,7 +379,7 @@ func set_type(newType : String):
 		$Outline.color = Color.BISQUE
 		add_services_for_type(newType)
 		add_custom_storage({"clean_water" : 20.0,"food1" : 10.0,"food2" : 10.0})
-		baseCustomers = 3
+		baseCustomers = 4
 	elif newType == "farm":
 		$Outline.color = Color.SEA_GREEN
 		add_services_for_type(newType)
@@ -400,6 +409,11 @@ func set_type(newType : String):
 		workers_needed = 8
 		add_producers_for_type(newType)
 		add_custom_storage({"oil" : 100.0, "fuel" : 100.0})
+	elif newType == "lounge":
+		$Outline.color = Color.CORNFLOWER_BLUE
+		baseCustomers = 8
+		min_customers_for_service = 2
+		add_services_for_type(newType)
 	$Label.text = newType
 	maxCustomers = baseCustomers
 	if workers_needed > 0:

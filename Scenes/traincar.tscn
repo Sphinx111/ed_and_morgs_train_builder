@@ -42,92 +42,12 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
 offset_top = 8.0
-offset_right = -8.0
-offset_bottom = -8.0
+offset_bottom = -42.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 4
 alignment = 1
-
-[node name="Speed" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Speed: 50"
-fit_content = true
-scroll_active = false
-
-[node name="Fuel" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Fuel:
-25"
-fit_content = true
-scroll_active = false
-
-[node name="Pop" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Pop: 25"
-fit_content = true
-scroll_active = false
-
-[node name="CleanWater" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Water:
-100"
-fit_content = true
-scroll_active = false
-
-[node name="GreyWater" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Grey:
-0"
-fit_content = true
-scroll_active = false
-
-[node name="BlackWater" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Black:
-0"
-fit_content = true
-scroll_active = false
-
-[node name="Food" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Food:
-0"
-fit_content = true
-scroll_active = false
-
-[node name="MechParts" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Parts:
-100"
-fit_content = true
-scroll_active = false
-
-[node name="Scrap" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Scrap:
-0"
-fit_content = true
-scroll_active = false
-
-[node name="Oil" type="RichTextLabel" parent="UICanvas/BasicUI/ResourcePanel/ResourceRows"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Oil:
-0"
-fit_content = true
-scroll_active = false
 
 [node name="ResourceDetailPanel" type="Panel" parent="UICanvas/BasicUI/ResourcePanel"]
 layout_mode = 1
@@ -233,7 +153,6 @@ offset_top = 53.0
 offset_right = 1155.0
 offset_bottom = 82.0
 focus_mode = 0
-button_pressed = true
 
 [node name="ThoughtsToggle" type="CheckButton" parent="UICanvas/BasicUI/DebugPanel"]
 layout_mode = 0
@@ -314,6 +233,7 @@ toggle_mode = true
 text = "Schedule Stop"
 
 [node name="StopSchedulePanel" type="Panel" parent="UICanvas/BasicUI"]
+visible = false
 layout_mode = 0
 offset_left = 864.0
 offset_top = 115.0

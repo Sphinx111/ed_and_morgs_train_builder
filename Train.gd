@@ -96,7 +96,9 @@ func get_res(key : String) -> float:
 	if res.has(key):
 		return res.get(key)
 	if key == "pop":
-		return passengerManager.passengers.size()
+		if passengerManager != null:
+			return passengerManager.passengers.size()
+		return 0
 	return 0
 
 ## Function to consume amount if available, returns a status code
