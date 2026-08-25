@@ -20,6 +20,7 @@ var collection_margin : float = 30   ## Range at which resources can be collecte
 const MAP_CONTENT_SIZE : Vector2 = Vector2(1024.0, 723.0)
 const MAX_RECURSE_SEARCH : int = 50
 var map_node_clicks_enabled : bool = false
+var schedulePanel : StopSchedulePanel = null
 
 func _ready():
 	trainMarker = get_node("TrainMarker") as TrainMarker
@@ -361,17 +362,26 @@ func train_step():
 		return
 	sun.advance()
 	sun.update_time_label(trainMarker.position, _time_to_sun_label)
-	# Debug testing - Next oil spot
-	if scheduleStop != "" :
-		var nextTarget : MapDestination = get_next_resource_spot(scheduleStop)
-		if nextTarget != null:
-			var scheduled_container : MapResourceContainer = nextTarget.target.get_resource_container_of_type(scheduleStop)
-			if scheduled_container != null:
-				print("Next %s Well has %s units and is at %f" % [scheduleStop, scheduled_container.amount, nextTarget.distance])
-			if nextTarget.distance <100 :
-				selectedTrain.target_speed = 100
-			if nextTarget.distance < 50 : 
-				selectedTrain.target_speed = 0 
+	if scheduleStop != "" : # TODO: at some point for efficiency we might wanna not run this EVERY tick
+		check_schedule()
+		
+		
+func check_schedule() :
+	var nextTarget : MapDestination = get_next_resource_spot(scheduleStop)
+	if nextTarget != null:
+		var scheduled_container : MapResourceContainer = nextTarget.target.get_resource_container_of_type(scheduleStop)
+		if scheduled_container != null:
+			print("Next %s Well has %s units and is at %f" % [scheduleStop, scheduled_container.amount, nextTarget.distance])
+		if nextTarget.distance < 100 :
+			if selectedTrain.target_speed > 200 : # don't speed up to 200
+				selectedTrain.target_speed = 200 # but do slow down to it
+			if nextTarget.distance <60 :
+				selectedTrain.target_speed = 100 #not checking this one since it only comes up 
+				 #if you're stopped and the next well is so close you might as well start it
+				if nextTarget.distance < 10 : 
+					selectedTrain.target_speed = 0 
+					scheduleStop = "" #clear the schedule so you can start the train again
+					
 
 func get_node_in_range(_range : float) -> MapLocation:
 	if trainMarker == null:
@@ -406,9 +416,9 @@ func query_scavenge_locations() -> Array[MapLocation]:
 	return result
 
 func get_next_resource_spot(_type : String) -> MapDestination:
-	if trainMarker == null or trainMarker.current_track == null:
+	if trainMarker == null or trainMarker.current_track == null :
 		return null
-	var ahead_node := trainMarker.get_travel_exit_node()
+	var ahead_node := trainMarker.get_travel_exit_node() 
 	var distance_remaining := trainMarker.get_distance_remaining_on_segment()
 	return ahead_node.get_next_node_with_resource(
 		_type,

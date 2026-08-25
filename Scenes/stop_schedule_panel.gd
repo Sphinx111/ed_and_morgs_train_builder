@@ -3,7 +3,7 @@ extends Panel
 class_name StopSchedulePanel
 
 var buttons : Array [Button]
-var buttonList : Array [String] = ["grey_water", "clean_water", "oil", "pop", "scrap", "mech_parts","food1"]
+var buttonList : Array [String] = ["grey_water", "clean_water", "oil", "pop", "scrap", "mech_parts","food1", "", "unknown"]
 
 func setup() : 
 	var i=0
@@ -18,6 +18,7 @@ func setup() :
 	
 
 func resourceSelectPress(resourceSelection) : 
+	buttonHighlight(resourceSelection)
 	var ourMap : MapHandler = get_parent().worldMap
 	ourMap.set_schedule_stop(resourceSelection)
 	#var nextResource : MapDestination = ourMap.get_next_resource_spot(resourceSelection)
@@ -26,3 +27,12 @@ func resourceSelectPress(resourceSelection) :
 		print("Next %s Well is at %f" % [resourceSelection, resourceDist])	
 	else :
 		print ("No %s Well is available along current route" % [resourceSelection])
+		
+func buttonHighlight(selectedText):
+	for buttonb in buttons :
+		if buttonb.text == selectedText :
+			buttonb.disabled = true
+			#buttonb.font_color = Color("#ff5f5f")
+		else :
+			buttonb.disabled = false
+			#buttonb.font_color = Color("#dfdfdf")
