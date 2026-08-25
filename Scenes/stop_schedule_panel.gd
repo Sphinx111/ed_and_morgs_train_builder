@@ -3,19 +3,25 @@ extends Panel
 class_name StopSchedulePanel
 
 var buttons : Array [Button]
-var buttonList : Array [String] = ["grey_water", "clean_water", "oil", "pop", "scrap", "mech_parts","food1", "", "unknown"]
+var buttonList : Array [String] = ["grey_water", "clean_water", "oil", "pop", "scrap", "mech_parts","food1", "unknown"]
+@onready var vBox : VBoxContainer = get_node("VBoxContainer")
 
 func setup() : 
 	var i=0
-	for nameb in buttonList : 
-		var newButton : Button = Button.new() 
-		add_child(newButton)
-		newButton.text = nameb
-		newButton.position = Vector2(0,i*35)
-		newButton.pressed.connect(resourceSelectPress.bind(newButton.text))
-		buttons.append(newButton)
-		i+=1
-	
+	if buttons.size() == 0:
+		for nameb in buttonList : 
+			var newButton : Button = Button.new() 
+			vBox.add_child(newButton)
+			newButton.text = nameb
+			newButton.pressed.connect(resourceSelectPress.bind(newButton.text))
+			buttons.append(newButton)
+			i+=1
+		## add special button wired up for cancelling
+		var cancelButton : Button = Button.new() 
+		vBox.add_child(cancelButton)
+		cancelButton.text = "Cancel"
+		cancelButton.pressed.connect(resourceSelectPress.bind(""))
+		buttons.append(cancelButton)
 
 func resourceSelectPress(resourceSelection) : 
 	buttonHighlight(resourceSelection)
@@ -36,3 +42,6 @@ func buttonHighlight(selectedText):
 		else :
 			buttonb.disabled = false
 			#buttonb.font_color = Color("#dfdfdf")
+
+func cleanup_buttons():
+	pass
