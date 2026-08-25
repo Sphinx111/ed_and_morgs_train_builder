@@ -174,13 +174,15 @@ func add_resource_container(container : MapResourceContainer) -> void:
 
 func has_resource_type(_type : String) -> bool:
 	for container in resource_containers:
-		if container.resource_type == _type and not container.is_empty() and container.discovered:
+		if _type == "unknown" and not container.is_empty() and not container.discovered:
+			return true
+		if container.resource_type == _type and not container.is_empty() and container.discovered: # or _type=="unknown"):
 			return true
 	return false
 
-func get_resource_container_of_type(_type : String) -> MapResourceContainer:
+func get_resource_container_of_type(_type : String, showUndiscovered : bool = false) -> MapResourceContainer:
 	for container in resource_containers:
-		if container.resource_type == _type and not container.is_empty() and container.discovered:
+		if container.resource_type == _type and not container.is_empty() and (container.discovered or showUndiscovered) :
 			return container
 	return null
 
@@ -320,6 +322,7 @@ func get_next_node_with_resource(
 	if outgoing == null:
 		return null
 	var next_node: MapLocation = outgoing.get_other_node(self)
+	
 	if next_node == null:
 		return null
 	return next_node.get_next_node_with_resource(
