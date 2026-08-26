@@ -31,7 +31,7 @@ var water_content : float = 0.0
 var displayNeeds : bool = false
 var displayNeedsScene : PackedScene = preload("res://Scenes/passenger_panel.tscn")
 var passengerPanel : PassengerPanel = null
-var targetNeed = ""
+var targetNeed : String = ""
 var needs = {
 	"thirst" : 0.0,
 	"hunger" : 0.65,
@@ -39,7 +39,7 @@ var needs = {
 	"illness" : 0.0,
 	"social" : 0.0
 }
-const maxNeeds = {
+const maxNeeds : Dictionary[String, float] = {
 	"thirst" : 1.0,
 	"hunger" : 1.0,
 	"rest" : 1.0,
@@ -137,6 +137,7 @@ func enter_customer_module(target : ModuleBase, _attemptNo : int) -> void:
 
 			if passengerPanel != null:
 				passengerPanel.actionLabel.text = "being served"
+				passengerPanel.show()
 
 func enter_worker_module(target : ModuleBase, _attemptNo : int) -> void:
 	if self.is_in_module == false:
@@ -146,6 +147,7 @@ func enter_worker_module(target : ModuleBase, _attemptNo : int) -> void:
 			self.hide()
 			if passengerPanel != null:
 				passengerPanel.actionLabel.text = "working"
+				passengerPanel.show()
 			is_in_module = true
 			is_working = true
 
@@ -184,7 +186,8 @@ func resource_tick(_train_temperature : float):
 		else:
 			needs[key] += Globals.need_growth_rates[key]
 	if _train_temperature >= temp_death:
-		is_dying = true;
+		_log_passenger_death("heat (%.1f°C)" % _train_temperature)
+		is_dying = true
 	check_needs()
 	
 	check_for_work()
@@ -213,22 +216,35 @@ func cleanup():
 func check_needs():
 	if is_on_expedition == true:
 		return
-	var maxVal : float = 0.0
-	var maxNeed : String = ""
+	var highest_proportion := 0.0
+	var priority_need := ""
 	for key in needs.keys():
-		if needs[key] > maxVal:
-			maxNeed = key
-			maxVal = needs[key]
-			if maxVal >= maxNeeds[key]:
-				if hit_max_need(key) == Globals.RESULT_FATAL:
-					is_dying = true
-					return
-	if maxVal > Globals.passenger_seeks_threshold:
-		if maxNeed != "" and maxNeed != targetNeed:
-			targetNeed = maxNeed
+		if not maxNeeds.has(key) or maxNeeds[key] <= 0.0:
+			continue
+		if needs[key] >= maxNeeds[key]:
+			if hit_max_need(key) == Globals.RESULT_FATAL:
+				is_dying = true
+				return
+		var proportion := _get_need_proportion(key)
+		if proportion > highest_proportion:
+			highest_proportion = proportion
+			priority_need = key
+	if highest_proportion > Globals.passenger_seeks_threshold:
+		if priority_need != "":
+			if priority_need != targetNeed:
+				targetNeed = priority_need
 			check_current_module()
 			if is_working and is_in_module:
 				exit_worker_module()
+
+
+func _get_need_proportion(need_key: String) -> float:
+	if not needs.has(need_key) or not maxNeeds.has(need_key):
+		return 0.0
+	var cap := maxNeeds[need_key]
+	if cap <= 0.0:
+		return 0.0
+	return needs[need_key] / cap
 
 ## Used before passengers are sent on an expedition
 func fix_all_needs():
@@ -243,8 +259,30 @@ func check_for_work():
 func hit_max_need(needType : String) -> int:
 	if needType == "social":
 		return Globals.RESULT_OK
-	print("%s %s: Oh no! I am dying of %s" % [firstname, lastname, needType])
+	_log_passenger_death(needType)
 	return Globals.RESULT_FATAL
+
+
+func _log_passenger_death(cause: String) -> void:
+	var needs_summary := _format_needs_summary()
+	var seeking_need := targetNeed if targetNeed != "" else "none"
+	var module_label := "none"
+	if is_in_module and is_instance_valid(current_module):
+		module_label = current_module.type
+	var role_label := "walking"
+	if is_in_module:
+		role_label = "worker" if is_working else "customer"
+	print(
+		"%s %s: Oh no! I am dying of %s | needs: {%s} | seeking: %s | module: %s | role: %s"
+		% [firstname, lastname, cause, needs_summary, seeking_need, module_label, role_label]
+	)
+
+
+func _format_needs_summary() -> String:
+	var parts: PackedStringArray = []
+	for key in needs.keys():
+		parts.append("%s=%.3f" % [key, needs[key]])
+	return ", ".join(parts)
 
 func pick_direction() -> void:
 	if targetNeed != "" or targetWork != "":

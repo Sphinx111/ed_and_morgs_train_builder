@@ -10,6 +10,7 @@ var mass : float = 250.0
 var adjacencies : int = 0
 
 var enabled : bool = true
+var mothballed : bool = false
 
 const build_cost : Dictionary[String, float] = {
 	"clean_water" : 25.0,
@@ -74,7 +75,7 @@ func can_enter(_myPassenger : Passenger) -> bool:
 	return false
 
 func worker_can_enter(_newWorker : Passenger) -> bool:
-	if enabled == false or workers.size() >= workers_needed:
+	if enabled == false or mothballed or workers.size() >= workers_needed:
 		return false
 	return true
 
@@ -84,7 +85,7 @@ func can_serve_need(testType : String) -> bool:
 	return false
 
 func needs_worker(work_type : String) -> bool:
-	if enabled == true:
+	if enabled == true and not mothballed:
 		if work_types.has(work_type) and (workers_needed - workers.size()) > 0:
 			return true
 	return false
@@ -94,18 +95,16 @@ func resource_tick():
 	if type == "empty":
 		return
 	$Label.text = "%s %d" % [type, adjacencies]
-	if enabled == false:
-		return
-	
-	if services.size() > 0:
-		serve_customers()
-	
-	if producers.size() > 0:
-		produce_resources()
+	if enabled:
+		if services.size() > 0:
+			serve_customers()
+		if producers.size() > 0:
+			produce_resources()
+		else:
+			_update_production_progress(0.0)
 	else:
 		_update_production_progress(0.0)
-		return
-	
+
 	if _inspector != null and is_instance_valid(_inspector):
 		_inspector.tick()
 
@@ -249,6 +248,7 @@ func set_active_producer_index(index: int) -> void:
 		active_producer.cancel_process(parentTrain)
 	active_producer = new_producer
 	_update_production_progress(active_producer.progress)
+	_sync_mothball_state()
 	if _inspector != null and is_instance_valid(_inspector):
 		_inspector.on_active_producer_changed()
 
@@ -268,7 +268,7 @@ func add_custom_storage(storageDict : Dictionary):
 ## Cycle through producers and run their production cycle
 func produce_resources():
 	_remove_invalid_workers()
-	if active_producer == null:
+	if mothballed or active_producer == null:
 		_update_production_progress(0.0)
 		return
 	# Producing materials requires workers
@@ -331,6 +331,7 @@ func reset_module():
 	capability_feature = ""
 	capability_amount = 0
 	enabled = true
+	mothballed = false
 	services = []
 	producers = []
 	active_producer = null
@@ -420,6 +421,69 @@ func set_type(newType : String):
 		parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)
 	_configure_capability(newType)
 	_update_click_area_enabled()
+	_sync_mothball_state()
+
+
+func apply_industry_mothball(resource_type_name: String, is_mothballed: bool) -> void:
+	if not _active_producer_outputs(resource_type_name):
+		return
+	if is_mothballed:
+		_enter_mothball_state()
+	else:
+		_exit_mothball_state()
+
+
+func _active_producer_outputs(resource_type_name: String) -> bool:
+	if active_producer == null:
+		return false
+	if active_producer.output_type_1 != null and active_producer.output_type_1.type_name == resource_type_name:
+		return true
+	if active_producer.output_type_2 != null and active_producer.output_type_2.type_name == resource_type_name:
+		return true
+	return false
+
+
+func _sync_mothball_state() -> void:
+	if active_producer == null or parentTrain == null:
+		if mothballed:
+			_exit_mothball_state()
+		return
+	var output_name := active_producer.output_type_1.type_name if active_producer.output_type_1 != null else ""
+	if output_name != "" and parentTrain.is_industry_mothballed(output_name):
+		if not mothballed:
+			_enter_mothball_state()
+	elif mothballed:
+		_exit_mothball_state()
+
+
+func _enter_mothball_state() -> void:
+	if mothballed:
+		return
+	mothballed = true
+	if active_producer != null:
+		active_producer.cancel_process(parentTrain)
+	_update_production_progress(0.0)
+	_eject_all_workers()
+	if workers_needed > 0:
+		parentCar.update_work_maps(work_types, sequence, Globals.WORKERS_FULL)
+
+
+func _exit_mothball_state() -> void:
+	if not mothballed:
+		return
+	mothballed = false
+	if workers_needed > 0:
+		var work_state := Globals.WORKERS_HAS_SPACE
+		if workers.size() >= workers_needed:
+			work_state = Globals.WORKERS_FULL
+		parentCar.update_work_maps(work_types, sequence, work_state)
+
+
+func _eject_all_workers() -> void:
+	for worker in workers.duplicate():
+		if is_instance_valid(worker):
+			worker.worker_ejected_from_module()
+			notify_remove_worker(worker)
 
 
 func _configure_capability(module_type: String) -> void:

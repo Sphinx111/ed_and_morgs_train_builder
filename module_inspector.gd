@@ -72,6 +72,8 @@ func _process(_delta: float) -> void:
 
 
 func tick() -> void:
+	if parentModule == null:
+		return
 	if parentModule.active_producer != null:
 		progressBar.value = parentModule.get_production_progress()
 	_update_occupant_lists()

@@ -2,13 +2,14 @@
 
 [ext_resource type="Script" uid="uid://bk25jb6hmaxiy" path="res://Modules/Services/ServiceRecipe.gd" id="1_recipe"]
 [ext_resource type="Resource" uid="uid://bqr3oavf6c3d" path="res://ResourceTypes/food1.tres" id="2_food1"]
-[ext_resource type="Resource" uid="uid://cmb6s7045j83r" path="res://ResourceTypes/black_water.tres" id="3_black_water"]
+[ext_resource type="Resource" uid="uid://dvdxcg2bu7jm4" path="res://ResourceTypes/food2.tres" id="2_i5yrq"]
 
 [resource]
 script = ExtResource("1_recipe")
 output_need = "hunger"
 output_rate = 0.05
+input_mode = 1
 input_type_1 = ExtResource("2_food1")
 input_1_needed = 1.0
-waste_type_1 = ExtResource("3_black_water")
-waste_1_produced = 1.0
+input_type_2 = ExtResource("2_i5yrq")
+input_2_needed = 1.0

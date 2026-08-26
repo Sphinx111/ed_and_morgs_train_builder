@@ -56,6 +56,9 @@ var res = {
 
 var max_res : Dictionary = {}
 
+# Whether each producible resource's industry is mothballed (true = not producing new cycles).
+var industry_states : Dictionary[String, bool] = {}
+
 var speed : float = 200.0
 var is_accelerating : bool = false
 var is_decelerating : bool = false
@@ -84,6 +87,7 @@ func _ready() -> void:
 	rebuild_passenger_map()
 	Helpers.update_resource_safety_flags(self)
 	worldMap = get_parent().find_child("BasicUI").worldMap
+	EventBus.industry_mothballed_changed.connect(_on_industry_mothballed_changed)
 
 ## Set up engine variables, placeholder for now
 func setup_engine():
@@ -149,6 +153,24 @@ func amend_storage(type : String, amount : float):
 		max_res[type] = max_res[type] + amount
 	else:
 		max_res[type] = amount
+
+
+func is_industry_mothballed(type_name: String) -> bool:
+	return industry_states.get(type_name, false)
+
+
+func set_industry_mothballed(type_name: String, mothballed: bool) -> void:
+	industry_states[type_name] = mothballed
+
+
+func _on_industry_mothballed_changed(type_name: String, mothballed: bool) -> void:
+	set_industry_mothballed(type_name, mothballed)
+	for carriage in carriages:
+		if carriage == null:
+			continue
+		for module in carriage.modules:
+			if module != null:
+				module.apply_industry_mothball(type_name, mothballed)
 
 func resource_tick():
 	for carriage in carriages:

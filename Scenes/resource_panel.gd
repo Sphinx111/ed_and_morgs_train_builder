@@ -2,8 +2,6 @@ extends Panel
 
 class_name ResourcePanel
 
-const RESOURCE_SUMMARY_SCENE: PackedScene = preload("res://Scenes/resource_summary.tscn")
-
 const RESOURCE_ROWS: Array[ResourceType] = [
 	ResourceTypeRegistry.TYPE_FUEL,
 	ResourceTypeRegistry.TYPE_POP,
@@ -16,21 +14,20 @@ const RESOURCE_ROWS: Array[ResourceType] = [
 	ResourceTypeRegistry.TYPE_OIL,
 ]
 
+const DETAIL_SCENE: PackedScene = preload("res://Scenes/resource_detail_panel.tscn")
+
 @onready var _resource_rows: HBoxContainer = $ResourceRows
-@onready var _detail_panel: Panel = $ResourceDetailPanel
-@onready var _type_label: Label = $ResourceDetailPanel/TypeLabel
-@onready var _value_label: Label = $ResourceDetailPanel/ValueLabel
 
 var _train: Train = null
 var _speed_label: RichTextLabel = null
-var _summaries: Dictionary = {}
-var _hover_signals_connected: bool = false
+var _slots: Dictionary = {}
+var _detail_panel: ResourceDetailPanel = null
+var _hovered_slot: ResourceHoverSlot = null
 
 
 func _ready() -> void:
 	apply_panel_width()
-	_detail_panel.hide()
-	_detail_panel.z_index = 1
+	_setup_detail_panel()
 	_build_resource_rows()
 
 
@@ -47,7 +44,8 @@ func apply_panel_width() -> void:
 
 func setup(train: Train) -> void:
 	_train = train
-	_setup_hover_signals()
+	for slot in _slots.values():
+		slot.bind_train(train)
 	update_from_train(train)
 
 
@@ -55,11 +53,10 @@ func update_from_train(train: Train) -> void:
 	_train = train
 	if _speed_label != null:
 		_speed_label.text = _format_speed(train)
-	for resource_type in RESOURCE_ROWS:
-		var summary: ResourceSummary = _summaries.get(resource_type.type_name)
-		if summary == null:
-			continue
-		summary.setup(resource_type, _get_row_amount(resource_type, train), false)
+	for slot in _slots.values():
+		slot.refresh()
+	if _detail_panel.visible and _hovered_slot != null:
+		_detail_panel.show_for_resource(_hovered_slot.resource_type, train)
 
 
 func _process(_delta: float) -> void:
@@ -67,11 +64,19 @@ func _process(_delta: float) -> void:
 		_speed_label.text = _format_speed(_train)
 
 
+func _setup_detail_panel() -> void:
+	_detail_panel = DETAIL_SCENE.instantiate()
+	_detail_panel.z_index = 10
+	_detail_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	_detail_panel.hide_panel()
+	_detail_panel.mouse_exited.connect(_on_detail_mouse_exited)
+	add_child(_detail_panel)
+
+
 func _build_resource_rows() -> void:
 	for child in _resource_rows.get_children():
 		child.queue_free()
-	_summaries.clear()
-	_hover_signals_connected = false
+	_slots.clear()
 
 	_speed_label = RichTextLabel.new()
 	_speed_label.name = "Speed"
@@ -82,59 +87,63 @@ func _build_resource_rows() -> void:
 	_resource_rows.add_child(_speed_label)
 
 	for resource_type in RESOURCE_ROWS:
-		var summary: ResourceSummary = RESOURCE_SUMMARY_SCENE.instantiate()
-		summary.name = resource_type.type_name
-		summary.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		summary.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		_resource_rows.add_child(summary)
-		_summaries[resource_type.type_name] = summary
+		var slot := ResourceHoverSlot.new()
+		slot.name = resource_type.type_name
+		slot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		slot.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		slot.custom_minimum_size = Vector2(72, 28)
+		slot.configure(resource_type)
+		slot.hover_started.connect(_on_slot_hover_started)
+		slot.hover_ended.connect(_on_slot_hover_ended)
+		if _train != null:
+			slot.bind_train(_train)
+		_resource_rows.add_child(slot)
+		_slots[resource_type.type_name] = slot
+
+
+func _on_slot_hover_started(slot: ResourceHoverSlot) -> void:
+	_hovered_slot = slot
+	_show_detail_for_slot(slot)
+
+
+func _on_slot_hover_ended(_slot: ResourceHoverSlot) -> void:
+	_schedule_hide_detail()
+
+
+func _on_detail_mouse_exited() -> void:
+	_schedule_hide_detail()
+
+
+func _schedule_hide_detail() -> void:
+	call_deferred("_update_detail_visibility")
+
+
+func _update_detail_visibility() -> void:
+	var mouse_pos := get_viewport().get_mouse_position()
+	if _detail_panel.visible and _detail_panel.get_global_rect().has_point(mouse_pos):
+		return
+	if _hovered_slot != null and _hovered_slot.get_global_rect().has_point(mouse_pos):
+		return
+	_hide_detail()
+
+
+func _show_detail_for_slot(slot: ResourceHoverSlot) -> void:
+	if _train == null or slot.resource_type == null:
+		return
+	slot.refresh()
+	_detail_panel.show_for_resource(slot.resource_type, _train)
+	_position_detail_panel(slot)
+
+
+func _position_detail_panel(slot: ResourceHoverSlot) -> void:
+	var slot_rect := slot.get_global_rect()
+	_detail_panel.global_position = slot_rect.position + Vector2(0.0, slot_rect.size.y)
+
+
+func _hide_detail() -> void:
+	_hovered_slot = null
+	_detail_panel.hide_panel()
 
 
 func _format_speed(train: Train) -> String:
 	return "Speed: %s" % Helpers.pretty_print_float(train.speed)
-
-
-func _get_row_amount(resource_type: ResourceType, train: Train) -> float:
-	if train == null or resource_type == null:
-		return 0.0
-	return train.get_res(resource_type.type_name)
-
-
-func _setup_hover_signals() -> void:
-	if _hover_signals_connected:
-		return
-	for resource_type in RESOURCE_ROWS:
-		var summary: ResourceSummary = _summaries.get(resource_type.type_name)
-		if summary == null:
-			continue
-		summary.mouse_entered.connect(_on_resource_hover.bind(resource_type, summary))
-		summary.mouse_exited.connect(_on_resource_leave)
-	_hover_signals_connected = true
-
-
-func _format_detail_value(resource_type: ResourceType) -> String:
-	var type_name := resource_type.type_name
-	var current := _train.get_res(type_name)
-	var current_text := ResourceTypeRegistry.format_amount(type_name, current)
-	if _train.max_res.has(type_name):
-		var max_text := ResourceTypeRegistry.format_amount(type_name, _train.max_res[type_name])
-		return "%s / %s" % [current_text, max_text]
-	return current_text
-
-
-func _position_detail_panel(summary: ResourceSummary) -> void:
-	_detail_panel.position.x = _resource_rows.position.x + summary.position.x
-	_detail_panel.position.y = _resource_rows.position.y + _resource_rows.size.y
-
-
-func _on_resource_hover(resource_type: ResourceType, summary: ResourceSummary) -> void:
-	if _train == null:
-		return
-	_position_detail_panel(summary)
-	_type_label.text = resource_type.display_name
-	_value_label.text = _format_detail_value(resource_type)
-	_detail_panel.show()
-
-
-func _on_resource_leave() -> void:
-	_detail_panel.hide()

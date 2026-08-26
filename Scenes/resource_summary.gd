@@ -4,7 +4,7 @@ class_name ResourceSummary
 
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	$RichTextLabel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 

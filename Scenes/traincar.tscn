@@ -42,34 +42,14 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 8.0
-offset_bottom = -42.0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 4
-alignment = 1
-
-[node name="ResourceDetailPanel" type="Panel" parent="UICanvas/BasicUI/ResourcePanel"]
-layout_mode = 1
-offset_left = 7.0
-offset_top = 92.0
-offset_right = 113.0
-offset_bottom = 144.0
-
-[node name="TypeLabel" type="Label" parent="UICanvas/BasicUI/ResourcePanel/ResourceDetailPanel"]
-layout_mode = 0
-offset_left = 4.0
-offset_right = 51.0
-offset_bottom = 23.0
-text = "Water"
-
-[node name="ValueLabel" type="Label" parent="UICanvas/BasicUI/ResourcePanel/ResourceDetailPanel"]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 23.0
-offset_right = 51.0
-offset_bottom = 46.0
-text = "25.05 / 100"
+alignment = 0
 
 [node name="LineEdit" type="LineEdit" parent="UICanvas/BasicUI"]
 layout_mode = 0
