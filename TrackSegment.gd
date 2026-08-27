@@ -32,7 +32,7 @@ func set_active(is_active: bool) -> void:
 		return
 	line.visible = is_active
 	if is_active:
-		line.default_color = Color(0.7, 0.7, 0.7, 0.9)
+		line.default_color = Color.DIM_GRAY
 
 
 func connects(location_a: MapLocation, location_b: MapLocation) -> bool:

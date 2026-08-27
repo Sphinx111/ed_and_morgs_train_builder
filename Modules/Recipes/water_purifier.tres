@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ProductionRecipe" load_steps=4 format=3 uid="uid://dmju32ld57y5u"]
+
+[ext_resource type="Script" uid="uid://b67infwsvsouv" path="res://Modules/Producers/ProductionRecipe.gd" id="1_recipe"]
+[ext_resource type="Resource" uid="uid://b44gxi75dqj0t" path="res://ResourceTypes/grey_water.tres" id="2_grey_water"]
+[ext_resource type="Resource" uid="uid://bky4hj8up8m3s" path="res://ResourceTypes/clean_water.tres" id="3_clean_water"]
+
+[resource]
+script = ExtResource("1_recipe")
+cycle_time = 4
+input_type_1 = ExtResource("2_grey_water")
+input_1_needed = 1.0
+output_type_1 = ExtResource("3_clean_water")
+output_1_amount = 0.9
+process_name = "Clean Water"

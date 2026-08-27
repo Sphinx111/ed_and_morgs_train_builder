@@ -5,7 +5,8 @@ class_name ConstructionPanel
 signal placement_requested(module_type: String)
 
 const MODULE_DISPLAY_LABELS: Dictionary[String, String] = {
-	"clean_water": "Water",
+	"water_purifier": "Water Purifier",
+	"sewage_works": "Sewage Works",
 	"mech_parts": "Parts",
 	"farm": "Farm",
 	"scrap_arm": "Scrap",

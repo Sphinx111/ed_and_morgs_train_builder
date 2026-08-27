@@ -15,7 +15,6 @@ const MODULE_SERVICES: Dictionary = {
 	"kitchen": [RECIPE_FAST_BASIC_FOOD, RECIPE_FAST_WATER],
 	"farm": [RECIPE_BASIC_FOOD],
 	"lounge": [RECIPE_BASIC_SOCIAL],
-	"clean_water": [RECIPE_BASIC_WATER]
 }
 
 

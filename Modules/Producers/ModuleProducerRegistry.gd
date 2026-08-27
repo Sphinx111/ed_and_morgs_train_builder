@@ -2,7 +2,8 @@ extends RefCounted
 
 class_name ModuleProducerRegistry
 
-const RECIPE_CLEAN_WATER: ProductionRecipe = preload("res://Modules/Recipes/clean_water.tres")
+const RECIPE_WATER_PURIFIER: ProductionRecipe = preload("res://Modules/Recipes/water_purifier.tres")
+const RECIPE_SEWAGE_WORKS: ProductionRecipe = preload("res://Modules/Recipes/sewage_works.tres")
 const RECIPE_FOOD1: ProductionRecipe = preload("res://Modules/Recipes/food1.tres")
 const RECIPE_FOOD2: ProductionRecipe = preload("res://Modules/Recipes/food2.tres")
 const RECIPE_SCRAP_COLLECTOR: ProductionRecipe = preload("res://Modules/Recipes/scrap_collector.tres")
@@ -11,7 +12,8 @@ const RECIPE_WATER_COLLECTOR: ProductionRecipe = preload("res://Modules/Recipes/
 const RECIPE_FUEL: ProductionRecipe = preload("res://Modules/Recipes/fuel.tres")
 
 const MODULE_PRODUCERS: Dictionary = {
-	"clean_water": [RECIPE_CLEAN_WATER],
+	"water_purifier": [RECIPE_WATER_PURIFIER],
+	"sewage_works": [RECIPE_SEWAGE_WORKS],
 	"farm": [RECIPE_FOOD1, RECIPE_FOOD2],
 	"scrap_arm": [RECIPE_SCRAP_COLLECTOR],
 	"mech_parts": [RECIPE_SCRAP_TO_MECH],

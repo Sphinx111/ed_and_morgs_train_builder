@@ -1,10 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://b3ph64gipnlm5"]
+[gd_scene load_steps=7 format=3 uid="uid://b3ph64gipnlm5"]
 
 [ext_resource type="Script" uid="uid://bywwc888bn2bf" path="res://MapHandler.gd" id="1_deu6t"]
 [ext_resource type="Texture2D" uid="uid://dve3f2r47q48u" path="res://images/Pixel_world_map.jpg" id="2_4ojr4"]
 [ext_resource type="Script" uid="uid://c4vqpjq4nfrxx" path="res://TrainMarker.gd" id="3_train"]
 [ext_resource type="Script" uid="uid://xw62eb0m2po0" path="res://MapGraphGenerator.gd" id="5_67byq"]
-[ext_resource type="Script" path="res://MapSun.gd" id="6_mapsun"]
+[ext_resource type="Script" uid="uid://ckeoq2je4lqct" path="res://MapSun.gd" id="6_mapsun"]
 
 [sub_resource type="Curve2D" id="Curve2D_1huhg"]
 _data = {
@@ -28,9 +28,11 @@ loop = false
 script = ExtResource("3_train")
 
 [node name="Rect" type="ColorRect" parent="TrainMarker"]
-offset_top = -14.0
-offset_right = 40.0
-offset_bottom = 18.0
+offset_left = -16.0
+offset_top = -5.0
+offset_right = 16.0
+offset_bottom = 5.0
+color = Color(0, 1, 0, 1)
 
 [node name="MapMask" type="ColorRect" parent="."]
 clip_children = 1

@@ -200,9 +200,19 @@ func parse_text_input():
 			subject = "grey_water"
 			wordsRead = 2
 		elif words[i] == "cleanwater" or words[i] == "clean_water":
-			subject = "clean_water"
+			subject = "water_purifier"
 		elif words[i] == "clean" and words[i+1] == "water":
-			subject = "clean_water"
+			subject = "water_purifier"
+			wordsRead = 2
+		elif words[i] == "purifier" or words[i] == "water_purifier":
+			subject = "water_purifier"
+		elif (words[i] == "water" or words[i] == "sewage") and words[i+1] == "purifier":
+			subject = "water_purifier"
+			wordsRead = 2
+		elif words[i] == "sewage_works" or words[i] == "sewageworks":
+			subject = "sewage_works"
+		elif words[i] == "sewage" and words[i+1] == "works":
+			subject = "sewage_works"
 			wordsRead = 2
 		elif words[i] == "blackwater" or words[i] == "black_water":
 			subject = "black_water"
@@ -216,7 +226,7 @@ func parse_text_input():
 		elif words[i] == "food" or  words[i] == "kitchen":
 			subject = "kitchen"
 		elif words[i] == "water":
-			subject = "clean_water"
+			subject = "water_purifier"
 		elif words[i] == "mechparts" or words[i] == "mech_parts" or words[i] == "mechanicalparts" or words[i] == "mechanical_parts":
 			subject = "mech_parts"
 		elif (words[i] == "mech" or words[i] == "mechanical") and words[i+1] == "parts":

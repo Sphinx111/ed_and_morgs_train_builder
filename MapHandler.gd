@@ -76,9 +76,9 @@ func _recreate_train_marker() -> TrainMarker:
 
 	var rect := ColorRect.new()
 	rect.name = "Rect"
-	rect.offset_top = -14.0
+	rect.offset_top = -10.0
 	rect.offset_right = 40.0
-	rect.offset_bottom = 18.0
+	rect.offset_bottom = 10.0
 	marker.add_child(rect)
 
 	trainMarker = marker

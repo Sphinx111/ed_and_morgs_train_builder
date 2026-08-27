@@ -13,7 +13,8 @@ var enabled : bool = true
 var mothballed : bool = false
 
 const build_cost : Dictionary[String, float] = {
-	"clean_water" : 25.0,
+	"water_purifier" : 25.0,
+	"sewage_works" : 25.0,
 	"mech_parts" : 20.0,
 	"farm" : 10.0,
 	"scrap_arm" : 50.0,
@@ -367,11 +368,16 @@ func set_type(newType : String):
 	if newType == "empty":
 		_update_click_area_enabled()
 		return
-	if newType == "clean_water":
+	if newType == "water_purifier":
 		$Outline.color = Color.AQUA
 		add_producers_for_type(newType)
 		workers_needed = 1
-		add_custom_storage({"clean_water" : 50.0,"grey_water" : 50.0, "black_water" : 10.0})
+		add_custom_storage({"clean_water" : 50.0, "grey_water" : 50.0})
+	elif newType == "sewage_works":
+		$Outline.color = Color.SLATE_GRAY
+		add_producers_for_type(newType)
+		workers_needed = 1
+		add_custom_storage({"grey_water" : 50.0, "black_water" : 10.0})
 	elif newType == "cabin":
 		$Outline.color = Color.BROWN
 		add_services_for_type(newType)

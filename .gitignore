@@ -4,4 +4,5 @@
 /addons/godot-git-plugin
 /addons/resources_spreadsheet_view
 /example/
+/images/*.import
 *.import
