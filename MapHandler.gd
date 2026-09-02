@@ -3,6 +3,7 @@ extends Node2D
 class_name MapHandler
 
 @onready var map_graph_generator : MapGraphGenerator = $MapGraphGenerator
+@onready var continent_generator : MapContinentGenerator = $MapContinentGenerator
 var resource_generator : MapResourceGenerator = MapResourceGenerator.new()
 var map_graph : MapGraph = null
 var active_track : TrackSegment = null
@@ -41,6 +42,8 @@ func apply_map_graph(graph: MapGraph) -> void:
 		return
 	_build_track_segments_from_graph(map_graph)
 	resource_generator.add_resources_to_map_graph(map_graph)
+	if continent_generator != null:
+		continent_generator.create_grids_from_mapGraph(map_graph)
 	set_map_node_clicks_enabled(map_node_clicks_enabled)
 	call_deferred("_place_train_on_active_route")
 

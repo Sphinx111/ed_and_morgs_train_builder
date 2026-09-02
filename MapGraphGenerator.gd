@@ -74,7 +74,9 @@ func regenerate_map() -> MapGraph:
 ## The arrays are new; the MapLocation and MapGraphEdge instances are the originals,
 ## so each node's edges array and each edge's node1/node2 still point at each other.
 func extract_map_graph() -> MapGraph:
-	return MapGraph.from_nodes(allNodes)
+	var mapGraph : MapGraph = MapGraph.from_nodes(allNodes)
+	mapGraph.mapSize = mapSize
+	return mapGraph
 
 
 func _run_generation_attempt(attempt_number: int, enforce_soft_timeout: bool) -> bool:

@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://b3ph64gipnlm5"]
+[gd_scene load_steps=8 format=3 uid="uid://b3ph64gipnlm5"]
 
 [ext_resource type="Script" uid="uid://bywwc888bn2bf" path="res://MapHandler.gd" id="1_deu6t"]
 [ext_resource type="Texture2D" uid="uid://dve3f2r47q48u" path="res://images/Pixel_world_map.jpg" id="2_4ojr4"]
 [ext_resource type="Script" uid="uid://c4vqpjq4nfrxx" path="res://TrainMarker.gd" id="3_train"]
 [ext_resource type="Script" uid="uid://xw62eb0m2po0" path="res://MapGraphGenerator.gd" id="5_67byq"]
 [ext_resource type="Script" uid="uid://ckeoq2je4lqct" path="res://MapSun.gd" id="6_mapsun"]
+[ext_resource type="Script" uid="uid://bf25xvpcvbx18" path="res://MapContinentGenerator.gd" id="7_continent"]
 
 [sub_resource type="Curve2D" id="Curve2D_1huhg"]
 _data = {
@@ -21,6 +22,10 @@ position = Vector2(-2, -39)
 scale = Vector2(1.705, 1.925)
 texture = ExtResource("2_4ojr4")
 centered = false
+
+[node name="MapContinentGenerator" type="Node2D" parent="."]
+z_index = 1
+script = ExtResource("7_continent")
 
 [node name="TrainMarker" type="PathFollow2D" parent="."]
 position = Vector2(-3, 177)

@@ -5,6 +5,7 @@ extends RefCounted
 ## so node.edges and edge.node1 / edge.node2 remain linked.
 class_name MapGraph
 
+var mapSize : Vector2
 var nodes: Array[MapLocation] = []
 var edges: Array[MapGraphEdge] = []
 var allCities: Array[MapLocation] = []
