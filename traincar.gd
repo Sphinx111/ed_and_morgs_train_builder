@@ -14,6 +14,11 @@ var modules : Array[ModuleBase] = [null, null, null, null]
 var ModuleScene = preload("res://Scenes/module.tscn")
 var defaultModuleArray = ["water_purifier", "farm", "cabin", "kitchen"] #passenger_door"]
 
+# Environmental Variables
+var moisture_requested : int = 1.0
+var moisture_level : int = 0
+var water_consumption_per_level : float = 0.1
+
 func _ready():
 	if Globals.train_direction < 0:
 		position.x = sequence * (Globals.car_length + Globals.car_separation)
@@ -37,7 +42,17 @@ func set_sequence(newSequence : int):
 	if newSequence == 0:
 		for i in range(4):
 			modules[i].set_type(defaultModuleArray[i])
+
+
 func resource_tick():
+	var water_required : float = moisture_requested * water_consumption_per_level
+	if parentTrain.gather_res("clean_water", water_required) == Globals.RESULT_OK:
+		moisture_level = moisture_requested
+		parentTrain.add_res("grey_water", water_required)
+	else:
+		moisture_level = 0
+		$MoistureSlider.value = 0
+		
 	for module in modules:
 		if module != null:
 			module.resource_tick()
@@ -93,3 +108,6 @@ func update_needs_maps(needsArray : Array[String], modulePos : int, newState : i
 
 func update_work_maps(workArray : Array[String], modulePos : int, newState : int):
 	parentTrain.update_work_maps(workArray, [sequence, modulePos], newState)
+
+func _on_moisture_slider_value_changed(value: float) -> void:
+	moisture_requested = int(value)

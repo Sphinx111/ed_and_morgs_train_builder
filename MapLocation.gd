@@ -210,7 +210,7 @@ func discover_random_resource() -> MapResourceContainer:
 	
 	var total_weight : float = 0.0
 	for container in candidates:
-		total_weight += container.rarity
+		total_weight += container.visibility
 	
 	var chosen : MapResourceContainer = null
 	if total_weight <= 0.0:
@@ -219,7 +219,7 @@ func discover_random_resource() -> MapResourceContainer:
 		var roll : float = randf() * total_weight
 		var cumulative : float = 0.0
 		for container in candidates:
-			cumulative += container.rarity
+			cumulative += container.visibility
 			if roll < cumulative:
 				chosen = container
 				break
@@ -300,11 +300,19 @@ func _setup_debug_label() -> void:
 
 
 func _build_resource_debug_text() -> String:
-	var lines: PackedStringArray = PackedStringArray()
+	var totals_by_type: Dictionary = {}
 	for container in resource_containers:
 		if container == null:
 			continue
-		lines.append(container.get_debug_text())
+		var current: float = totals_by_type.get(container.resource_type, 0.0)
+		totals_by_type[container.resource_type] = current + container.amount
+
+	var lines: PackedStringArray = PackedStringArray()
+	for resource_type in totals_by_type.keys():
+		var total: float = totals_by_type[resource_type]
+		if total <= 0.0:
+			continue
+		lines.append("%s: %s" % [resource_type, Helpers.pretty_print_float(total)])
 	return "\n".join(lines)
 
 func get_next_node_with_resource(

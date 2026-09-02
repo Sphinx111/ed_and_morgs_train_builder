@@ -6,10 +6,10 @@ var index : int = 0    # Used if there are multiples of the same expedition type
 var original_name : String = ""
 var pop : int = 0
 var passengers : Array[Passenger] = []
-var total_duration : int = 0
 var travel_time : int = 0
-var time_passed : int = 0
 var collection_time : int = 0
+var scavenge_time : int = 0
+var time_passed : int = 0
 var resource_spot : MapResourceContainer = null
 var is_scavenge : bool = false
 var scavenge_location : MapLocation = null
@@ -40,14 +40,21 @@ static func new_expedition(_index : int, optionSelected : ExpeditionOption, pass
 	_new_expedition.index = _index
 	_new_expedition.original_name = optionSelected.display_name
 	_new_expedition.pop = optionSelected.pop_allocated
-	_new_expedition.total_duration = optionSelected.time_needed
 	_new_expedition.travel_time = optionSelected.travel_time
+	_new_expedition.collection_time = optionSelected.collection_time
+	_new_expedition.scavenge_time = optionSelected.scavenge_time
 	_new_expedition.target_resources = optionSelected.gains_per_pop
 	_new_expedition.passengers = passengersArray
 	_new_expedition.resource_spot = optionSelected.resource_spot
 	_new_expedition.is_scavenge = optionSelected.is_scavenge
 	_new_expedition.scavenge_location = optionSelected.scavenge_location
 	return _new_expedition
+
+func get_activity_time() -> int:
+	return scavenge_time if is_scavenge else collection_time
+
+func get_total_duration() -> int:
+	return (2 * travel_time) + get_activity_time()
 
 func _ready():
 	name_label = get_node("NameLabel")
@@ -62,12 +69,11 @@ func _ready():
 	progress_background_width = get_node("ProgressBackground").size.x
 	return_button = get_node("ReturnButton")
 	return_button.pressed.connect(_on_return_button_pressed)
-	collection_time = total_duration - (2 * travel_time)
 	
 	self.name_label.text = "%s %d" % [original_name, index]
 	self.pop_label.text = "%d" % pop
 	self.fetch_panel.size.x = (fetch_panel_base_width * 2) + (fetch_panel_width_per_item * (target_resources.size() + 1))
-	self.time_label.text = "%s" % Helpers.seconds_to_mm_ss(total_duration - time_passed)
+	self.time_label.text = "%s" % Helpers.seconds_to_mm_ss(get_total_duration() - time_passed)
 	
 	for i in range(target_resources.size()):
 		var target = target_resources[i]
@@ -85,10 +91,11 @@ func _ready():
 
 func train_tick():
 	time_passed += 1
-	if not is_scavenge and time_passed >= travel_time and time_passed < (total_duration - travel_time):
+	if not is_scavenge and time_passed >= travel_time and time_passed < travel_time + collection_time:
 		collect_resources()
+	var total_duration := get_total_duration()
 	self.time_label.text = "%s" % Helpers.seconds_to_mm_ss(total_duration - time_passed)
-	progress_bar.size.x = (progress_background_width / total_duration * time_passed)
+	progress_bar.size.x = (progress_background_width / float(total_duration) * time_passed)
 
 func collect_resources():
 	for i in range(target_resources.size()):
@@ -114,8 +121,9 @@ func collect_resources():
 			_on_return_button_pressed()
 
 func _on_return_button_pressed():
-	if time_passed < travel_time + collection_time:
-		time_passed = travel_time + collection_time
+	var activity_end := travel_time + get_activity_time()
+	if time_passed < activity_end:
+		time_passed = activity_end
 	return_button.text = "Abandon"
 	return_button.pressed.disconnect(_on_return_button_pressed)
 	return_button.pressed.connect(_on_abandon_button_pressed)

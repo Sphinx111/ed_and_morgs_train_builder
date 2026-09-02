@@ -8,9 +8,10 @@ const my_scene = preload("res://Scenes/expedition_option.tscn")
 
 var controller : ExpeditionsController = null
 
-var min_pop : int = 4        ## Minimum number of people required for expedition
-var time_needed : int = 190  ## Time required for expedition, in game ticks
+var min_pop : int = 2        ## Minimum number of people required for expedition
 var travel_time : int = 60
+var collection_time : int = 30
+var scavenge_time : int = 60
 var resource_spot : MapResourceContainer = null
 var is_scavenge : bool = false
 var scavenge_location : MapLocation = null
@@ -20,6 +21,7 @@ var scavenge_location : MapLocation = null
 var gains_per_pop : Array = [_build_gain_row("scrap", 25)]
 
 const default_gains : Dictionary = {
+	"clean_water" : {"amount" : 10, "chance" : 1.0},
 	"scrap": {"amount": 25, "chance": 1.0},
 	"grey_water": {"amount": 15, "chance": 1.0},
 	"pop": {"amount": 2, "chance": 1.0},
@@ -43,7 +45,7 @@ const default_cost_amounts : Dictionary = {
 }
 
 # Tracking variables
-var pop_allocated : int = 4
+var pop_allocated : int = 2
 
 # sizing constants
 const width_per_cost : float = 50.0
@@ -125,6 +127,12 @@ static func get_default_costs_from_type(type_wanted : String) -> Array:
 			result.append(_build_cost_row("food1", default_cost_amounts["food1"]))
 	return result
 
+func get_activity_time() -> int:
+	return scavenge_time if is_scavenge else collection_time
+
+func get_total_duration() -> int:
+	return (2 * travel_time) + get_activity_time()
+
 func _ready():
 	name_label = get_node("NameLabel")
 	gain_panel = get_node("GainPanel")
@@ -148,7 +156,7 @@ func _ready():
 
 ## Update the display using current cost and gain values
 func update_full_option():
-	time_label.text = Helpers.seconds_to_mm_ss(time_needed)
+	time_label.text = Helpers.seconds_to_mm_ss(get_total_duration())
 	name_label.text = display_name
 	
 	gain_panel.size.x = 10.0 + (gains_per_pop.size() * width_per_cost)
@@ -191,11 +199,18 @@ func _apply_resource_icon(sprite: Sprite2D, type_name: String) -> void:
 	sprite.modulate = resource_type.iconModulate
 
 
-func set_basic_params(_display_name : String, _min_pop : int, _time_needed : int, _travel_time : int):
+func set_basic_params(
+	_display_name : String,
+	_min_pop : int,
+	_travel_time : int,
+	_collection_time : int = 30,
+	_scavenge_time : int = 60
+):
 	self.display_name = _display_name
 	self.min_pop = _min_pop
-	self.time_needed = _time_needed
 	self.travel_time = _travel_time
+	self.collection_time = _collection_time
+	self.scavenge_time = _scavenge_time
 
 func _on_add_pop_button_pressed() -> void:
 	if pop_allocated >= Globals.max_expedition_size:

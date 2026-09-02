@@ -132,7 +132,7 @@ func train_tick():
 
 	for expedition in expeditions_active:
 		expedition.train_tick()
-		if expedition.time_passed >= expedition.total_duration:
+		if expedition.time_passed >= expedition.get_total_duration():
 			complete_expedition(expedition)
 			expeditions_awaiting_cleanup.append(expedition)
 	
