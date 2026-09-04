@@ -12,6 +12,7 @@ var scavenge_time : int = 0
 var time_passed : int = 0
 var resource_spot : MapResourceContainer = null
 var is_scavenge : bool = false
+var is_train_car_recovery : bool = false
 var scavenge_location : MapLocation = null
 
 var target_resources : Array = []
@@ -47,11 +48,19 @@ static func new_expedition(_index : int, optionSelected : ExpeditionOption, pass
 	_new_expedition.passengers = passengersArray
 	_new_expedition.resource_spot = optionSelected.resource_spot
 	_new_expedition.is_scavenge = optionSelected.is_scavenge
+	_new_expedition.is_train_car_recovery = optionSelected.is_train_car_recovery
 	_new_expedition.scavenge_location = optionSelected.scavenge_location
 	return _new_expedition
 
+func get_train_car_gather_time() -> int:
+	return maxi(1, MapResourceLocation.GATHER_TIME / pop)
+
 func get_activity_time() -> int:
-	return scavenge_time if is_scavenge else collection_time
+	if is_scavenge:
+		return scavenge_time
+	if is_train_car_recovery:
+		return get_train_car_gather_time()
+	return collection_time
 
 func get_total_duration() -> int:
 	return (2 * travel_time) + get_activity_time()
@@ -80,7 +89,7 @@ func _ready():
 		var type_name: String = target[0]
 		if i == 0:
 			_apply_resource_icon(sprite1, type_name)
-			label1.text = "?" if is_scavenge else ""
+			label1.text = "?" if (is_scavenge or is_train_car_recovery) else ""
 			sprite1.show()
 			label1.show()
 		elif i == 1:
@@ -91,7 +100,7 @@ func _ready():
 
 func train_tick():
 	time_passed += 1
-	if not is_scavenge and time_passed >= travel_time and time_passed < travel_time + collection_time:
+	if not is_scavenge and not is_train_car_recovery and time_passed >= travel_time and time_passed < travel_time + collection_time:
 		collect_resources()
 	var total_duration := get_total_duration()
 	self.time_label.text = "%s" % Helpers.seconds_to_mm_ss(total_duration - time_passed)

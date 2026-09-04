@@ -85,6 +85,13 @@ func refresh_options():
 		available_expeditions_panel.add_child(scavengeOption)
 		scavengeOption.position.y = (option_index * (height_of_option + separation_between_options)) + separation_between_options
 		option_index += 1
+
+	for container in selectedTrain.worldMap.query_train_car_yards():
+		var trainCarOption : ExpeditionOption = ExpeditionOption.new_train_car_expedition(container)
+		options_available.append(trainCarOption)
+		available_expeditions_panel.add_child(trainCarOption)
+		trainCarOption.position.y = (option_index * (height_of_option + separation_between_options)) + separation_between_options
+		option_index += 1
 	
 	_update_panel_layout()
 
@@ -153,6 +160,11 @@ func complete_expedition(completed : ActiveExpedition):
 	if completed.is_scavenge:
 		if completed.scavenge_location != null:
 			completed.scavenge_location.discover_random_resource()
+		refresh_options()
+	elif completed.is_train_car_recovery:
+		if completed.resource_spot != null:
+			completed.resource_spot._take_resource(1.0)
+		selectedTrain.add_recovery_carriage()
 		refresh_options()
 	else:
 		for key in completed.resources_gathered.keys():

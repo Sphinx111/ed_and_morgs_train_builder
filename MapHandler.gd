@@ -406,6 +406,20 @@ func query_resource_types() -> Array[MapResourceContainer]:
 	var result : Array[MapResourceContainer] = []
 	for location in get_nodes_in_range(collection_margin):
 		for container in location.get_resource_containers():
+			if container.resource_type == MapResourceLocation.RESOURCE_TYPE:
+				continue
+			if container.is_empty() or not container.discovered:
+				continue
+			result.append(container)
+	return result
+
+
+func query_train_car_yards() -> Array[MapResourceContainer]:
+	var result : Array[MapResourceContainer] = []
+	for location in get_nodes_in_range(collection_margin):
+		for container in location.get_resource_containers():
+			if container.resource_type != MapResourceLocation.RESOURCE_TYPE:
+				continue
 			if container.is_empty() or not container.discovered:
 				continue
 			result.append(container)

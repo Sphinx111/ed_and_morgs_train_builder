@@ -12,7 +12,7 @@ var mass : float = 1000.0
 # List of modules in the car
 var modules : Array[ModuleBase] = [null, null, null, null]
 var ModuleScene = preload("res://Scenes/module.tscn")
-var defaultModuleArray = ["water_purifier", "farm", "cabin", "kitchen"] #passenger_door"]
+var defaultModuleArray = ["water_purifier", "cabin", "cabin", "cabin"]
 
 # Environmental Variables
 var moisture_requested : int = 1.0
@@ -51,7 +51,6 @@ func resource_tick():
 		parentTrain.add_res("grey_water", water_required)
 	else:
 		moisture_level = 0
-		$MoistureSlider.value = 0
 		
 	for module in modules:
 		if module != null:

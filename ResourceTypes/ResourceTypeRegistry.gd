@@ -13,6 +13,7 @@ const TYPE_OIL: ResourceType = preload("res://ResourceTypes/oil.tres")
 const TYPE_FUEL: ResourceType = preload("res://ResourceTypes/fuel.tres")
 const TYPE_POP: ResourceType = preload("res://ResourceTypes/pop.tres")
 const TYPE_UNKNOWN: ResourceType = preload("res://ResourceTypes/unknown.tres")
+const TYPE_TRAIN_CARS: ResourceType = preload("res://ResourceTypes/train_cars.tres")
 
 const TYPES_BY_NAME: Dictionary[String, ResourceType] = {
 	"clean_water": TYPE_CLEAN_WATER,
@@ -26,6 +27,7 @@ const TYPES_BY_NAME: Dictionary[String, ResourceType] = {
 	"fuel": TYPE_FUEL,
 	"pop": TYPE_POP,
 	"unknown": TYPE_UNKNOWN,
+	"trainCars": TYPE_TRAIN_CARS,
 }
 
 

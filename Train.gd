@@ -65,7 +65,7 @@ var is_decelerating : bool = false
 var target_speed : float = 200.00
 var engine_thrust : float = 20000.0
 var braking_force : float = 40000.0
-const fuel_per_tick : float = 0.03
+const fuel_per_tick : float = 0.1
 
 func _ready() -> void:
 	self.position.x = Globals.train_origin_x
@@ -245,6 +245,23 @@ func add_car():
 		minXpos -= Globals.car_length + Globals.car_separation
 	elif Globals.train_direction < 0:
 		maxXpos += Globals.car_length + Globals.car_separation
+
+
+## Add a recovered yard carriage with randomised starter modules.
+func add_recovery_carriage() -> void:
+	var car_index := carriages.size()
+	add_car()
+	var carriage := carriages[car_index]
+	var planned_modules: Array[String] = ["cabin", "cabin", "cabin", "water_purifier"]
+	for slot in range(planned_modules.size()):
+		var module_type: String = planned_modules[slot]
+		if randf() < 0.5:
+			continue
+		carriage.modules[slot].set_type(module_type)
+		update_needs_maps(carriage.modules[slot].serves_needs, [car_index, slot], Globals.MODULE_ADDED)
+		if carriage.modules[slot].workers_needed > 0:
+			update_work_maps(carriage.modules[slot].work_types, [car_index, slot], Globals.MODULE_ADDED)
+	carriage.recalculateAdjacencies()
 
 func close_module_inspectors(except_module : ModuleBase = null) -> void:
 	for carriage in carriages:

@@ -42,7 +42,7 @@ var firstPassTotals : Array[ResourceSpec] = [
 	ResourceSpec.new("oil",         220.0,   80.0,  0.0, MapLocation.TYPE.CITY,    true,   0.6, 0.0),
 	ResourceSpec.new("oil",         800.0,   120.0,  0.0, MapLocation.TYPE.VILLAGE, true,   0.4, 0.1),
 	ResourceSpec.new("food1",       420.0,   100.0,  0.0, MapLocation.TYPE.TOWN,    false,  0.1, 0.4),
-	ResourceSpec.new("pop",         125.0,   8.0,   5.0, MapLocation.TYPE.VILLAGE, false,  0.0, 1.0),
+	ResourceSpec.new("pop",         125.0,   8.0,   5.0, MapLocation.TYPE.VILLAGE, false,  1.5, 0.1),
 	ResourceSpec.new("mech_parts",  200.0,   30.0,  10.0, MapLocation.TYPE.CITY,    false,  0.4, 0.8)
 ]
 
@@ -95,6 +95,22 @@ func add_resources_to_map_graph(_mapGraph : MapGraph) -> void:
 	self.mapGraph = _mapGraph
 	cities_first_pass()
 	nodes_second_pass()
+	place_train_yards()
+
+
+func place_train_yards() -> void:
+	var towns: Array[MapLocation] = []
+	for location in mapGraph.nodes:
+		if location.type == MapLocation.TYPE.TOWN:
+			towns.append(location)
+	if towns.is_empty():
+		return
+
+	towns.shuffle()
+	var yards_to_place: int = mini(3, towns.size())
+	for index in range(yards_to_place):
+		var car_count: float = maxf(1.0, roundi(randf_range(1.0, 3.0)))
+		MapResourceLocation.attach_to(towns[index], car_count)
 
 func cities_first_pass():
 	var mainRoute : Array[MapLocation] = mapGraph.get_main_route()
