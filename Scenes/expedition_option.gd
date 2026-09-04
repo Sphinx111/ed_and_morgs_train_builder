@@ -14,6 +14,7 @@ var collection_time : int = 30
 var scavenge_time : int = 60
 var resource_spot : MapResourceContainer = null
 var is_scavenge : bool = false
+var is_train_car_recovery : bool = false
 var scavenge_location : MapLocation = null
 
 # List of resources which can be gained from the expedition
@@ -100,6 +101,17 @@ static func new_scavenge_expedition(location : MapLocation) -> ExpeditionOption:
 	new_option.costs = get_default_costs_from_type("scrap")
 	return new_option
 
+
+static func new_train_car_expedition(_resource_spot: MapResourceContainer) -> ExpeditionOption:
+	var new_option : ExpeditionOption = my_scene.instantiate()
+	new_option.display_name = "Recover Train Car"
+	new_option.resource_spot = _resource_spot
+	new_option.is_train_car_recovery = true
+	new_option.travel_time = 0
+	new_option.gains_per_pop = [_build_gain_row("trainCars", 1)]
+	new_option.costs = get_default_costs_from_type("scrap")
+	return new_option
+
 static func get_default_gain_from_type(type_wanted : String) -> Array:
 	if default_gains.has(type_wanted):
 		var gain_data: Dictionary = default_gains[type_wanted]
@@ -127,8 +139,15 @@ static func get_default_costs_from_type(type_wanted : String) -> Array:
 			result.append(_build_cost_row("food1", default_cost_amounts["food1"]))
 	return result
 
+func get_train_car_gather_time(pop_count: int) -> int:
+	return maxi(1, MapResourceLocation.GATHER_TIME / pop_count)
+
 func get_activity_time() -> int:
-	return scavenge_time if is_scavenge else collection_time
+	if is_scavenge:
+		return scavenge_time
+	if is_train_car_recovery:
+		return get_train_car_gather_time(pop_allocated)
+	return collection_time
 
 func get_total_duration() -> int:
 	return (2 * travel_time) + get_activity_time()
@@ -164,7 +183,7 @@ func update_full_option():
 		var gain_array = gains_per_pop[i]
 		if i == 0:
 			_apply_resource_icon(gain_sprite, gain_array[0])
-			if is_scavenge:
+			if is_scavenge or is_train_car_recovery:
 				gain_label.text = "?"
 			else:
 				var max_gain : float = min(resource_spot.amount, gain_array[1] * pop_allocated)
@@ -212,13 +231,16 @@ func set_basic_params(
 	self.collection_time = _collection_time
 	self.scavenge_time = _scavenge_time
 
+func _refresh_time_label() -> void:
+	time_label.text = Helpers.seconds_to_mm_ss(get_total_duration())
+
 func _on_add_pop_button_pressed() -> void:
 	if pop_allocated >= Globals.max_expedition_size:
 		return
 	pop_allocated += 1
 	explorers_label.text = ResourceTypeRegistry.format_amount("pop", pop_allocated)
 	if gains_per_pop.size() == 1:
-		if is_scavenge:
+		if is_scavenge or is_train_car_recovery:
 			gain_label.text = "?"
 		else:
 			var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
@@ -228,6 +250,8 @@ func _on_add_pop_button_pressed() -> void:
 		cost1_label.text = ResourceTypeRegistry.format_amount(costs[1][0], pop_allocated * costs[1][1])
 	if costs.size() >= 3:
 		cost2_label.text = ResourceTypeRegistry.format_amount(costs[2][0], pop_allocated * costs[2][1])
+	if is_train_car_recovery:
+		_refresh_time_label()
 
 
 func _on_remove_pop_button_pressed() -> void:
@@ -236,7 +260,7 @@ func _on_remove_pop_button_pressed() -> void:
 	pop_allocated -= 1
 	explorers_label.text = ResourceTypeRegistry.format_amount("pop", pop_allocated)
 	if gains_per_pop.size() == 1:
-		if is_scavenge:
+		if is_scavenge or is_train_car_recovery:
 			gain_label.text = "?"
 		else:
 			var max_gain : float = min(resource_spot.amount, gains_per_pop[0][1] * pop_allocated)
@@ -246,6 +270,8 @@ func _on_remove_pop_button_pressed() -> void:
 		cost1_label.text = ResourceTypeRegistry.format_amount(costs[1][0], pop_allocated * costs[1][1])
 	if costs.size() >= 3:
 		cost2_label.text = ResourceTypeRegistry.format_amount(costs[2][0], pop_allocated * costs[2][1])
+	if is_train_car_recovery:
+		_refresh_time_label()
 
 
 func _on_dispatch_button_pressed() -> void:

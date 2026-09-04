@@ -22,7 +22,7 @@ const modules_per_car : int = 4
 
 var train_origin_x : float = display_width - car_length
 var train_direction : int = 1
-const train_initial_carriage_count : int = 3
+const train_initial_carriage_count : int = 2
 
 # Module Variables
 const module_width : float = 50

@@ -12,7 +12,7 @@ var mass : float = 1000.0
 # List of modules in the car
 var modules : Array[ModuleBase] = [null, null, null, null]
 var ModuleScene = preload("res://Scenes/module.tscn")
-var defaultModuleArray = ["water_purifier", "farm", "cabin", "kitchen"] #passenger_door"]
+var defaultModuleArray = ["water_purifier", "cabin", "cabin", "cabin"]
 
 # Environmental Variables
 var moisture_requested : int = 1.0
