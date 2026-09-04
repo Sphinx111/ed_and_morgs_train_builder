@@ -3,12 +3,14 @@ extends Node2D
 class_name MapContinentGenerator
 
 @export var DEBUG: bool = true
+enum TERRAINS {unassigned, water, land, mountain, river, valley}
 
 class MapBigGrid extends RefCounted:
 	var coords: Vector2i
 	var tracks: int = 0
 	var nodes: int = 0
 	var touches_edge: bool = false
+	var terrainType: TERRAINS
 
 	func _init(new_coords: Vector2i) -> void:
 		coords = new_coords
@@ -20,7 +22,7 @@ class MapBigGrid extends RefCounted:
 		tracks += 1
 
 var worldSize: Vector2
-var granularity: int = 16
+var granularity: int = 32
 var mapGrids: Array = []
 var grid_size: Vector2
 var _debug_layer: Node2D = null
@@ -44,6 +46,8 @@ func create_grids_from_mapGraph(mapGraph: MapGraph) -> void:
 
 	for edge: MapGraphEdge in mapGraph.edges:
 		_mark_grids_for_mapGraphEdge(edge)
+		
+	generate_terrain()
 
 	_refresh_debug_visuals()
 
@@ -76,13 +80,18 @@ func _refresh_debug_visuals() -> void:
 
 func _add_grid_debug_visual(grid: MapBigGrid) -> void:
 	var rect_points := _grid_rect_points(grid.coords.x, grid.coords.y)
-
-	if grid.nodes > 0 or grid.tracks > 0:
-		var fill := Polygon2D.new()
-		fill.name = "Fill_%d_%d" % [grid.coords.x, grid.coords.y]
-		fill.polygon = rect_points
-		fill.color = Color(0.0, 1.0, 0.0, 0.12)
-		_debug_layer.add_child(fill)
+	
+	var fill := Polygon2D.new()
+	fill.name = "Fill_%d_%d" % [grid.coords.x, grid.coords.y]
+	fill.polygon = rect_points
+	
+	if grid.terrainType == TERRAINS.water :
+		fill.color = Color(0.0, 0.0, 1.0, 0.22)
+	elif grid.terrainType == TERRAINS.land:
+		fill.color = Color(0.0, 1.0, 0.0, 0.22)
+	else:
+		fill.color = Color(0.0, 0.0, 0.0, 0.22)
+	_debug_layer.add_child(fill)
 
 	var outline := Line2D.new()
 	outline.name = "Outline_%d_%d" % [grid.coords.x, grid.coords.y]
@@ -175,3 +184,41 @@ func _init_grid_at_coord(x: int, y: int) -> void:
 
 func _map_position_to_grid_coord(map_position: Vector2) -> Vector2i:
 	return Vector2i(map_position / grid_size)
+
+func generate_terrain(heat:int=0):
+	var gridConcern
+	var maxr = granularity-1
+	for y in range(granularity):
+		for x in range(granularity):
+			gridConcern= mapGrids[y][x]
+			if gridConcern.nodes > 0 or gridConcern.tracks > 0:
+				gridConcern.terrainType = TERRAINS.land
+			if x == 0 or x == maxr or y== 0 or y==maxr :
+				gridConcern.terrainType = TERRAINS.water
+				
+	for y in range(1,granularity-1):
+		for x in range(1,granularity-1):
+			gridConcern= mapGrids[y][x]
+			if gridConcern.terrainType == TERRAINS.unassigned:
+				var landProb : float = landProbability(y,x)
+				# TODO: Make better desicsions
+				if  landProb > .5+heat :
+					gridConcern.terrainType = TERRAINS.land
+				else:
+					gridConcern.terrainType = TERRAINS.water
+				
+# TODO: Write something MUCH better than this
+func landProbability(y:int, x:int) :
+	var neighbourTypes=returnNeighborsTerrain(y,x)
+	return (neighbourTypes.filter(func(type): return type == TERRAINS.land).size()/neighbourTypes.size())
+
+func returnNeighborsTerrain(y:int, x:int) :
+	var neighborTypes : Array = []
+	for i in range(y-1,y+1):
+		for j in range(x-1,x+1):
+			if i!=j: #remove condition to check diagonals
+				if i>=0 and j >=0 and i<granularity and j<granularity:
+					if mapGrids[i][j].terrainType != TERRAINS.unassigned :
+						neighborTypes.append(mapGrids[i][j].terrainType)
+	return neighborTypes
+			
