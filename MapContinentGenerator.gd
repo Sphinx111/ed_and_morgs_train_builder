@@ -3,6 +3,7 @@ extends Node2D
 class_name MapContinentGenerator
 
 @export var DEBUG: bool = true
+var heat = .2
 enum TERRAINS {unassigned, water, land, mountain, river, valley}
 
 class MapBigGrid extends RefCounted:
@@ -22,7 +23,7 @@ class MapBigGrid extends RefCounted:
 		tracks += 1
 
 var worldSize: Vector2
-var granularity: int = 32
+var granularity: int = 64
 var mapGrids: Array = []
 var grid_size: Vector2
 var _debug_layer: Node2D = null
@@ -195,26 +196,47 @@ func generate_terrain(heat:int=0):
 				gridConcern.terrainType = TERRAINS.land
 			if x == 0 or x == maxr or y== 0 or y==maxr :
 				gridConcern.terrainType = TERRAINS.water
-	
-	var passes = 2 #generate the map in passes instead of gridbygrid ascending
-	for passno in range(passes, 0, -1) : 
-		var passheat=heat*(passno/passes)
+				
+	# each number in this array represents a random pass through the map that 
+	#occurs before the spiral fills it in. bigger numbers are more sparse passes
+	var passesPreFill: Array = [9,7] #never put a 1 in this array tia
+	for passno in passesPreFill: 
 		for y in range(1,granularity-1):
 			if y % passno == 0: 
 				for x in range(1,granularity-1):
 					if x % passno ==0: #max(1,passno-1)
-						gridConcern= mapGrids[y][x]
-						if gridConcern.terrainType == TERRAINS.unassigned:
-							var landProb : float = terrTypeProb(TERRAINS.land,y,x,passheat)
-							var waterProb : float= terrTypeProb(TERRAINS.water,y,x,passheat)
-							# TODO: Make better desicsions
-							if  landProb >= randf()-heat: #2*waterProb :
-								gridConcern.terrainType = TERRAINS.land
-							else:
-								gridConcern.terrainType = TERRAINS.water
+						assignTerrain(y,x)
+				
+	#attempt to spiral fill:
+	for edgedistance in range(1,(granularity/2)+1):
+		for x in range(edgedistance,granularity-edgedistance): #increasing x
+			assignTerrain(edgedistance,x) #run accross
+		for y in range(edgedistance,granularity-edgedistance): #inceasing y 
+			assignTerrain(y,maxr-edgedistance) #right hand side
+		for x in range(granularity-edgedistance,edgedistance,-1): # deceasing x
+			assignTerrain(maxr-edgedistance,x) #bottom edge
+		for y in range(granularity-edgedistance,edgedistance,-1): #decreasing y
+			assignTerrain(y,edgedistance) #left edge?
+			
+		
+				
+				#if x==edgedistance or x==maxr-edgedistance or y==edgedistance or y==maxr-edgedistance:
+					#gridConcern= mapGrids[y][x]
+					
+					
+func assignTerrain(y:int, x:int) :
+	var gridConcern= mapGrids[y][x]
+	if gridConcern.terrainType == TERRAINS.unassigned:
+		var landProb : float = terrTypeProb(TERRAINS.land,y,x)
+		var waterProb : float= terrTypeProb(TERRAINS.water,y,x)
+		# TODO: Make better desicsions
+		if  landProb >= waterProb :
+			gridConcern.terrainType = TERRAINS.land
+		else:
+			gridConcern.terrainType = TERRAINS.water
 					
 # TODO: Write something MUCH better than this
-func terrTypeProb(targetType:TERRAINS, y:int, x:int,heat:float=.10) :
+func terrTypeProb(targetType:TERRAINS, y:int, x:int) :
 	var neighbourTypes=returnNeighborsTerrain(y,x)
 	if neighbourTypes.size()>0:
 		return (neighbourTypes.filter(func(type): return type == targetType).size()/neighbourTypes.size())
@@ -225,7 +247,7 @@ func returnNeighborsTerrain(y:int, x:int) :
 	var neighborTypes : Array = []
 	for i in range(y-1,y+1):
 		for j in range(x-1,x+1):
-			if i!=j: #remove condition to check diagonals
+			#if i!=j: #remove condition to check diagonals
 				if i>=0 and j >=0 and i<granularity and j<granularity:
 					if mapGrids[i][j].terrainType != TERRAINS.unassigned :
 						neighborTypes.append(mapGrids[i][j].terrainType)
