@@ -199,25 +199,28 @@ func generate_terrain(heat:int=0):
 				
 	# each number in this array represents a random pass through the map that 
 	#occurs before the spiral fills it in. bigger numbers are more sparse passes
-	var passesPreFill: Array = [9,7] #never put a 1 in this array tia
+	# runs in order so should be in descending order
+	# if you add 1 to this array it will fill everything and bypass the spiral
+	var passesPreFill: Array = [9,7,5,2]
 	for passno in passesPreFill: 
 		for y in range(1,granularity-1):
 			if y % passno == 0: 
 				for x in range(1,granularity-1):
-					if x % passno ==0: #max(1,passno-1)
+					if x % passno == 0 : # max(2,passno-1):
 						assignTerrain(y,x)
 				
 	#attempt to spiral fill:
-	for edgedistance in range(1,(granularity/2)+1):
-		for x in range(edgedistance,granularity-edgedistance): #increasing x
-			assignTerrain(edgedistance,x) #run accross
-		for y in range(edgedistance,granularity-edgedistance): #inceasing y 
-			assignTerrain(y,maxr-edgedistance) #right hand side
-		for x in range(granularity-edgedistance,edgedistance,-1): # deceasing x
-			assignTerrain(maxr-edgedistance,x) #bottom edge
-		for y in range(granularity-edgedistance,edgedistance,-1): #decreasing y
-			assignTerrain(y,edgedistance) #left edge?
-			
+	if not passesPreFill.find(1)>=0: #no sense spiraling if it's all prefilled
+		for edgedistance in range(1,(granularity/2)+1):
+			for x in range(edgedistance,granularity-edgedistance): #increasing x
+				assignTerrain(edgedistance,x) #run accross
+			for y in range(edgedistance,granularity-edgedistance): #inceasing y 
+				assignTerrain(y,maxr-edgedistance) #right hand side
+			for x in range(granularity-edgedistance,edgedistance,-1): # deceasing x
+				assignTerrain(maxr-edgedistance,x) #bottom edge
+			for y in range(granularity-edgedistance,edgedistance,-1): #decreasing y
+				assignTerrain(y,edgedistance) #left edge?
+				
 		
 				
 				#if x==edgedistance or x==maxr-edgedistance or y==edgedistance or y==maxr-edgedistance:
@@ -230,16 +233,20 @@ func assignTerrain(y:int, x:int) :
 		var landProb : float = terrTypeProb(TERRAINS.land,y,x)
 		var waterProb : float= terrTypeProb(TERRAINS.water,y,x)
 		# TODO: Make better desicsions
-		if  landProb >= waterProb :
+		if  landProb >= .5: 
 			gridConcern.terrainType = TERRAINS.land
-		else:
+		elif waterProb>= .5 :
+			gridConcern.terrainType = TERRAINS.water
+		if  landProb >= .1: 
+			gridConcern.terrainType = TERRAINS.land
+		else :
 			gridConcern.terrainType = TERRAINS.water
 					
 # TODO: Write something MUCH better than this
 func terrTypeProb(targetType:TERRAINS, y:int, x:int) :
 	var neighbourTypes=returnNeighborsTerrain(y,x)
 	if neighbourTypes.size()>0:
-		return (neighbourTypes.filter(func(type): return type == targetType).size()/neighbourTypes.size())
+		return ((neighbourTypes.filter(func(type): return type == targetType).size())/(max(neighbourTypes.size(),2)))
 	else:
 		return randf()+heat
 
