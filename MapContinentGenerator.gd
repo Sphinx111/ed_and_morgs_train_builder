@@ -47,7 +47,7 @@ func create_grids_from_mapGraph(mapGraph: MapGraph) -> void:
 	for edge: MapGraphEdge in mapGraph.edges:
 		_mark_grids_for_mapGraphEdge(edge)
 		
-	generate_terrain()
+	generate_terrain(.2)
 
 	_refresh_debug_visuals()
 
@@ -195,22 +195,31 @@ func generate_terrain(heat:int=0):
 				gridConcern.terrainType = TERRAINS.land
 			if x == 0 or x == maxr or y== 0 or y==maxr :
 				gridConcern.terrainType = TERRAINS.water
-				
-	for y in range(1,granularity-1):
-		for x in range(1,granularity-1):
-			gridConcern= mapGrids[y][x]
-			if gridConcern.terrainType == TERRAINS.unassigned:
-				var landProb : float = landProbability(y,x)
-				# TODO: Make better desicsions
-				if  landProb > .5+heat :
-					gridConcern.terrainType = TERRAINS.land
-				else:
-					gridConcern.terrainType = TERRAINS.water
-				
+	
+	var passes = 2 #generate the map in passes instead of gridbygrid ascending
+	for passno in range(passes, 0, -1) : 
+		var passheat=heat*(passno/passes)
+		for y in range(1,granularity-1):
+			if y % passno == 0: 
+				for x in range(1,granularity-1):
+					if x % passno ==0: #max(1,passno-1)
+						gridConcern= mapGrids[y][x]
+						if gridConcern.terrainType == TERRAINS.unassigned:
+							var landProb : float = terrTypeProb(TERRAINS.land,y,x,passheat)
+							var waterProb : float= terrTypeProb(TERRAINS.water,y,x,passheat)
+							# TODO: Make better desicsions
+							if  landProb >= randf()-heat: #2*waterProb :
+								gridConcern.terrainType = TERRAINS.land
+							else:
+								gridConcern.terrainType = TERRAINS.water
+					
 # TODO: Write something MUCH better than this
-func landProbability(y:int, x:int) :
+func terrTypeProb(targetType:TERRAINS, y:int, x:int,heat:float=.10) :
 	var neighbourTypes=returnNeighborsTerrain(y,x)
-	return (neighbourTypes.filter(func(type): return type == TERRAINS.land).size()/neighbourTypes.size())
+	if neighbourTypes.size()>0:
+		return (neighbourTypes.filter(func(type): return type == targetType).size()/neighbourTypes.size())
+	else:
+		return randf()+heat
 
 func returnNeighborsTerrain(y:int, x:int) :
 	var neighborTypes : Array = []
