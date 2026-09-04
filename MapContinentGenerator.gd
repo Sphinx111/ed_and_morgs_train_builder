@@ -3,8 +3,16 @@ extends Node2D
 class_name MapContinentGenerator
 
 @export var DEBUG: bool = true
-var heat = .2
+var heat = .1
 enum TERRAINS {unassigned, water, land, mountain, river, valley}
+
+var probabilityMatrix: Dictionary = {
+#(water land mountain)
+TERRAINS.mountain : [1,3,1],
+TERRAINS.land : [1,3,1],
+TERRAINS.water : [3,1,1]
+}
+
 
 class MapBigGrid extends RefCounted:
 	var coords: Vector2i
@@ -48,7 +56,7 @@ func create_grids_from_mapGraph(mapGraph: MapGraph) -> void:
 	for edge: MapGraphEdge in mapGraph.edges:
 		_mark_grids_for_mapGraphEdge(edge)
 		
-	generate_terrain(.2)
+	generate_terrain(heat)
 
 	_refresh_debug_visuals()
 
@@ -90,6 +98,8 @@ func _add_grid_debug_visual(grid: MapBigGrid) -> void:
 		fill.color = Color(0.0, 0.0, 1.0, 0.22)
 	elif grid.terrainType == TERRAINS.land:
 		fill.color = Color(0.0, 1.0, 0.0, 0.22)
+	elif grid.terrainType == TERRAINS.mountain:
+		fill.color = Color(0.4, 0.4, 0.0, 0.22)
 	else:
 		fill.color = Color(0.0, 0.0, 0.0, 0.22)
 	_debug_layer.add_child(fill)
@@ -186,7 +196,7 @@ func _init_grid_at_coord(x: int, y: int) -> void:
 func _map_position_to_grid_coord(map_position: Vector2) -> Vector2i:
 	return Vector2i(map_position / grid_size)
 
-func generate_terrain(heat:int=0):
+func generate_terrain(heat:int=heat):
 	var gridConcern
 	var maxr = granularity-1
 	for y in range(granularity):
@@ -201,13 +211,18 @@ func generate_terrain(heat:int=0):
 	#occurs before the spiral fills it in. bigger numbers are more sparse passes
 	# runs in order so should be in descending order
 	# if you add 1 to this array it will fill everything and bypass the spiral
-	var passesPreFill: Array = [9,7,5,2]
+	var passesPreFill: Array = [9,5]
 	for passno in passesPreFill: 
 		for y in range(1,granularity-1):
 			if y % passno == 0: 
 				for x in range(1,granularity-1):
 					if x % passno == 0 : # max(2,passno-1):
 						assignTerrain(y,x)
+	var passesFuzzOut: Array = [2,3,2,3,2,1,2,1]
+	for passno in passesFuzzOut:
+		for y in range(1,granularity-1):
+				for x in range(1,granularity-1):
+						assignTerrain(y,x,passno)
 				
 	#attempt to spiral fill:
 	if not passesPreFill.find(1)>=0: #no sense spiraling if it's all prefilled
@@ -220,41 +235,45 @@ func generate_terrain(heat:int=0):
 				assignTerrain(maxr-edgedistance,x) #bottom edge
 			for y in range(granularity-edgedistance,edgedistance,-1): #decreasing y
 				assignTerrain(y,edgedistance) #left edge?
-				
-		
-				
 				#if x==edgedistance or x==maxr-edgedistance or y==edgedistance or y==maxr-edgedistance:
 					#gridConcern= mapGrids[y][x]
 					
 					
-func assignTerrain(y:int, x:int) :
+func assignTerrain(y:int, x:int, minInfo=0) :
 	var gridConcern= mapGrids[y][x]
 	if gridConcern.terrainType == TERRAINS.unassigned:
-		var landProb : float = terrTypeProb(TERRAINS.land,y,x)
-		var waterProb : float= terrTypeProb(TERRAINS.water,y,x)
+		var landProb : float = terrTypeProb(TERRAINS.land,y,x,minInfo)
+		var waterProb : float= terrTypeProb(TERRAINS.water,y,x,minInfo)
 		# TODO: Make better desicsions
-		if  landProb >= .5: 
+		if (landProb+waterProb)==0:
+			gridConcern.terrainType = TERRAINS.unassigned
+		elif landProb-waterProb > .7:
+			gridConcern.terrainType = TERRAINS.mountain
+		elif  landProb >= .5: 
 			gridConcern.terrainType = TERRAINS.land
 		elif waterProb>= .5 :
 			gridConcern.terrainType = TERRAINS.water
-		if  landProb >= .1: 
+		elif  landProb >= .1: 
 			gridConcern.terrainType = TERRAINS.land
 		else :
 			gridConcern.terrainType = TERRAINS.water
 					
 # TODO: Write something MUCH better than this
-func terrTypeProb(targetType:TERRAINS, y:int, x:int) :
+func terrTypeProb(targetType:TERRAINS, y:int, x:int, minimumInfo:int=0) :
 	var neighbourTypes=returnNeighborsTerrain(y,x)
+	if neighbourTypes.size() < minimumInfo:
+		return 0
 	if neighbourTypes.size()>0:
 		return ((neighbourTypes.filter(func(type): return type == targetType).size())/(max(neighbourTypes.size(),2)))
 	else:
 		return randf()+heat
+		
 
 func returnNeighborsTerrain(y:int, x:int) :
 	var neighborTypes : Array = []
 	for i in range(y-1,y+1):
 		for j in range(x-1,x+1):
-			#if i!=j: #remove condition to check diagonals
+			if i!=j: #remove condition to check diagonals
 				if i>=0 and j >=0 and i<granularity and j<granularity:
 					if mapGrids[i][j].terrainType != TERRAINS.unassigned :
 						neighborTypes.append(mapGrids[i][j].terrainType)
