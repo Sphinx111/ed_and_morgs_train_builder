@@ -51,7 +51,6 @@ func resource_tick():
 		parentTrain.add_res("grey_water", water_required)
 	else:
 		moisture_level = 0
-		$MoistureSlider.value = 0
 		
 	for module in modules:
 		if module != null:

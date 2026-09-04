@@ -53,7 +53,6 @@ func get_work_types() -> Array[String]:
 	var work_types: Array[String] = []
 	work_types.append("any")
 	_append_work_category(work_types, output_type_1)
-	_append_work_category(work_types, output_type_2)
 	return work_types
 
 
