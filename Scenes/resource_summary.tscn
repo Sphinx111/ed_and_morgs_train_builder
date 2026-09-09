@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dnidl4th21m2e"]
+[gd_scene load_steps=4 format=3 uid="uid://dnidl4th21m2e"]
 
 [ext_resource type="Script" uid="uid://dnjah2hcpnfbr" path="res://Scenes/resource_summary.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dbqhndenl23nt" path="res://images/scrap_icon.png" id="2_icon"]
+[ext_resource type="Script" path="res://Scenes/resource_trend_indicator.gd" id="3_trend"]
 
 [node name="ResourceSummary" type="Panel"]
 custom_minimum_size = Vector2(72, 28)
@@ -34,3 +35,8 @@ theme_override_font_sizes/normal_font_size = 64
 text = "x10"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="TrendIndicator" type="Control" parent="."]
+visible = false
+layout_mode = 1
+script = ExtResource("3_trend")

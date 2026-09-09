@@ -29,35 +29,36 @@ var passengerManager : PassengerManager = null
 var minXpos : float = 0.0
 var maxXpos : float = 0.0
 
-# x varieties of food
-var res : Dictionary[String, float] = {
-	"food" : 100.0,
-	"food1" : 100.0,
-	"food2" : 100.0,
-	"food3" : 0.0,
-	"food4" : 0.0,
-	"food5" : 0.0,
-	"food6" : 0.0,
-	"clean_water" : 200.0,
-	"grey_water" : 0.0,
-	"black_water" : 0.0,
-	"mech_parts" : 100.0,
-	"fuel" : 100.0,
-	"oil" : 10.0,
-	"fertiliser" : 10.0,
-	"seeds1" : 10.0,
-	"seeds2" : 10.0,
-	"seeds3" : 0.0,
-	"seeds4" : 0.0,
-	"seeds5" : 0.0,
-	"seeds6" : 0.0,
-	"scrap" : 0.0
-}
+# Resource storage, adding/removing, and per-tick production/consumption tracking all live in
+# TrainResources now (composition) - see that file for the resource dict, storage caps, mothball
+# state, and the rolling-window/trend bookkeeping. The properties below just forward reads for
+# existing callers (UI, modules) so they can keep reading train.max_res / train.last_tick_trend /
+# etc. without reaching into resourceManager directly.
+var resourceManager : TrainResources = TrainResources.new(self)
 
-var max_res : Dictionary = {}
+var max_res : Dictionary:
+	get:
+		return resourceManager.max_res
 
-# Whether each producible resource's industry is mothballed (true = not producing new cycles).
-var industry_states : Dictionary[String, bool] = {}
+var last_tick_produced : Dictionary:
+	get:
+		return resourceManager.last_tick_produced
+
+var last_tick_consumed : Dictionary:
+	get:
+		return resourceManager.last_tick_consumed
+
+var last_tick_trend : Dictionary:
+	get:
+		return resourceManager.last_tick_trend
+
+var rolling_tick_produced : Dictionary:
+	get:
+		return resourceManager.rolling_tick_produced
+
+var rolling_tick_consumed : Dictionary:
+	get:
+		return resourceManager.rolling_tick_consumed
 
 var speed : float = 200.0
 var is_accelerating : bool = false
@@ -96,51 +97,24 @@ func setup_engine() -> void:
 	engineStorage.create_storage(self)
 	engine.storages.append(engineStorage)
 
+## Resource storing/adding/removing now lives in TrainResources (resourceManager) - these just
+## forward so existing callers across the module/UI code don't need to change.
 func get_res(key : String) -> float:
-	if res.has(key):
-		return res.get(key)
-	if key == "pop":
-		if passengerManager != null:
-			return passengerManager.passengers.size()
-		return 0
-	return 0
+	return resourceManager.get_res(key)
 
 ## Function to consume amount if available, returns a status code
 func gather_res(key : String, amount : float) -> int:
-	if res.has(key) and res[key] >= amount:
-		add_res(key, -amount)
-		return Globals.RESULT_OK
-	return Globals.NO_RESOURCES
+	return resourceManager.gather_res(key, amount)
 
 # adds a resource to the train, returning the amount that could not be added
 func add_res(key : String, amount : float) -> float:
-	if res.has(key):
-		if max_res.has(key):
-			var goal_amount : float = res[key] + amount
-			if goal_amount > max_res[key]:
-				var excess : float = goal_amount - max_res[key]
-				res[key] = max_res[key];
-				return excess
-			else:
-				res[key] = res[key] + amount
-	elif key == "pop":
-		for i in range(roundi(amount)):
-			passengerManager.add_passenger()
-	else:
-		print_debug("adding resource that doesn't exist: " + key)
-	return 0
+	return resourceManager.add_res(key, amount)
 
 func add_pop(amount : int) -> void:
-	if amount > 0:
-		for i in range(amount):
-			passengerManager.add_passenger()
-	else:
-		for i in range(abs(amount)):
-			remove_random_passenger()
-
+	resourceManager.add_pop(amount)
 
 func remove_random_passenger() -> void:
-	passengerManager.remove_random_passenger()
+	resourceManager.remove_random_passenger()
 
 func get_expedition_team(passengers_needed : int) -> Array[Passenger]:
 	return passengerManager.get_expedition_passengers(passengers_needed)
@@ -149,18 +123,15 @@ func recover_expedition(teamArray : Array[Passenger]) -> void:
 	passengerManager.recover_expedition(teamArray)
 
 func amend_storage(type : String, amount : float) -> void:
-	if max_res.has(type):
-		max_res[type] = max_res[type] + amount
-	else:
-		max_res[type] = amount
+	resourceManager.amend_storage(type, amount)
 
 
 func is_industry_mothballed(type_name: String) -> bool:
-	return industry_states.get(type_name, false)
+	return resourceManager.is_industry_mothballed(type_name)
 
 
 func set_industry_mothballed(type_name: String, mothballed: bool) -> void:
-	industry_states[type_name] = mothballed
+	resourceManager.set_industry_mothballed(type_name, mothballed)
 
 
 func _on_industry_mothballed_changed(type_name: String, mothballed: bool) -> void:
@@ -172,7 +143,11 @@ func _on_industry_mothballed_changed(type_name: String, mothballed: bool) -> voi
 			if module != null:
 				module.apply_industry_mothball(type_name, mothballed)
 
+## begin_tick()/end_tick() bracket everything below that can add or remove a resource
+## (carriages, their modules, passengers) so TrainResources can capture this tick's exact
+## produced/consumed totals and fold them into its rolling window/trend - see TrainResources.gd.
 func resource_tick() -> void:
+	resourceManager.begin_tick()
 	for carriage in carriages:
 		if carriage != null:
 			carriage.resource_tick()
@@ -180,6 +155,7 @@ func resource_tick() -> void:
 	passengerManager.resource_tick(train_temperature)
 	_speed_tick()
 	Helpers.update_resource_safety_flags(self)
+	resourceManager.end_tick()
 
 func _temperature_tick() -> void:
 	# Map height 0..2 (horizon..horizon) to heating intensity 0..1..0, peaking at seam/midday.

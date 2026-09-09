@@ -2,6 +2,8 @@ extends Panel
 
 class_name ResourceSummary
 
+@onready var _trend_indicator: ResourceTrendIndicator = $TrendIndicator
+
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -20,3 +22,8 @@ func setup_by_type_name(type_name: String, amount: float, use_multiplier_prefix:
 	if resource_type == null:
 		return
 	setup(resource_type, amount, use_multiplier_prefix)
+
+
+## trend: 1 = net production last tick, -1 = net consumption last tick, 0 = no net change.
+func set_trend(trend: int) -> void:
+	_trend_indicator.set_trend(trend)

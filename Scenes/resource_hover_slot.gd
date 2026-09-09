@@ -37,6 +37,7 @@ func refresh() -> void:
 	if _train == null or resource_type == null or _summary == null:
 		return
 	_summary.setup(resource_type, _train.get_res(resource_type.type_name), false)
+	_summary.set_trend(_train.last_tick_trend.get(resource_type.type_name, 0))
 
 
 func _on_mouse_entered() -> void:

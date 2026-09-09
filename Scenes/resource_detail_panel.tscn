@@ -3,9 +3,9 @@
 [ext_resource type="Script" uid="uid://pbw21554i43" path="res://Scenes/resource_detail_panel.gd" id="1_script"]
 
 [node name="ResourceDetailPanel" type="Panel"]
-custom_minimum_size = Vector2(72, 36)
-offset_right = 162.0
-offset_bottom = 95.0
+custom_minimum_size = Vector2(96, 48)
+offset_right = 246.0
+offset_bottom = 118.0
 size_flags_horizontal = 3
 script = ExtResource("1_script")
 
@@ -31,6 +31,11 @@ text = "Water"
 [node name="ValueLabel" type="Label" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "25 / 100"
+
+[node name="TickLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Last 60s — Produced: 0   Consumed: 0"
 
 [node name="Button" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
