@@ -12,20 +12,6 @@ var adjacencies : int = 0
 var enabled : bool = true
 var mothballed : bool = false
 
-const build_cost : Dictionary[String, float] = {
-	"water_purifier" : 25.0,
-	"sewage_works" : 25.0,
-	"mech_parts" : 20.0,
-	"farm" : 10.0,
-	"scrap_arm" : 50.0,
-	"kitchen" : 5.0,
-	"cabin" : 2.0,
-	"expedition_room" : 20.0,
-	"water_collector" : 25.0,
-	"fuel_refinery" : 50.0,
-	"lounge" : 10.0
-}
-
 # Service variables
 var services : Array[ServiceProvider] = []
 var serves_needs : Array[String] = []
@@ -356,6 +342,7 @@ func reset_module():
 	# Remove any storage provision from train
 	for storage in storages:
 		storage.remove_storage(parentTrain)
+	storages = []
 
 func set_adjacency(newVal : int) -> void:
 	adjacencies = newVal
@@ -368,66 +355,38 @@ func set_type(newType : String):
 	if newType == "empty":
 		_update_click_area_enabled()
 		return
-	if newType == "water_purifier":
-		$Outline.color = Color.AQUA
-		add_producers_for_type(newType)
-		workers_needed = 1
-		add_custom_storage({"clean_water" : 50.0, "grey_water" : 50.0})
-	elif newType == "sewage_works":
-		$Outline.color = Color.SLATE_GRAY
-		add_producers_for_type(newType)
-		workers_needed = 1
-		add_custom_storage({"grey_water" : 50.0, "black_water" : 10.0})
-	elif newType == "cabin":
-		$Outline.color = Color.BROWN
-		add_services_for_type(newType)
-		baseCustomers = 4
-	elif newType == "kitchen":
-		$Outline.color = Color.BISQUE
-		add_services_for_type(newType)
-		add_custom_storage({"clean_water" : 20.0,"food1" : 10.0,"food2" : 10.0})
-		baseCustomers = 4
-	elif newType == "farm":
-		$Outline.color = Color.SEA_GREEN
-		add_services_for_type(newType)
-		baseCustomers = 5
-		add_producers_for_type(newType)
-		workers_needed = 5
-		add_custom_storage({"food1" : 50.0, "food2" : 50.0})
-	elif newType == "scrap_arm":
-		$Outline.color = Color.SANDY_BROWN
-		add_producers_for_type(newType)
-		workers_needed = 1
-		add_custom_storage({"scrap" : 50.0})
-	elif newType == "mech_parts":
-		$Outline.color = Color.SANDY_BROWN
-		add_producers_for_type(newType)
-		workers_needed = 1
-		add_custom_storage({"mech_parts" : 50.0})
-	elif newType == "expedition_room":
-		$Outline.color = Color.MEDIUM_PURPLE
-	elif newType == "water_collector":
-		$Outline.color = Color.CADET_BLUE
-		add_producers_for_type(newType)
-		workers_needed = 1
-		add_custom_storage({"grey_water" : 100.0})
-	elif newType == "fuel_refinery":
-		$Outline.color = Color.DARK_SLATE_GRAY
-		workers_needed = 8
-		add_producers_for_type(newType)
-		add_custom_storage({"oil" : 100.0, "fuel" : 100.0})
-	elif newType == "lounge":
-		$Outline.color = Color.CORNFLOWER_BLUE
-		baseCustomers = 8
-		min_customers_for_service = 2
-		add_services_for_type(newType)
+
+	var config := ModuleDefinitionRegistry.get_definition(newType)
+	if config.is_empty():
+		push_warning("ModuleBase.set_type: unknown module type '%s'" % newType)
+		$Label.text = newType
+		_update_click_area_enabled()
+		return
+
+	_apply_module_definition(newType, config)
 	$Label.text = newType
 	maxCustomers = baseCustomers
 	if workers_needed > 0:
-		parentCar.update_work_maps(work_types,sequence,Globals.MODULE_ADDED)
+		parentCar.update_work_maps(work_types, sequence, Globals.MODULE_ADDED)
 	_configure_capability(newType)
 	_update_click_area_enabled()
 	_sync_mothball_state()
+
+
+func _apply_module_definition(module_type: String, config: Dictionary) -> void:
+	$Outline.color = config.get("outline_color", Color.GRAY)
+	workers_needed = config.get("workers", 0)
+	baseCustomers = config.get("base_customers", 0)
+	min_customers_for_service = config.get("min_customers_for_service", 0)
+
+	var storage: Dictionary = config.get("storage", {})
+	if not storage.is_empty():
+		add_custom_storage(storage)
+
+	if ModuleProducerRegistry.get_recipes_for_module(module_type).size() > 0:
+		add_producers_for_type(module_type)
+	if ServiceProviderRegistry.get_recipes_for_module(module_type).size() > 0:
+		add_services_for_type(module_type)
 
 
 func apply_industry_mothball(resource_type_name: String, is_mothballed: bool) -> void:

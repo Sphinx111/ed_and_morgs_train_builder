@@ -3,6 +3,7 @@
 /android/
 /addons/godot-git-plugin
 /addons/resources_spreadsheet_view
+/addons/dialogue_manager
 /example/
 /images/*.import
 *.import

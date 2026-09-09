@@ -45,7 +45,7 @@ func _ready() -> void:
 	enabled_toggle = get_node("ControlsSection/ToggleButton")
 
 	get_node("%s/HeaderSection/ModuleNameLabel" % MAIN_VBOX_PATH).text = parentModule.type
-	var refund: float = ModuleBase.build_cost.get(parentModule.type, 0.0) * Globals.refund_module_fraction
+	var refund: float = ModuleDefinitionRegistry.get_build_cost(parentModule.type) * Globals.refund_module_fraction
 	get_node("%s/HeaderSection/CostLabel" % MAIN_VBOX_PATH).text = "Sell: %f" % refund
 	_setup_mode_dropdown()
 	mode_button.item_selected.connect(_on_mode_selected)

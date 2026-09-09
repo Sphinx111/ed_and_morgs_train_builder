@@ -11,15 +11,15 @@ var mass : float = 1000.0
 
 # List of modules in the car
 var modules : Array[ModuleBase] = [null, null, null, null]
-var ModuleScene = preload("res://Scenes/module.tscn")
-var defaultModuleArray = ["water_purifier", "cabin", "cabin", "cabin"]
+var ModuleScene : PackedScene = preload("res://Scenes/module.tscn")
+var defaultModuleArray : Array[String] = ["water_purifier", "cabin", "cabin", "cabin"]
 
 # Environmental Variables
-var moisture_requested : int = 1.0
+var moisture_requested : int = 1
 var moisture_level : int = 0
 var water_consumption_per_level : float = 0.1
 
-func _ready():
+func _ready() -> void:
 	if Globals.train_direction < 0:
 		position.x = sequence * (Globals.car_length + Globals.car_separation)
 	else:
@@ -32,7 +32,7 @@ func _ready():
 	for i in range(4):
 		init_module("empty", i)
 
-func set_sequence(newSequence : int):
+func set_sequence(newSequence : int) -> void:
 	sequence = newSequence
 	if Globals.train_direction < 0:
 		position.x = sequence * (Globals.car_length + Globals.car_separation)
@@ -44,7 +44,7 @@ func set_sequence(newSequence : int):
 			modules[i].set_type(defaultModuleArray[i])
 
 
-func resource_tick():
+func resource_tick() -> void:
 	var water_required : float = moisture_requested * water_consumption_per_level
 	if parentTrain.gather_res("clean_water", water_required) == Globals.RESULT_OK:
 		moisture_level = moisture_requested
@@ -56,56 +56,56 @@ func resource_tick():
 		if module != null:
 			module.resource_tick()
 
-func init_module(type : String, position : int) -> void:
+func init_module(type : String, _position : int) -> void:
 	var new_module : ModuleBase = ModuleScene.instantiate()
 	add_child(new_module)
 	new_module.set_type(type)
-	new_module.set_sequence(position)
+	new_module.set_sequence(_position)
 
-	if modules[position] != null:
-		new_module.customers = modules[position].customers
-		new_module.workers = modules[position].workers
-		modules[position].queue_free()
+	if modules[_position] != null:
+		new_module.customers = modules[_position].customers
+		new_module.workers = modules[_position].workers
+		modules[_position].queue_free()
 
-	modules[position] = new_module
+	modules[_position] = new_module
 
-func add_module(type : String, slot : int):
+func add_module(type : String, slot : int) -> void:
 	modules[slot].set_type(type)
 	recalculateAdjacencies()
 	
 # TODO: last slot seems to not get adjacencie bonuses test more then fix
-func recalculateAdjacencies():
+func recalculateAdjacencies() -> void:
 	for i in range(0,4):
 		var newVal : int = 0
-		var type=modules[i].type
+		var type : String = modules[i].type
 		if i>0 and modules[i-1].type == type :
 			newVal += 1
 		if i<3 and modules[i+1].type== type :
 			newVal += 1
 		modules[i].set_adjacency(newVal)
 
-func remove_module(slot: int):
+func remove_module(slot: int) -> void:
 	modules[slot].set_type("empty")
 	recalculateAdjacencies()
 
 func get_type_map(need_type_to_find : String) -> Array:
-	var result = [0,0,0,0]
+	var result : Array[int] = [0,0,0,0]
 	for i in range(4):
 		if modules[i].can_serve_need(need_type_to_find):
 			result[i] = 1
 	return result
 
 func get_work_map(work_type_to_find : String) -> Array:
-	var result = [0,0,0,0]
+	var result : Array[int] = [0,0,0,0]
 	for i in range(4):
 		if modules[i].needs_worker(work_type_to_find):
 			result[i] = 1
 	return result
 
-func update_needs_maps(needsArray : Array[String], modulePos : int, newState : int):
+func update_needs_maps(needsArray : Array[String], modulePos : int, newState : int) -> void:
 	parentTrain.update_needs_maps(needsArray, [sequence, modulePos], newState)
 
-func update_work_maps(workArray : Array[String], modulePos : int, newState : int):
+func update_work_maps(workArray : Array[String], modulePos : int, newState : int) -> void:
 	parentTrain.update_work_maps(workArray, [sequence, modulePos], newState)
 
 func _on_moisture_slider_value_changed(value: float) -> void:

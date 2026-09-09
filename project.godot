@@ -26,6 +26,7 @@ resources_spreadsheet_view/freeze_first_column=true
 config/name="Ed_and_morgans_train_builder"
 run/main_scene="uid://dvfa2mi1q8kyn"
 config/features=PackedStringArray("4.5", "Forward Plus")
+run/max_fps=60
 config/icon="res://icon.svg"
 
 [autoload]
@@ -33,6 +34,11 @@ config/icon="res://icon.svg"
 Globals="*res://globals.gd"
 Helpers="*res://helpers.gd"
 EventBus="*res://event_bus.gd"
+DialogueManager="*res://addons/dialogue_manager/dialogue_manager.gd"
+
+[debug]
+
+gdscript/warnings/untyped_declaration=1
 
 [display]
 
@@ -46,7 +52,7 @@ version_control/autoload_on_startup=true
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/resources_spreadsheet_view/plugin.cfg")
+enabled=PackedStringArray("res://addons/dialogue_manager/plugin.cfg", "res://addons/resources_spreadsheet_view/plugin.cfg")
 
 [input]
 
@@ -72,3 +78,7 @@ camera_right={
 , Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":68,"key_label":0,"unicode":100,"location":0,"echo":false,"script":null)
 ]
 }
+
+[internationalization]
+
+locale/translations_pot_files=PackedStringArray("res://DialogData/TestDialogue.dialogue")

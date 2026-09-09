@@ -4,13 +4,13 @@ class_name Train
 
 var train_name : String = ""	#Give it a name?
 var engine : ModuleBase = null
-var players = []				#Which players run the train?
+var players : Array[int] = []				#Which players run the train?
 var carriages : Array[TraincarBase] = []
-var tickCount = 0 				#Resource ticks since the train launched
+var tickCount : int = 0 				#Resource ticks since the train launched
 
 var eventProcessor : TrainEventProcessor = TrainEventProcessor.new(self)
 
-var CarriageScene = preload("res://Scenes/traincar_base.tscn")
+var CarriageScene : PackedScene = preload("res://Scenes/traincar_base.tscn")
 
 # Pointer to world map so train can track its position in the world
 var worldMap : MapHandler = null
@@ -30,7 +30,7 @@ var minXpos : float = 0.0
 var maxXpos : float = 0.0
 
 # x varieties of food
-var res = {
+var res : Dictionary[String, float] = {
 	"food" : 100.0,
 	"food1" : 100.0,
 	"food2" : 100.0,
@@ -90,9 +90,9 @@ func _ready() -> void:
 	EventBus.industry_mothballed_changed.connect(_on_industry_mothballed_changed)
 
 ## Set up engine variables, placeholder for now
-func setup_engine():
+func setup_engine() -> void:
 	engine = ModuleBase.new()
-	var engineStorage = EngineStorageProvider.new()
+	var engineStorage : EngineStorageProvider = EngineStorageProvider.new()
 	engineStorage.create_storage(self)
 	engine.storages.append(engineStorage)
 
@@ -145,10 +145,10 @@ func remove_random_passenger() -> void:
 func get_expedition_team(passengers_needed : int) -> Array[Passenger]:
 	return passengerManager.get_expedition_passengers(passengers_needed)
 
-func recover_expedition(teamArray : Array[Passenger]):
+func recover_expedition(teamArray : Array[Passenger]) -> void:
 	passengerManager.recover_expedition(teamArray)
 
-func amend_storage(type : String, amount : float):
+func amend_storage(type : String, amount : float) -> void:
 	if max_res.has(type):
 		max_res[type] = max_res[type] + amount
 	else:
@@ -172,7 +172,7 @@ func _on_industry_mothballed_changed(type_name: String, mothballed: bool) -> voi
 			if module != null:
 				module.apply_industry_mothball(type_name, mothballed)
 
-func resource_tick():
+func resource_tick() -> void:
 	for carriage in carriages:
 		if carriage != null:
 			carriage.resource_tick()
@@ -208,7 +208,7 @@ func _speed_tick() -> void:
 			is_accelerating = false
 			is_decelerating = false
 
-func _process(delta):
+func _process(delta : float) -> void:
 	if is_accelerating:
 		speed = move_toward(speed,target_speed,get_acceleration(engine_thrust) * delta * Globals.time_factor)
 	elif is_decelerating:
@@ -221,7 +221,7 @@ func get_acceleration(moving_force : float) -> float:
 	
 	return moving_force / train_mass
 
-func add_module(type: String, carNum : int, slot : int):
+func add_module(type: String, carNum : int, slot : int) -> void:
 	if carNum >= carriages.size() or slot >= Globals.modules_per_car or carriages[carNum] == null:
 		print_debug("Error: Invalid Build slot: " + String.num_int64(carNum) + ":" + String.num_int64(slot))
 		return
@@ -230,7 +230,7 @@ func add_module(type: String, carNum : int, slot : int):
 		remove_module(carNum, slot)
 	
 	if type != "empty":
-		var cost : float = ModuleBase.build_cost[type]
+		var cost : float = ModuleDefinitionRegistry.get_build_cost(type)
 		if gather_res("mech_parts", cost) == Globals.NO_RESOURCES:
 			return
 	
@@ -238,7 +238,7 @@ func add_module(type: String, carNum : int, slot : int):
 	update_needs_maps(carriages[carNum].modules[slot].serves_needs,[carNum, slot],Globals.MODULE_ADDED)
 
 ## Add a new car to the end of the train
-func add_car():
+func add_car() -> void:
 	add_carriage(carriages.size())
 	passengerMap.resize_maps()
 	if Globals.train_direction > 0:
@@ -281,15 +281,15 @@ func refresh_module_click_areas() -> void:
 				module.update_click_area()
 
 
-func remove_module(carNum : int, slot : int):
+func remove_module(carNum : int, slot : int) -> void:
 	if carriages.size() <= slot or carriages[carNum] == null:
 		print_debug("Error: attempting to remove module from nonexistent car: " + String.num_int64(carNum))
 	var typesToRemove : Array[String] = carriages[carNum].modules[slot].serves_needs.duplicate()
 	var workTypesToRemove : Array[String] = [] 
 	if carriages[carNum].modules[slot].workers_needed > 0:
 		workTypesToRemove = carriages[carNum].modules[slot].work_types.duplicate()
-	var modType = carriages[carNum].modules[slot].type
-	var refund : float = ModuleBase.build_cost[modType] * Globals.refund_module_fraction
+	var modType : String = carriages[carNum].modules[slot].type
+	var refund : float = ModuleDefinitionRegistry.get_build_cost(modType) * Globals.refund_module_fraction
 	add_res("mech_parts", refund)
 	
 	carriages[carNum].remove_module(slot)
@@ -298,19 +298,19 @@ func remove_module(carNum : int, slot : int):
 	if workTypesToRemove.size() > 0:
 		update_work_maps(workTypesToRemove,[carNum, slot],Globals.MODULE_REMOVED)
 
-func add_carriage(sequence : int):
-	var newCarriage = CarriageScene.instantiate()
+func add_carriage(sequence : int) -> void:
+	var newCarriage : TraincarBase = CarriageScene.instantiate()
 	add_child(newCarriage)
 	carriages.append(newCarriage)
 	newCarriage.set_sequence(sequence)
 
-func add_passenger_debug():
+func add_passenger_debug() -> void:
 	passengerManager.add_passenger()
 
-func get_car_count():
+func get_car_count() -> int:
 	return carriages.size()
 
-func get_passenger_count():
+func get_passenger_count()-> int:
 	return passengerManager.get_passenger_count()
 
 func init_passenger_map() -> void:
@@ -350,9 +350,8 @@ func _on_speed_lever_changed(new_position: int) -> void:
 	target_speed = 100.0 * new_position
 	pass # Replace with function body.
 
-func receive_expeditions_started_signal():
+func receive_expeditions_started_signal() -> void:
 	expedition_safety_flag = true
 
-func receive_expeditions_finished_signal():
+func receive_expeditions_finished_signal() -> void:
 	expedition_safety_flag = false
-	pass

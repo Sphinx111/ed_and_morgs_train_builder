@@ -4,20 +4,6 @@ class_name ConstructionPanel
 
 signal placement_requested(module_type: String)
 
-const MODULE_DISPLAY_LABELS: Dictionary[String, String] = {
-	"water_purifier": "Water Purifier",
-	"sewage_works": "Sewage Works",
-	"mech_parts": "Parts",
-	"farm": "Farm",
-	"scrap_arm": "Scrap",
-	"kitchen": "Kitchen",
-	"cabin": "Cabin",
-	"expedition_room": "Expedition Room",
-	"water_collector": "H2O Scoop",
-	"fuel_refinery": "Refinery",
-	"lounge" : "Lounge"
-}
-
 @onready var _module_buttons: HBoxContainer = $ModuleButtons
 
 var _buttons: Array[Button] = []
@@ -61,14 +47,8 @@ func _on_module_button_pressed(module_type: String) -> void:
 
 
 func _get_buildable_module_types() -> Array[String]:
-	var module_types: Array[String] = []
-	for module_type in ModuleBase.build_cost.keys():
-		module_types.append(module_type)
-	module_types.sort()
-	return module_types
+	return ModuleDefinitionRegistry.get_buildable_module_types()
 
 
 func _get_display_label(module_type: String) -> String:
-	if MODULE_DISPLAY_LABELS.has(module_type):
-		return MODULE_DISPLAY_LABELS[module_type]
-	return module_type.replace("_", " ")
+	return ModuleDefinitionRegistry.get_display_label(module_type)
