@@ -27,11 +27,11 @@ func _ready() -> void:
 	actionLabel.text = " Coding it so the action label is accurate"
 
 func update_step() -> void:
-	thirstBar.size.x = passenger.needs["thirst"] * bar_width
-	hungerBar.size.x = passenger.needs["hunger"] * bar_width
-	socialBar.size.x = passenger.needs["social"] * bar_width
-	illnessBar.size.x = passenger.needs["illness"] * bar_width
-	restBar.size.x = passenger.needs["rest"] * bar_width
+	thirstBar.size.x = passenger.wants_need("thirst") * bar_width
+	hungerBar.size.x = passenger.wants_need("hunger") * bar_width
+	socialBar.size.x = passenger.wants_need("social") * bar_width
+	illnessBar.size.x = passenger.wants_need("illness") * bar_width
+	restBar.size.x = passenger.wants_need("rest") * bar_width
 	if passenger.is_in_module:
 		actionLabel.text = ("working at %s" if passenger.is_working else "served by %s") % passenger.current_module.type
 	else:

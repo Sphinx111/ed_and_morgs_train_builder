@@ -31,21 +31,13 @@ var water_content : float = 0.0
 var displayNeeds : bool = false
 var displayNeedsScene : PackedScene = preload("res://Scenes/passenger_panel.tscn")
 var passengerPanel : PassengerPanel = null
-var targetNeed : String = ""
-var needs = {
-	"thirst" : 0.0,
-	"hunger" : 0.65,
-	"rest" : 0.0,
-	"illness" : 0.0,
-	"social" : 0.0
-}
-const maxNeeds : Dictionary[String, float] = {
-	"thirst" : 1.0,
-	"hunger" : 1.0,
-	"rest" : 1.0,
-	"illness" : 1.0,
-	"social" : 99.0
-}
+
+# Need levels, caps, and the currently-targeted need all live in PassengerNeeds now
+# (composition) - see that file for the tracking itself. The pass-through methods further down
+# (wants_need, adjust_need, check_needs, fix_all_needs) are what other systems (ServiceProvider,
+# PassengerManager, PassengerPanel) call instead of reaching into needsManager directly.
+var needsManager : PassengerNeeds = PassengerNeeds.new(self)
+
 const WANDER_DURATION : float = 2.0
 
 var temp_tolerance : float = 40.0 # At this temp, passenger consumes most resources
@@ -75,8 +67,7 @@ func _ready_debug_displays():
 		$DebugRest.show()
 
 func _init_random_needs():
-	for key in needs:
-		needs[key] = randf_range(0.0, 0.5)
+	needsManager.randomize_needs()
 	water_content = randf_range(0.0, 0.5)
 
 func _process(delta: float) -> void:
@@ -111,16 +102,16 @@ func update_module_positions():
 	check_current_module()
 
 func update_needs_debug():
-	$DebugThirst.size.y = (20 * needs["thirst"])
-	$DebugHunger.size.y = (20 * needs["hunger"])
-	$DebugRest.size.y   = (20 * needs["rest"])
+	$DebugThirst.size.y = (20 * wants_need("thirst"))
+	$DebugHunger.size.y = (20 * wants_need("hunger"))
+	$DebugRest.size.y   = (20 * wants_need("rest"))
 
 # If my needs have just changed, check whether the module I am in serves what I need
 func check_current_module():
 	var myLocation = Helpers.get_trainpos_from_coords(self.position)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
-	if targetNeed != "":
-		if current_module.can_serve_need(targetNeed):
+	if needsManager.targetNeed != "":
+		if current_module.can_serve_need(needsManager.targetNeed):
 			enter_customer_module(current_module, 1)
 	elif targetWork != "":
 		if current_module.needs_worker(targetWork):
@@ -159,7 +150,7 @@ func exit_customer_module():
 ## Used by modules to eject a passenger
 func ejected_from_module():
 	self.show()
-	targetNeed = ""
+	needsManager.targetNeed = ""
 	is_in_module = false
 	is_working = false
 
@@ -179,17 +170,12 @@ func worker_ejected_from_module():
 	is_working = false
 
 func resource_tick(_train_temperature : float):
-	for key in needs.keys():
-		if key == "thirst":
-			var temp_stress : float = _train_temperature - Globals.train_base_temp
-			needs[key] += (Globals.need_growth_rates[key] * temp_stress / temp_stress_tolerance * water_consumption_at_tolerance);
-		else:
-			needs[key] += Globals.need_growth_rates[key]
+	needsManager.grow_needs(_train_temperature)
 	if _train_temperature >= temp_death:
 		_log_passenger_death("heat (%.1f°C)" % _train_temperature)
 		is_dying = true
-	check_needs()
-	
+	needsManager.check_needs()
+
 	check_for_work()
 	if Globals.passenger_debug == true:
 		update_needs_debug()
@@ -197,10 +183,10 @@ func resource_tick(_train_temperature : float):
 	if passengerPanel != null:
 		passengerPanel.update_step()
 
+## Need tracking now lives in PassengerNeeds (needsManager) - these just forward so existing
+## callers (ServiceProvider, PassengerManager, PassengerPanel) don't need to change.
 func wants_need(type : String) -> float:
-	if needs.has(type):
-		return (needs[type])
-	return 0.0
+	return needsManager.wants_need(type)
 
 ## Called to remove itself from any modules, this passenger is about to die
 func cleanup():
@@ -214,42 +200,11 @@ func cleanup():
 		is_in_module = false
 
 func check_needs():
-	if is_on_expedition == true:
-		return
-	var highest_proportion := 0.0
-	var priority_need := ""
-	for key in needs.keys():
-		if not maxNeeds.has(key) or maxNeeds[key] <= 0.0:
-			continue
-		if needs[key] >= maxNeeds[key]:
-			if hit_max_need(key) == Globals.RESULT_FATAL:
-				is_dying = true
-				return
-		var proportion := _get_need_proportion(key)
-		if proportion > highest_proportion:
-			highest_proportion = proportion
-			priority_need = key
-	if highest_proportion > Globals.passenger_seeks_threshold:
-		if priority_need != "":
-			if priority_need != targetNeed:
-				targetNeed = priority_need
-			check_current_module()
-			if is_working and is_in_module:
-				exit_worker_module()
-
-
-func _get_need_proportion(need_key: String) -> float:
-	if not needs.has(need_key) or not maxNeeds.has(need_key):
-		return 0.0
-	var cap := maxNeeds[need_key]
-	if cap <= 0.0:
-		return 0.0
-	return needs[need_key] / cap
+	needsManager.check_needs()
 
 ## Used before passengers are sent on an expedition
 func fix_all_needs():
-	for key in needs.keys():
-		needs[key] = 0.0
+	needsManager.fix_all_needs()
 
 func check_for_work():
 	targetWork = manager.get_next_work_priority()
@@ -264,8 +219,8 @@ func hit_max_need(needType : String) -> int:
 
 
 func _log_passenger_death(cause: String) -> void:
-	var needs_summary := _format_needs_summary()
-	var seeking_need := targetNeed if targetNeed != "" else "none"
+	var needs_summary := needsManager.format_needs_summary()
+	var seeking_need := needsManager.targetNeed if needsManager.targetNeed != "" else "none"
 	var module_label := "none"
 	if is_in_module and is_instance_valid(current_module):
 		module_label = current_module.type
@@ -278,14 +233,8 @@ func _log_passenger_death(cause: String) -> void:
 	)
 
 
-func _format_needs_summary() -> String:
-	var parts: PackedStringArray = []
-	for key in needs.keys():
-		parts.append("%s=%.3f" % [key, needs[key]])
-	return ", ".join(parts)
-
 func pick_direction() -> void:
-	if targetNeed != "" or targetWork != "":
+	if needsManager.targetNeed != "" or targetWork != "":
 		_pick_goal_direction()
 		return
 
@@ -298,8 +247,8 @@ func _pick_goal_direction() -> void:
 	goal_travel_pull = _get_goal_travel_pull(my_location)
 
 	if goal_travel_pull == PassengerVectorMap.NO_DIRECTION:
-		if targetNeed != "":
-			new_thought("I can't find anywhere to fulfil my crushing %s need!" % targetNeed)
+		if needsManager.targetNeed != "":
+			new_thought("I can't find anywhere to fulfil my crushing %s need!" % needsManager.targetNeed)
 		_start_wander_if_due()
 		return
 
@@ -313,8 +262,8 @@ func _pick_goal_direction() -> void:
 	direction = _travel_pull_to_direction(goal_travel_pull)
 
 	if absf(goal_travel_pull) > 7.0:
-		if targetNeed != "":
-			new_thought("It's a long way to fulfil my %s" % targetNeed)
+		if needsManager.targetNeed != "":
+			new_thought("It's a long way to fulfil my %s" % needsManager.targetNeed)
 		elif targetWork != "":
 			new_thought("It's a long way to find %s work" % targetWork)
 
@@ -336,8 +285,8 @@ func _start_wander() -> void:
 
 
 func _get_goal_travel_pull(my_location : Array[int]) -> float:
-	if targetNeed != "":
-		return parentTrain.passengerMap.get_travel_pull_at(my_location, targetNeed, "need")
+	if needsManager.targetNeed != "":
+		return parentTrain.passengerMap.get_travel_pull_at(my_location, needsManager.targetNeed, "need")
 	if targetWork != "":
 		return parentTrain.passengerMap.get_travel_pull_at(my_location, targetWork, "work")
 	return PassengerVectorMap.NO_DIRECTION
@@ -351,8 +300,7 @@ func _travel_pull_to_direction(travel_pull : float) -> int:
 
 # adjust the need, and return the amount remaining
 func adjust_need(type : String, amount : float) -> float:
-	needs[type] = max(needs[type] - amount, 0)
-	return needs[type]
+	return needsManager.adjust_need(type, amount)
 
 # adjust the water_content, and return the new value
 func adjust_water_content(amount : float) -> float:
