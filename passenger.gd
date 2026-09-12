@@ -9,6 +9,7 @@ var firstname : String = ""
 var lastname : String = ""
 var movespeed = 30
 var is_dying : bool = false
+var cause_of_death : String = ""    # Set by _log_passenger_death(); read by Gravestone.create_gravestone()
 
 var current_module : ModuleBase = null
 var next_module_pos : float = Globals.module_width		# If position.x exceeds this, check module
@@ -46,27 +47,29 @@ var temp_death : float = 60.0 # At this temp, the passenger dies
 var water_consumption_at_tolerance : float = 4.0
 
 var targetWork : String = ""
-var skills = {
+var skills : Dictionary [String, float]= {
 	"strength" : randf() / 2,
 	"intelligence" : randf() / 2
 }
 
-# Array of recent thoughts
-var thoughts : PackedStringArray = []
+# Thought construction/emission (including the above-head popup) lives in ThoughtsModule now
+# (composition) - the pass-throughs further down (emit_thought, get_last_thought_text) are what
+# PassengerNeeds and PassengerPanel call instead of reaching into thoughtsModule directly.
+var thoughtsModule : ThoughtsModule = ThoughtsModule.new(self)
 
-func _ready():
+func _ready() -> void:
 	manager = get_parent()
 	parentTrain = manager.get_parent()
 	_ready_debug_displays()
 	_init_random_needs()
 
-func _ready_debug_displays():
+func _ready_debug_displays() -> void:
 	if Globals.passenger_debug == true:
 		$DebugThirst.show()
 		$DebugHunger.show()
 		$DebugRest.show()
 
-func _init_random_needs():
+func _init_random_needs() -> void:
 	needsManager.randomize_needs()
 	water_content = randf_range(0.0, 0.5)
 
@@ -89,11 +92,11 @@ func _process(delta: float) -> void:
 
 # Once at outset, or per module moved, confirm position on train and which module we are at
 # set thresholds to re-check module next
-func update_module_positions():
-	var myLocation = Helpers.get_trainpos_from_coords(self.position)
+func update_module_positions() -> void:
+	var myLocation : Array[int] = Helpers.get_trainpos_from_coords(self.position)
 	last_module_pos = Helpers.get_xpos_from_trainpos(myLocation)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
-	var nextLocation = myLocation
+	var nextLocation : Array[int] = myLocation
 	nextLocation[1] = nextLocation[1] + 1
 	if nextLocation[1] == Globals.modules_per_car:
 		nextLocation[0] = nextLocation[0] + 1
@@ -101,14 +104,14 @@ func update_module_positions():
 	next_module_pos = Helpers.get_xpos_from_trainpos(nextLocation)
 	check_current_module()
 
-func update_needs_debug():
+func update_needs_debug() -> void:
 	$DebugThirst.size.y = (20 * wants_need("thirst"))
 	$DebugHunger.size.y = (20 * wants_need("hunger"))
 	$DebugRest.size.y   = (20 * wants_need("rest"))
 
 # If my needs have just changed, check whether the module I am in serves what I need
-func check_current_module():
-	var myLocation = Helpers.get_trainpos_from_coords(self.position)
+func check_current_module() -> void:
+	var myLocation : Array[int] = Helpers.get_trainpos_from_coords(self.position)
 	current_module = parentTrain.carriages[myLocation[0]].modules[myLocation[1]]
 	if needsManager.targetNeed != "":
 		if current_module.can_serve_need(needsManager.targetNeed):
@@ -143,19 +146,19 @@ func enter_worker_module(target : ModuleBase, _attemptNo : int) -> void:
 			is_working = true
 
 ## Used by passenger to tell module they're leaving
-func exit_customer_module():
+func exit_customer_module() -> void:
 	ejected_from_module()
 	current_module.notify_remove_customer(self)
 
 ## Used by modules to eject a passenger
-func ejected_from_module():
+func ejected_from_module() -> void:
 	self.show()
 	needsManager.targetNeed = ""
 	is_in_module = false
 	is_working = false
 
 ## Used by passenger to tell module they're leaving
-func exit_worker_module():
+func exit_worker_module() -> void:
 	self.show()
 	targetWork = ""
 	is_in_module = false
@@ -163,13 +166,13 @@ func exit_worker_module():
 	current_module.notify_remove_worker(self)
 
 ## Used by modules to eject a worker
-func worker_ejected_from_module():
+func worker_ejected_from_module() -> void:
 	self.show()
 	targetWork = ""
 	is_in_module = false
 	is_working = false
 
-func resource_tick(_train_temperature : float):
+func resource_tick(_train_temperature : float) -> void:
 	needsManager.grow_needs(_train_temperature)
 	if _train_temperature >= temp_death:
 		_log_passenger_death("heat (%.1f°C)" % _train_temperature)
@@ -180,6 +183,9 @@ func resource_tick(_train_temperature : float):
 	if Globals.passenger_debug == true:
 		update_needs_debug()
 	pick_direction()
+	# Runs last so it sees whether any needs/work thought already fired this tick before it rolls
+	# for idle chatter.
+	thoughtsModule.tick()
 	if passengerPanel != null:
 		passengerPanel.update_step()
 
@@ -189,7 +195,7 @@ func wants_need(type : String) -> float:
 	return needsManager.wants_need(type)
 
 ## Called to remove itself from any modules, this passenger is about to die
-func cleanup():
+func cleanup() -> void:
 	position.y = 0
 	if is_working and is_in_module:
 		current_module.notify_remove_worker(self)
@@ -199,14 +205,14 @@ func cleanup():
 		current_module.notify_remove_customer(self)
 		is_in_module = false
 
-func check_needs():
+func check_needs() -> void:
 	needsManager.check_needs()
 
 ## Used before passengers are sent on an expedition
-func fix_all_needs():
+func fix_all_needs() -> void:
 	needsManager.fix_all_needs()
 
-func check_for_work():
+func check_for_work() -> void:
 	targetWork = manager.get_next_work_priority()
 	check_current_module()
 
@@ -219,6 +225,7 @@ func hit_max_need(needType : String) -> int:
 
 
 func _log_passenger_death(cause: String) -> void:
+	cause_of_death = cause
 	var needs_summary := needsManager.format_needs_summary()
 	var seeking_need := needsManager.targetNeed if needsManager.targetNeed != "" else "none"
 	var module_label := "none"
@@ -248,7 +255,7 @@ func _pick_goal_direction() -> void:
 
 	if goal_travel_pull == PassengerVectorMap.NO_DIRECTION:
 		if needsManager.targetNeed != "":
-			new_thought("I can't find anywhere to fulfil my crushing %s need!" % needsManager.targetNeed)
+			emit_thought(PassengerThought.TYPE_NEEDS, PassengerThought.SENTIMENT_NEGATIVE, "I can't find anywhere to fulfil my crushing %s need!" % needsManager.targetNeed, needsManager.targetNeed)
 		_start_wander_if_due()
 		return
 
@@ -263,9 +270,9 @@ func _pick_goal_direction() -> void:
 
 	if absf(goal_travel_pull) > 7.0:
 		if needsManager.targetNeed != "":
-			new_thought("It's a long way to fulfil my %s" % needsManager.targetNeed)
+			emit_thought(PassengerThought.TYPE_NEEDS, PassengerThought.SENTIMENT_NEGATIVE, "It's a long way to fulfil my %s" % needsManager.targetNeed, needsManager.targetNeed)
 		elif targetWork != "":
-			new_thought("It's a long way to find %s work" % targetWork)
+			emit_thought(PassengerThought.TYPE_WORK, PassengerThought.SENTIMENT_NEGATIVE, "It's a long way to find %s work" % targetWork)
 
 
 func _start_wander_if_due() -> void:
@@ -308,13 +315,14 @@ func adjust_water_content(amount : float) -> float:
 	return water_content
 	
 
-func new_thought(text : String):
-	if thoughts.size() > 0 and thoughts.get(thoughts.size() - 1) == text:
-		return
-	thoughts.append(text)
-	var prefix = ("%s %s: " % [firstname, lastname])
-	text = prefix + text
-	Globals.activeUI.add_thought(text)
+## Thought construction/emission (including the above-head popup) lives in ThoughtsModule
+## (thoughtsModule) now - these just forward so PassengerNeeds and PassengerPanel don't need to
+## reach into thoughtsModule directly.
+func emit_thought(type : String, sentiment : int, text : String, icon_key : String = "") -> void:
+	thoughtsModule.emit_thought(type, sentiment, text, icon_key)
+
+func get_last_thought_text() -> String:
+	return thoughtsModule.get_last_thought_text()
 
 func show_passenger_panel():
 	displayNeeds = !displayNeeds

@@ -138,6 +138,11 @@ func add_thought(newThought : String):
 	var listPos : int = thoughtsList.add_item(newThought, null, false)
 	thoughtsList.move_item(listPos, 0)
 
+## Catches a passenger's thought (see PassengerThought / ThoughtsModule) and shows it here as
+## "Name: text" - no sentiment colouring in this panel, that's only for the above-head popup.
+func add_passenger_thought(thought : PassengerThought) -> void:
+	add_thought("%s: %s" % [thought.passenger_name, thought.text])
+
 func _on_line_edit_text_submitted(_new_text: String) -> void:
 	parse_text_input()
 	pass # Replace with function body.

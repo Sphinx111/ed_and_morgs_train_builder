@@ -13,5 +13,5 @@ func create_gravestone(person : Passenger):
 	firstname = person.firstname
 	lastname = person.lastname
 	age = randi_range(10,75)
-	cause_of_death = person.targetNeed
+	cause_of_death = person.cause_of_death
 	tick_died = Globals.game_tick

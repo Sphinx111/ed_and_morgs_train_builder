@@ -35,5 +35,6 @@ func update_step() -> void:
 	if passenger.is_in_module:
 		actionLabel.text = ("working at %s" if passenger.is_working else "served by %s") % passenger.current_module.type
 	else:
-		actionLabel.text = passenger.thoughts[-1] if passenger.thoughts.size() > 0 else "Wandering"
+		var last_thought : String = passenger.get_last_thought_text()
+		actionLabel.text = last_thought if last_thought != "" else "Wandering"
 	return
