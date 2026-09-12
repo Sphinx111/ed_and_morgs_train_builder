@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ProductionRecipe" load_steps=5 format=3]
+
+[ext_resource type="Script" uid="uid://b67infwsvsouv" path="res://Modules/Producers/ProductionRecipe.gd" id="1_recipe"]
+[ext_resource type="Resource" uid="uid://bqr3oavf6c3d" path="res://ResourceTypes/food1.tres" id="2_food1"]
+[ext_resource type="Resource" uid="uid://bky4hj8up8m3s" path="res://ResourceTypes/clean_water.tres" id="3_clean_water"]
+[ext_resource type="Resource" uid="uid://dtf20h72fvoql" path="res://ResourceTypes/pop.tres" id="4_pop"]
+
+[resource]
+script = ExtResource("1_recipe")
+cycle_time = 100
+input_mode = 1
+input_type_1 = ExtResource("2_food1")
+input_1_needed = 10.0
+input_type_2 = ExtResource("3_clean_water")
+input_2_needed = 20.0
+output_type_1 = ExtResource("4_pop")
+output_1_amount = 1.0
+process_name = "Nursery"

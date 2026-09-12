@@ -172,7 +172,7 @@ visible = false
 layout_mode = 1
 script = ExtResource("4_o0k6p")
 
-[node name="ModuleButtons" type="HBoxContainer" parent="UICanvas/BasicUI/constructionPanel"]
+[node name="ModuleButtons" type="VBoxContainer" parent="UICanvas/BasicUI/constructionPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -183,6 +183,16 @@ offset_right = -8.0
 offset_bottom = -4.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="ServiceRow" type="HBoxContainer" parent="UICanvas/BasicUI/constructionPanel/ModuleButtons"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="IndustryRow" type="HBoxContainer" parent="UICanvas/BasicUI/constructionPanel/ModuleButtons"]
+layout_mode = 2
 theme_override_constants/separation = 6
 alignment = 1
 

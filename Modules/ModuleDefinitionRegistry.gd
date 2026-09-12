@@ -78,6 +78,12 @@ const DEFINITIONS: Dictionary = {
 		"build_cost": 10.0,
 		"display_label": "Lounge",
 	},
+	"nursery": {
+		"outline_color": Color.LIGHT_PINK,
+		"workers": 2,
+		"build_cost": 20.0,
+		"display_label": "Nursery",
+	},
 }
 
 

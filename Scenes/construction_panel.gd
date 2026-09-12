@@ -4,7 +4,12 @@ class_name ConstructionPanel
 
 signal placement_requested(module_type: String)
 
-@onready var _module_buttons: HBoxContainer = $ModuleButtons
+## Module types that show in the "services" row of the construction menu.
+## Everything else buildable falls into the "industry" row.
+const SERVICE_MODULE_TYPES: Array[String] = ["cabin", "kitchen", "lounge", "nursery", "expedition_room"]
+
+@onready var _service_row: HBoxContainer = $ModuleButtons/ServiceRow
+@onready var _industry_row: HBoxContainer = $ModuleButtons/IndustryRow
 
 var _buttons: Array[Button] = []
 
@@ -31,7 +36,8 @@ func setup() -> void:
 		new_button.text = _get_display_label(module_type)
 		new_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		new_button.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		_module_buttons.add_child(new_button)
+		var target_row := _service_row if SERVICE_MODULE_TYPES.has(module_type) else _industry_row
+		target_row.add_child(new_button)
 		_buttons.append(new_button)
 		new_button.pressed.connect(_on_module_button_pressed.bind(module_type))
 

@@ -10,6 +10,7 @@ const RECIPE_SCRAP_COLLECTOR: ProductionRecipe = preload("res://Modules/Recipes/
 const RECIPE_SCRAP_TO_MECH: ProductionRecipe = preload("res://Modules/Recipes/scrap_to_mech.tres")
 const RECIPE_WATER_COLLECTOR: ProductionRecipe = preload("res://Modules/Recipes/water_collector.tres")
 const RECIPE_FUEL: ProductionRecipe = preload("res://Modules/Recipes/fuel.tres")
+const RECIPE_NURSERY: ProductionRecipe = preload("res://Modules/Recipes/nursery.tres")
 
 const MODULE_PRODUCERS: Dictionary = {
 	"water_purifier": [RECIPE_WATER_PURIFIER],
@@ -19,6 +20,7 @@ const MODULE_PRODUCERS: Dictionary = {
 	"mech_parts": [RECIPE_SCRAP_TO_MECH],
 	"water_collector": [RECIPE_WATER_COLLECTOR],
 	"fuel_refinery": [RECIPE_FUEL],
+	"nursery": [RECIPE_NURSERY],
 }
 
 

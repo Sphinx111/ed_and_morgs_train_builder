@@ -44,11 +44,13 @@ func modify_needs_maps(need_types : Array[String], train_pos : Array[int], new_s
 
 func modify_work_maps(work_types : Array[String], train_pos : Array[int], new_state : int) -> void:
 	for work_type in work_types:
+		_ensure_work_map(work_type)
 		_update_work_location(work_type, train_pos, new_state)
 		work_vectors_map[work_type] = build_vector_map(work_locations_map[work_type], true)
 
 
 func has_work_for_type(test_type : String) -> bool:
+	_ensure_work_map(test_type)
 	if not work_locations_map.has(test_type):
 		return false
 	for cell_value in work_locations_map[test_type]:
@@ -60,6 +62,8 @@ func has_work_for_type(test_type : String) -> bool:
 ## Returns signed pull toward the nearest goal module at this train position.
 ## Positive pulls right along the train, negative pulls left, 0.0 means already at a goal module.
 func get_travel_pull_at(position : Array[int], goal_type : String, map_kind : String) -> float:
+	if map_kind == "work":
+		_ensure_work_map(goal_type)
 	var index : int = Helpers.coords_to_index(position)
 	var vectors : Array = _get_vectors_for_kind(goal_type, map_kind)
 	if vectors.is_empty() or index < 0 or index >= vectors.size():
@@ -115,6 +119,16 @@ func _rebuild_need_map(need : String) -> void:
 func _rebuild_work_map(work_type : String) -> void:
 	work_locations_map[work_type] = train.get_work_location_map_for_type(work_type)
 	work_vectors_map[work_type] = build_vector_map(work_locations_map[work_type], true)
+
+
+## Lazily initialises a work map entry the first time a work_type is seen that wasn't part of
+## Globals.work_types when init_maps() originally ran (e.g. a newly added module/resource type
+## such as "pop" from the nursery). Safe to call repeatedly - a no-op once the entry exists.
+func _ensure_work_map(work_type : String) -> void:
+	if work_locations_map.has(work_type):
+		return
+	print_debug("PassengerVectorMap: no work map existed for '%s' - initialising it now" % work_type)
+	_rebuild_work_map(work_type)
 
 
 func _update_need_location(need : String, train_pos : Array[int], new_state : int) -> void:
