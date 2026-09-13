@@ -60,7 +60,11 @@ func update_sun_state() -> void:
 
 	sunbeam.show()
 	var rotation_height : float = _sun_height_for_sunbeam_rotation(raw_sun_height)
-	sunbeam.rotation = PI - (0.5 * PI * rotation_height)
+	# rotation_height sweeps 1 -> -1 across a sun pass (entering -> exiting).
+	# Map that to: entering (still travelling forward into sunlight) -> points right,
+	# mid-pass (sun directly overhead) -> points up, exiting (sun now catching up
+	# to the back of the train) -> points left.
+	sunbeam.rotation = (0.5 * PI) * (rotation_height - 1.0)
 
 
 ## Remap 0..2 day arc back to the legacy -1..1 per-sun scale used by the sunbeam formula.

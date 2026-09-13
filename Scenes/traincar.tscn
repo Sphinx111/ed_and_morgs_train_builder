@@ -196,6 +196,11 @@ layout_mode = 2
 theme_override_constants/separation = 6
 alignment = 1
 
+[node name="AddonRow" type="HBoxContainer" parent="UICanvas/BasicUI/constructionPanel/ModuleButtons"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
 [node name="construct" type="Button" parent="UICanvas/BasicUI"]
 layout_mode = 0
 offset_left = 1058.0

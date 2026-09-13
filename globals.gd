@@ -7,7 +7,7 @@ const display_height = 648
 const resource_panel_width_percent : float = 80.0
 const resource_panel_height : float = 89.0
 const construction_panel_width_percent : float = 80.0
-const construction_panel_height : float = 94.0
+const construction_panel_height : float = 141.0
 var game_tick : int = 0
 const tick_duration : float = 2.0
 
@@ -29,6 +29,27 @@ const module_width : float = 50
 const module_height : float = 50
 var refund_module_fraction : float = 0.5
 const ADJACENCY_BONUS : float = 0.25
+
+# Traincar Addon Variables (roof addons - one per car, separate from the 4 module slots)
+var antenna_count : int = 0
+var kite_sail_count : int = 0
+const BASE_TRACK_SWITCH_COOLDOWN : int = 2
+const KITE_SAIL_MAX_SPEED : float = 100.0
+const KITE_SAIL_STRENGTH : float = 1.0    # Diminishing returns: fuel multiplier = 1 / (1 + STRENGTH * sail_count)
+
+## Ticks a train must wait between track switches at the same junction. The first antenna is
+## already included for free (switching itself is never gated); each additional antenna reduces
+## this by 2, floored at 0.
+func get_track_switch_cooldown() -> int:
+	var reduction : int = maxi(0, antenna_count - 1) * 2
+	return maxi(0, BASE_TRACK_SWITCH_COOLDOWN - reduction)
+
+## Fraction of fuel_per_tick actually consumed while accelerating. Kite sails only help below
+## KITE_SAIL_MAX_SPEED (inactive at/above it) and have diminishing returns - never reaches 0.
+func get_fuel_discount_multiplier(current_speed : float) -> float:
+	if current_speed >= KITE_SAIL_MAX_SPEED or kite_sail_count <= 0:
+		return 1.0
+	return 1.0 / (1.0 + KITE_SAIL_STRENGTH * kite_sail_count)
 
 # Production ratios
 var scrap_to_mech_ratio : float = 0.2 # 5 Scrap to make 1 mech parts

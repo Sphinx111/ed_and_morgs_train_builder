@@ -6,7 +6,6 @@ class_name TrackJunction
 var location: MapLocation
 var selector_index: int = 0
 var last_changed_tick: int = 0
-var tick_cooldown: int = 2
 
 
 func _init(owner: MapLocation) -> void:
@@ -90,7 +89,7 @@ func cycle_manual() -> void:
 
 
 func can_switch() -> bool:
-	if Globals.game_tick < (last_changed_tick + tick_cooldown):
+	if Globals.game_tick < (last_changed_tick + Globals.get_track_switch_cooldown()):
 		return false
 	return location.track_segments.size() >= 2
 

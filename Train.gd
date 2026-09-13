@@ -157,6 +157,13 @@ func resource_tick() -> void:
 	Helpers.update_resource_safety_flags(self)
 	resourceManager.end_tick()
 
+## Whether the train is currently under the sun (vs. in shade/night) - the same condition
+## _temperature_tick() uses to decide whether the train heats up. Addons like the moisture
+## collector key their "not in sunlight" behaviour off this.
+func is_in_sunlight() -> bool:
+	return worldMap.get_sun_height_for_train() > 0.0
+
+
 func _temperature_tick() -> void:
 	# Map height 0..2 (horizon..horizon) to heating intensity 0..1..0, peaking at seam/midday.
 	var raw_sun_height : float = worldMap.get_sun_height_for_train()
@@ -172,7 +179,8 @@ func _temperature_tick() -> void:
 func _speed_tick() -> void:
 	if expedition_safety_flag == false:
 		if target_speed > speed:
-			if gather_res("fuel", fuel_per_tick) == Globals.RESULT_OK:
+			var fuel_cost : float = fuel_per_tick * Globals.get_fuel_discount_multiplier(speed)
+			if gather_res("fuel", fuel_cost) == Globals.RESULT_OK:
 				is_accelerating = true
 				is_decelerating = false
 			else:
@@ -255,6 +263,42 @@ func refresh_module_click_areas() -> void:
 		for module in carriage.modules:
 			if module != null:
 				module.update_click_area()
+
+
+## Roof addons (radio antenna, kite sail, etc.) - one per car, separate from the 4 module slots.
+func add_addon(type: String, carNum : int) -> void:
+	if carNum >= carriages.size() or carriages[carNum] == null:
+		print_debug("Error: Invalid Addon car: " + String.num_int64(carNum))
+		return
+
+	if carriages[carNum].addon.type != "empty":
+		remove_addon(carNum)
+
+	if type != "empty":
+		var cost : float = TraincarAddonDefinitionRegistry.get_build_cost(type)
+		if gather_res("mech_parts", cost) == Globals.NO_RESOURCES:
+			return
+
+	carriages[carNum].add_addon(type)
+
+
+func remove_addon(carNum : int) -> void:
+	if carriages.size() <= carNum or carriages[carNum] == null:
+		print_debug("Error: attempting to remove addon from nonexistent car: " + String.num_int64(carNum))
+		return
+	var addonType : String = carriages[carNum].addon.type
+	var refund : float = TraincarAddonDefinitionRegistry.get_build_cost(addonType) * Globals.refund_module_fraction
+	add_res("mech_parts", refund)
+
+	carriages[carNum].remove_addon()
+
+
+func refresh_addon_click_areas() -> void:
+	for carriage in carriages:
+		if carriage == null:
+			continue
+		if carriage.addon != null:
+			carriage.addon.update_click_area()
 
 
 func remove_module(carNum : int, slot : int) -> void:

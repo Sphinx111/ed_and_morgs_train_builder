@@ -3,6 +3,7 @@ extends Panel
 class_name ConstructionPanel
 
 signal placement_requested(module_type: String)
+signal addon_placement_requested(addon_type: String)
 
 ## Module types that show in the "services" row of the construction menu.
 ## Everything else buildable falls into the "industry" row.
@@ -10,6 +11,7 @@ const SERVICE_MODULE_TYPES: Array[String] = ["cabin", "kitchen", "lounge", "nurs
 
 @onready var _service_row: HBoxContainer = $ModuleButtons/ServiceRow
 @onready var _industry_row: HBoxContainer = $ModuleButtons/IndustryRow
+@onready var _addon_row: HBoxContainer = $ModuleButtons/AddonRow
 
 var _buttons: Array[Button] = []
 
@@ -40,6 +42,14 @@ func setup() -> void:
 		target_row.add_child(new_button)
 		_buttons.append(new_button)
 		new_button.pressed.connect(_on_module_button_pressed.bind(module_type))
+	for addon_type in _get_buildable_addon_types():
+		var new_button := Button.new()
+		new_button.text = _get_addon_display_label(addon_type)
+		new_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		new_button.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		_addon_row.add_child(new_button)
+		_buttons.append(new_button)
+		new_button.pressed.connect(_on_addon_button_pressed.bind(addon_type))
 
 
 func teardown() -> void:
@@ -52,9 +62,21 @@ func _on_module_button_pressed(module_type: String) -> void:
 	placement_requested.emit(module_type)
 
 
+func _on_addon_button_pressed(addon_type: String) -> void:
+	addon_placement_requested.emit(addon_type)
+
+
 func _get_buildable_module_types() -> Array[String]:
 	return ModuleDefinitionRegistry.get_buildable_module_types()
 
 
 func _get_display_label(module_type: String) -> String:
 	return ModuleDefinitionRegistry.get_display_label(module_type)
+
+
+func _get_buildable_addon_types() -> Array[String]:
+	return TraincarAddonDefinitionRegistry.get_buildable_addon_types()
+
+
+func _get_addon_display_label(addon_type: String) -> String:
+	return TraincarAddonDefinitionRegistry.get_display_label(addon_type)

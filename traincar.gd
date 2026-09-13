@@ -14,6 +14,14 @@ var modules : Array[ModuleBase] = [null, null, null, null]
 var ModuleScene : PackedScene = preload("res://Scenes/module.tscn")
 var defaultModuleArray : Array[String] = ["water_purifier", "cabin", "cabin", "cabin"]
 
+# Roof addon (radio antenna, kite sail, etc.) - one per car, separate from the 4 module slots
+var addon : TraincarAddonBase = null
+var AddonScene : PackedScene = preload("res://Scenes/traincar_addon.tscn")
+
+# Car-scoped stats contributed by the roof addon (e.g. heat_resistance, luxury_rating).
+# Read by whatever future system cares (heat, luxury...); addons apply/remove their own share.
+var car_stats : Dictionary = {}
+
 # Environmental Variables
 var moisture_requested : int = 1
 var moisture_level : int = 0
@@ -31,6 +39,7 @@ func _ready() -> void:
 	
 	for i in range(4):
 		init_module("empty", i)
+	init_addon("empty")
 
 func set_sequence(newSequence : int) -> void:
 	sequence = newSequence
@@ -55,6 +64,9 @@ func resource_tick() -> void:
 	for module in modules:
 		if module != null:
 			module.resource_tick()
+
+	if addon != null:
+		addon.resource_tick()
 
 func init_module(type : String, _position : int) -> void:
 	var new_module : ModuleBase = ModuleScene.instantiate()
@@ -87,6 +99,22 @@ func recalculateAdjacencies() -> void:
 func remove_module(slot: int) -> void:
 	modules[slot].set_type("empty")
 	recalculateAdjacencies()
+
+func init_addon(type : String) -> void:
+	var new_addon : TraincarAddonBase = AddonScene.instantiate()
+	add_child(new_addon)
+	new_addon.set_type(type)
+
+	if addon != null:
+		addon.queue_free()
+
+	addon = new_addon
+
+func add_addon(type : String) -> void:
+	addon.set_type(type)
+
+func remove_addon() -> void:
+	addon.set_type("empty")
 
 func get_type_map(need_type_to_find : String) -> Array:
 	var result : Array[int] = [0,0,0,0]

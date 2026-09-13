@@ -25,6 +25,7 @@ var expeditionsControllerScene : PackedScene = preload("res://Scenes/expeditions
 var expeditionsController : ExpeditionsController = null
 var backgroundController : BackgroundManager = null
 var pending_module_type : String = ""
+var pending_addon_type : String = ""
 var scene_root : Node = null
 var _world_map_rest_position : Vector2 = Vector2.ZERO
 var _world_map_rest_scale : Vector2 = Vector2.ONE
@@ -69,6 +70,7 @@ func _ready() -> void:
 
 	backgroundController = scene_root.get_node("Background")
 	constructionPanel.placement_requested.connect(_on_construction_placement_requested)
+	constructionPanel.addon_placement_requested.connect(_on_construction_addon_placement_requested)
 	EventBus.time_factor_requested.connect(_on_time_factor_requested)
 
 	_world_map_rest_position = worldMap.position
@@ -108,7 +110,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _on_construction_placement_requested(module_type: String) -> void:
 	pending_module_type = module_type
+	pending_addon_type = ""
 	selectedTrain.refresh_module_click_areas()
+	selectedTrain.refresh_addon_click_areas()
 	add_thought("Select a slot on the train to place %s." % module_type)
 
 func place_module_at_slot(car_num: int, slot: int) -> void:
@@ -130,6 +134,25 @@ func _clear_placement_mode() -> void:
 	pending_module_type = ""
 	if selectedTrain != null:
 		selectedTrain.refresh_module_click_areas()
+
+
+func _on_construction_addon_placement_requested(addon_type: String) -> void:
+	pending_addon_type = addon_type
+	pending_module_type = ""
+	selectedTrain.refresh_addon_click_areas()
+	selectedTrain.refresh_module_click_areas()
+	add_thought("Select a car's roof to place %s." % addon_type)
+
+func place_addon_at_car(car_num: int) -> void:
+	if pending_addon_type == "":
+		return
+	selectedTrain.add_addon(pending_addon_type, car_num)
+	_clear_addon_placement_mode()
+
+func _clear_addon_placement_mode() -> void:
+	pending_addon_type = ""
+	if selectedTrain != null:
+		selectedTrain.refresh_addon_click_areas()
 
 func resource_panel_update() -> void:
 	resource_panel.update_from_train(selectedTrain)
@@ -366,6 +389,7 @@ func _on_construct_toggled(toggled_on: bool) -> void:
 		constructionPanel.setup()
 	else:
 		_clear_placement_mode()
+		_clear_addon_placement_mode()
 		constructionPanel.hide()
 		constructionPanel.teardown()
 
