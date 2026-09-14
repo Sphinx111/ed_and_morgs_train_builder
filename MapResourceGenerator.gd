@@ -1,178 +1,240 @@
-extends Resource
+@tool
+extends Node
 
 class_name MapResourceGenerator
 
-## Helper class to define resources available to different setups
-class ResourceSpec:
-	var resource_type : String
-	var total_to_place : float = 0.0
-	var avg_amount_per_spot : float = 0.0
-	var min_per_location : float = 0.0
-	var min_location_size : MapLocation.TYPE
-	var force_location_size : bool # If true, this batch of resources must be placed only in cities that match min_location_size exactly
-	var visibility : float = 0.0   # Weight when choosing which deposit scavenge reveals
-	var rarity : float = 0.0       # Chance to skip placing at a location: 0.0 = always, 1.0 = never
-	
-	func _init(
-		t : String,
-		ttp : float,
-		avg_spot : float,
-		mnpl : float,
-		mls : MapLocation.TYPE,
-		fls : bool = false,
-		vis : float = 0.0,
-		r : float = 0.0
-	):
-		resource_type = t
-		total_to_place = ttp
-		avg_amount_per_spot = avg_spot
-		min_per_location = mnpl
-		min_location_size = mls
-		force_location_size = fls
-		visibility = vis
-		rarity = r
+## Resource placement is organised by settlement size - Village/Town/City Resources below,
+## each a dictionary of resource type -> ResourceSpec (coverage % and amount, both editable
+## as sliders). A location rolls independently for every resource type available to its
+## size: on success it gets a single MapResourceContainer at that spec's amount - no
+## randomness in the amount itself, only in whether a given location gets it at all.
+##
+## Main Route Minimums then tops up specific resources along the main route if those rolls
+## didn't produce enough of them. Trainyards places at most one train yard on the main route
+## (off-route locations can still roll independently), using the same coverage/amount shape.
 
 var mapGraph : MapGraph
-var firstPassTotals : Array[ResourceSpec] = [
-	ResourceSpec.new("clean_water", 550.0,   55.0, 50.0, MapLocation.TYPE.VILLAGE, false, 0.9, 0.3),
-	ResourceSpec.new("clean_water", 950.0,   55.0, 50.0, MapLocation.TYPE.VILLAGE, false, 0.7, 0.4),
-	ResourceSpec.new("grey_water",  800.0,   125.0, 50.0, MapLocation.TYPE.VILLAGE, false,  0.2, 0.1),
-	ResourceSpec.new("grey_water",  1200.0,  225.0, 50.0, MapLocation.TYPE.VILLAGE, false,  0.4, 0.4),
-	ResourceSpec.new("scrap",       5100.0,  250.0, 0.0, MapLocation.TYPE.TOWN,    false,  0.2, 0.1),
-	ResourceSpec.new("oil",         220.0,   80.0,  0.0, MapLocation.TYPE.CITY,    true,   0.6, 0.0),
-	ResourceSpec.new("oil",         800.0,   120.0,  0.0, MapLocation.TYPE.VILLAGE, true,   0.4, 0.1),
-	ResourceSpec.new("food1",       420.0,   100.0,  0.0, MapLocation.TYPE.TOWN,    false,  0.1, 0.4),
-	ResourceSpec.new("pop",         125.0,   8.0,   5.0, MapLocation.TYPE.VILLAGE, false,  1.5, 0.1),
-	ResourceSpec.new("mech_parts",  200.0,   30.0,  10.0, MapLocation.TYPE.CITY,    false,  0.4, 0.8)
-]
 
-var secondPassTotals: Array[ResourceSpec] = [
-	ResourceSpec.new("clean_water", 2000.0,  100.0,  0.0, MapLocation.TYPE.VILLAGE,  false,  0.5, 0.5),
-	ResourceSpec.new("grey_water",  8000.0,  300.0, 0.0, MapLocation.TYPE.VILLAGE,  false,  0.3, 0.5),
-	ResourceSpec.new("scrap",       40000.0, 800.0, 0.0, MapLocation.TYPE.TOWN,     false,  0.2, 0.5),
-	ResourceSpec.new("oil",         500.0,   120.0,  0.0, MapLocation.TYPE.CITY,     true,   0.6, 0.5),
-	ResourceSpec.new("oil",         4000.0,  420.0, 0.0, MapLocation.TYPE.VILLAGE,  true,   0.4, 0.5),
-	ResourceSpec.new("food1",       8200.0,  400.0, 0.0, MapLocation.TYPE.TOWN,     false,  0.1, 0.5),
-	ResourceSpec.new("pop",         1000.0,   25.0,  0.0, MapLocation.TYPE.VILLAGE,  false,  0.2, 0.5),
-	ResourceSpec.new("mech_parts",  500.0,   30.0,  0.0, MapLocation.TYPE.CITY,     false,  0.7, 0.5)
-]
+@export_group("Village Resources")
+## Villages typically end up with just one or two of these (keep coverage percentages low
+## overall), but in much larger amounts than towns or cities.
+@export var villageResourceSpecs : Dictionary[String, ResourceSpec] = _default_village_specs()
 
-var variability : float = 0.8 # Proportion up or down resources vary per city
+@export_group("Town Resources")
+## Towns should end up with roughly half of the available resource types - "pop" is set to
+## 100% coverage by default so every town always has some population.
+@export var townResourceSpecs : Dictionary[String, ResourceSpec] = _default_town_specs()
 
-func _spot_amount(resourceSpec: ResourceSpec) -> float:
-	if resourceSpec.avg_amount_per_spot <= 0.0:
-		return 0.0
-	return resourceSpec.avg_amount_per_spot * randf_range(1.0 - variability, 1.0 + variability)
+@export_group("City Resources")
+## Cities should end up with most resource types (high coverage across the board), but in
+## smaller amounts than villages.
+@export var cityResourceSpecs : Dictionary[String, ResourceSpec] = _default_city_specs()
 
-func _add_resource_spots_at_location(location: MapLocation, resourceSpec: ResourceSpec, location_budget: float) -> float:
-	if location_budget <= 0.0:
-		return 0.0
+@export_group("Main Route Minimums")
+## Minimum number of main-route locations (cities plus any main-route villages) that must
+## end up with each resource type. Topped up deterministically, using each location's own
+## settlement-size amount, if the coverage rolls above didn't produce enough. 0 = no
+## guarantee - the rolls above decide entirely.
+@export var mainRouteMinimums : Dictionary[String, int] = _default_main_route_minimums()
 
-	var placed := 0.0
-	while placed < location_budget:
-		var remaining := location_budget - placed
-		var spot_amount : float
-		if resourceSpec.avg_amount_per_spot > 0.0:
-			spot_amount = minf(_spot_amount(resourceSpec), remaining)
-		else:
-			spot_amount = remaining
-		if spot_amount <= 0.0:
-			break
+@export_group("Trainyards")
+## Same coverage%/amount shape as the resource dictionaries above (amount = train car
+## count), but _place_trainyards() caps this so at most one trainyard ends up on the main
+## route - locations off the main route can still roll independently with no cap.
+@export var villageTrainyardSpec : ResourceSpec = _default_trainyard_spec(0.0, 1.0)
+@export var townTrainyardSpec : ResourceSpec = _default_trainyard_spec(15.0, 18.0)
+@export var cityTrainyardSpec : ResourceSpec = _default_trainyard_spec(8.0, 1.0)
 
-		var resource_container := MapResourceContainer.new(
-			resourceSpec.resource_type,
-			spot_amount
-		)
-		resource_container.visibility = resourceSpec.visibility
-		location.add_resource_container(resource_container)
-		placed += spot_amount
-	return placed
 
-func _should_skip_location_for_rarity(resourceSpec: ResourceSpec) -> bool:
-	return randf() < resourceSpec.rarity
+static func _spec(coverage_pct: float, amount: float, vis: float = 0.3) -> ResourceSpec:
+	var s := ResourceSpec.new()
+	s.coverage_percent = coverage_pct
+	s.amount = amount
+	s.visibility = vis
+	return s
+
+
+## Starting point only - tune freely with the sliders. Aims for "most types, small amounts":
+## 6 of 7 resource types have some coverage (food1 excluded - cities don't farm).
+static func _default_city_specs() -> Dictionary[String, ResourceSpec]:
+	return {
+		"clean_water": _spec(90.0, 300.0, 0.5),
+		"grey_water":  _spec(90.0, 800.0, 0.2),
+		"scrap":       _spec(90.0, 750.0, 0.2),
+		"oil":         _spec(90.0, 100.0, 0.4),
+		"food1":       _spec(90.0,  80.0,  0.1),
+		"pop":         _spec(90.0, 60.0,  0.7),
+		"mech_parts":  _spec(40.0, 100.0, 0.4),
+	}
+
+
+## Starting point only - aims for "about half the types" (clean_water/scrap/food1/pop = 4 of
+## 7), with "pop" always present (100% coverage) so every town has some population.
+static func _default_town_specs() -> Dictionary[String, ResourceSpec]:
+	return {
+		"clean_water": _spec(40.0,  450.0, 0.5),
+		"grey_water":  _spec(70.0,   1250.0, 0.2),
+		"scrap":       _spec(70.0,  8000.0, 0.2),
+		"oil":         _spec(0.0,   150.0, 0.4),
+		"food1":       _spec(40.0,  600.0, 0.1),
+		"pop":         _spec(90.0, 160.0, 0.7),
+		"mech_parts":  _spec(5.0,   150.0, 0.4),
+	}
+
+
+## Starting point only - coverages are deliberately low and sum to ~110%, so a typical
+## village ends up with one or two resource types, each in a much larger amount than towns
+## or cities get. "pop" is both low-coverage and low-amount - villages have very few people.
+static func _default_village_specs() -> Dictionary[String, ResourceSpec]:
+	return {
+		"clean_water": _spec(25.0, 1200.0,  0.1),
+		"grey_water":  _spec(20.0, 2400.0,  0.6),
+		"scrap":       _spec(15.0, 1500.0, 1.8),
+		"oil":         _spec(10.0, 2500.0, 0.5),
+		"food1":       _spec(5.0,  1000.0, 0.1),
+		"pop":         _spec(15.0, 40.0,   0.3),
+		"mech_parts":  _spec(20.0, 20.0,    0.2),
+	}
+
+
+## Starting point only - "certain resources" the main route should always have some of.
+## Everything else defaults to 0 (no guarantee) but is still listed here for easy tuning.
+static func _default_main_route_minimums() -> Dictionary[String, int]:
+	return {
+		"clean_water": 2,
+		"food1": 2,
+		"scrap": 4,
+		"grey_water": 4,
+		"oil": 1,
+		"pop": 4,
+		"mech_parts": 1,
+	}
+
+
+static func _default_trainyard_spec(coverage_pct: float, car_count: float) -> ResourceSpec:
+	return _spec(coverage_pct, car_count)
+
+
+func _specs_for_type(loc_type: MapLocation.TYPE) -> Dictionary[String, ResourceSpec]:
+	match loc_type:
+		MapLocation.TYPE.VILLAGE:
+			return villageResourceSpecs
+		MapLocation.TYPE.TOWN:
+			return townResourceSpecs
+		MapLocation.TYPE.CITY:
+			return cityResourceSpecs
+	return {}
+
+
+func _trainyard_spec_for_type(loc_type: MapLocation.TYPE) -> ResourceSpec:
+	match loc_type:
+		MapLocation.TYPE.VILLAGE:
+			return villageTrainyardSpec
+		MapLocation.TYPE.TOWN:
+			return townTrainyardSpec
+		MapLocation.TYPE.CITY:
+			return cityTrainyardSpec
+	return null
+
+
+func _rolls_success(coverage_percent: float) -> bool:
+	return randf() * 100.0 < coverage_percent
+
+
+## Generation-time presence check - deliberately ignores MapResourceContainer.discovered
+## (has_resource_type()/get_resource_container_of_type() on MapLocation filter by that,
+## which is a player-facing "have they found it yet" flag, not what we want here).
+func _location_has_resource(location: MapLocation, resource_type: String) -> bool:
+	for container in location.resource_containers:
+		if container.resource_type == resource_type and not container.is_empty():
+			return true
+	return false
+
 
 func add_resources_to_map_graph(_mapGraph : MapGraph) -> void:
 	self.mapGraph = _mapGraph
-	cities_first_pass()
-	nodes_second_pass()
-	place_train_yards()
+	_place_location_resources()
+	_enforce_main_route_minimums()
+	_place_trainyards()
 
 
-func place_train_yards() -> void:
-	var towns: Array[MapLocation] = []
+## Every location rolls independently, once per resource type available to its settlement
+## size. A success places exactly one MapResourceContainer for that resource, at the
+## configured amount - no randomness in the amount itself.
+func _place_location_resources() -> void:
 	for location in mapGraph.nodes:
-		if location.type == MapLocation.TYPE.TOWN:
-			towns.append(location)
-	if towns.is_empty():
+		var specs: Dictionary[String, ResourceSpec] = _specs_for_type(location.type)
+		for resource_type in specs:
+			var spec: ResourceSpec = specs[resource_type]
+			if spec.amount <= 0.0:
+				continue
+			if not _rolls_success(spec.coverage_percent):
+				continue
+			var container := MapResourceContainer.new(resource_type, spec.amount)
+			container.visibility = spec.visibility
+			location.add_resource_container(container)
+
+
+## Tops up specific resources along the main route if the rolls above didn't produce enough
+## locations carrying them - deterministic, using each location's own settlement-size amount.
+func _enforce_main_route_minimums() -> void:
+	if mainRouteMinimums.is_empty():
 		return
 
-	towns.shuffle()
-	var yards_to_place: int = mini(3, towns.size())
-	for index in range(yards_to_place):
-		var car_count: float = maxf(1.0, roundi(randf_range(1.0, 3.0)))
-		MapResourceLocation.attach_to(towns[index], car_count)
+	var main_route: Array[MapLocation] = mapGraph.get_main_route()
+	if main_route.is_empty():
+		return
 
-func cities_first_pass():
-	var mainRoute : Array[MapLocation] = mapGraph.get_main_route()
-	for resourceSpec in firstPassTotals:
-		var remainingLocations : int = mainRoute.size()
-		if resourceSpec.force_location_size == true:
-			continue	## Come back to forced location size items later
-		
-		var total_remaining : float = resourceSpec.total_to_place
-		for location in mainRoute:
-			# Skip locations that are wrong size for this ResourceSpec
-			if (location.type < resourceSpec.min_location_size or 
-				(resourceSpec.force_location_size and location.type != resourceSpec.min_location_size)):
-				remainingLocations -= 1
-				continue
-			
-			if _should_skip_location_for_rarity(resourceSpec):
-				remainingLocations -= 1
-				continue
-			
-			var amount_to_place : float = total_remaining / float(remainingLocations) * randf_range(1 - variability, 1 + variability)
-			amount_to_place = maxf(amount_to_place, resourceSpec.min_per_location)
-			amount_to_place = minf(amount_to_place, total_remaining)
-			var placed_amount := _add_resource_spots_at_location(location, resourceSpec, amount_to_place)
-			remainingLocations -= 1
-			total_remaining -= placed_amount
-
-
-func nodes_second_pass() -> void:
-	var unusedLocations: Array[MapLocation] = []
-	for location in mapGraph.nodes:
-		if location.resource_containers.is_empty():
-			unusedLocations.append(location)
-
-	for resourceSpec in secondPassTotals:
-		var eligibleLocations: Array[MapLocation] = []
-		for location in unusedLocations:
-			if location.type < resourceSpec.min_location_size:
-				continue
-			if resourceSpec.force_location_size and location.type != resourceSpec.min_location_size:
-				continue
-			eligibleLocations.append(location)
-
-		var remainingLocations: int = eligibleLocations.size()
-		if remainingLocations <= 0:
+	for resource_type in mainRouteMinimums:
+		var minimum: int = mainRouteMinimums[resource_type]
+		if minimum <= 0:
 			continue
 
-		var total_remaining: float = resourceSpec.total_to_place
-		for location in eligibleLocations:
-			if remainingLocations <= 0 or total_remaining <= 0.0:
+		var have_count := 0
+		var missing: Array[MapLocation] = []
+		for location in main_route:
+			if _location_has_resource(location, resource_type):
+				have_count += 1
+			else:
+				missing.append(location)
+
+		var shortfall: int = minimum - have_count
+		if shortfall <= 0:
+			continue
+
+		for location in missing:
+			if shortfall <= 0:
 				break
+			var spec: ResourceSpec = _specs_for_type(location.type).get(resource_type)
+			if spec == null or spec.amount <= 0.0:
+				continue # this location's settlement size has no configured amount for this resource
+			var container := MapResourceContainer.new(resource_type, spec.amount)
+			container.visibility = spec.visibility
+			location.add_resource_container(container)
+			shortfall -= 1
 
-			if _should_skip_location_for_rarity(resourceSpec):
-				remainingLocations -= 1
-				continue
 
-			var share: float = total_remaining / float(remainingLocations) * randf_range(1 - variability, 1 + variability)
-			var amount_to_place: float = share
-			if resourceSpec.min_per_location > 0.0:
-				amount_to_place = maxf(share, resourceSpec.min_per_location)
-			amount_to_place = minf(amount_to_place, total_remaining)
+## Same coverage/amount rules as the resource dictionaries above, but capped so at most one
+## trainyard ends up on the main route - off-route locations can still roll independently.
+func _place_trainyards() -> void:
+	var main_route: Array[MapLocation] = mapGraph.get_main_route()
+	var main_route_set: Dictionary = {}
+	for location in main_route:
+		main_route_set[location] = true
 
-			var placed_amount := _add_resource_spots_at_location(location, resourceSpec, amount_to_place)
-			remainingLocations -= 1
-			total_remaining -= placed_amount
+	var main_route_yard_placed := false
+	for location in mapGraph.nodes:
+		var spec: ResourceSpec = _trainyard_spec_for_type(location.type)
+		if spec == null or spec.amount <= 0.0:
+			continue
+
+		var on_main_route: bool = main_route_set.has(location)
+		if on_main_route and main_route_yard_placed:
+			continue # main route cap already satisfied - don't even roll for this one
+
+		if not _rolls_success(spec.coverage_percent):
+			continue
+
+		MapResourceLocation.attach_to(location, spec.amount)
+		if on_main_route:
+			main_route_yard_placed = true

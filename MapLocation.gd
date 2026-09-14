@@ -194,41 +194,10 @@ func has_undiscovered_resources() -> bool:
 			return true
 	return false
 
-func discover_undiscovered_resources() -> void:
-	for container in resource_containers:
-		if not container.discovered and not container.is_empty():
-			container.discovered = true
-	_refresh_debug_view()
-
-func discover_random_resource() -> MapResourceContainer:
-	var candidates : Array[MapResourceContainer] = []
-	for container in resource_containers:
-		if not container.discovered and not container.is_empty():
-			candidates.append(container)
-	if candidates.is_empty():
-		return null
-	
-	var total_weight : float = 0.0
-	for container in candidates:
-		total_weight += container.visibility
-	
-	var chosen : MapResourceContainer = null
-	if total_weight <= 0.0:
-		chosen = candidates[randi() % candidates.size()]
-	else:
-		var roll : float = randf() * total_weight
-		var cumulative : float = 0.0
-		for container in candidates:
-			cumulative += container.visibility
-			if roll < cumulative:
-				chosen = container
-				break
-		if chosen == null:
-			chosen = candidates[candidates.size() - 1]
-	
-	chosen.discovered = true
-	_refresh_debug_view()
-	return chosen
+# What an expedition's scavenge mission actually reveals at this location now lives in
+# ExpeditionDiscoveryHelper (see discover_portion()), not here - this class only exposes
+# the container list and the query helpers above for other systems (expeditions, the stop
+# scheduler) to read the location's current state.
 
 
 func _refresh_debug_view() -> void:

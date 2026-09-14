@@ -114,7 +114,7 @@ func _add_grid_debug_visual(grid: MapBigGrid) -> void:
 		rect_points[0],
 	])
 	outline.width = 1.0
-	outline.default_color = Color(1.0, 1.0, 1.0, 0.35)
+	outline.default_color = Color(1.0, 1.0, 1.0, 0.05)
 	_debug_layer.add_child(outline)
 
 

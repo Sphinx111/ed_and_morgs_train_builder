@@ -1,0 +1,154 @@
+[gd_scene load_steps=3 format=3 uid="uid://cc0f2nr8mgppk"]
+
+[ext_resource type="Script" uid="uid://bxdkigjaysfsv" path="res://Scenes/resource_distribution_report.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://clj67t63wyp0i" path="res://Scenes/resource_bar_chart.gd" id="3_barchart"]
+
+[node name="ResourceDistributionReport" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1000.0
+offset_bottom = 800.0
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 285.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.11, 0.11, 0.13, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatusLabel" type="Label" parent="Margin/Layout"]
+layout_mode = 2
+text = "Showing MapResourceGenerator's current default values - hit Refresh again after editing _default_*_specs()."
+
+[node name="Charts" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="VillageColumn" type="VBoxContainer" parent="Margin/Layout/Charts"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Margin/Layout/Charts/VillageColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Village"
+
+[node name="ChartHeader" type="HBoxContainer" parent="Margin/Layout/Charts/VillageColumn"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="Margin/Layout/Charts/VillageColumn/ChartHeader"]
+custom_minimum_size = Vector2(88, 0)
+layout_mode = 2
+
+[node name="CoverageLabel" type="Label" parent="Margin/Layout/Charts/VillageColumn/ChartHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35, 0.65, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "Coverage %"
+
+[node name="AmountLabel" type="Label" parent="Margin/Layout/Charts/VillageColumn/ChartHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.65, 0.25, 1)
+theme_override_font_sizes/font_size = 11
+text = "Amount"
+
+[node name="VillageChart" type="VBoxContainer" parent="Margin/Layout/Charts/VillageColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+script = ExtResource("3_barchart")
+
+[node name="TownColumn" type="VBoxContainer" parent="Margin/Layout/Charts"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Margin/Layout/Charts/TownColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Town"
+
+[node name="ChartHeader" type="HBoxContainer" parent="Margin/Layout/Charts/TownColumn"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="Margin/Layout/Charts/TownColumn/ChartHeader"]
+custom_minimum_size = Vector2(88, 0)
+layout_mode = 2
+
+[node name="CoverageLabel" type="Label" parent="Margin/Layout/Charts/TownColumn/ChartHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35, 0.65, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "Coverage %"
+
+[node name="AmountLabel" type="Label" parent="Margin/Layout/Charts/TownColumn/ChartHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.65, 0.25, 1)
+theme_override_font_sizes/font_size = 11
+text = "Amount"
+
+[node name="TownChart" type="VBoxContainer" parent="Margin/Layout/Charts/TownColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+script = ExtResource("3_barchart")
+
+[node name="CityColumn" type="VBoxContainer" parent="Margin/Layout/Charts"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Margin/Layout/Charts/CityColumn"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "City"
+
+[node name="ChartHeader" type="HBoxContainer" parent="Margin/Layout/Charts/CityColumn"]
+layout_mode = 2
+
+[node name="Spacer" type="Control" parent="Margin/Layout/Charts/CityColumn/ChartHeader"]
+custom_minimum_size = Vector2(88, 0)
+layout_mode = 2
+
+[node name="CoverageLabel" type="Label" parent="Margin/Layout/Charts/CityColumn/ChartHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35, 0.65, 0.95, 1)
+theme_override_font_sizes/font_size = 11
+text = "Coverage %"
+
+[node name="AmountLabel" type="Label" parent="Margin/Layout/Charts/CityColumn/ChartHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.65, 0.25, 1)
+theme_override_font_sizes/font_size = 11
+text = "Amount"
+
+[node name="CityChart" type="VBoxContainer" parent="Margin/Layout/Charts/CityColumn"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+script = ExtResource("3_barchart")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b3ph64gipnlm5"]
+[gd_scene load_steps=9 format=3 uid="uid://b3ph64gipnlm5"]
 
 [ext_resource type="Script" uid="uid://bywwc888bn2bf" path="res://MapHandler.gd" id="1_deu6t"]
 [ext_resource type="Texture2D" uid="uid://dve3f2r47q48u" path="res://images/Pixel_world_map.jpg" id="2_4ojr4"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://xw62eb0m2po0" path="res://MapGraphGenerator.gd" id="5_67byq"]
 [ext_resource type="Script" uid="uid://ckeoq2je4lqct" path="res://MapSun.gd" id="6_mapsun"]
 [ext_resource type="Script" uid="uid://bf25xvpcvbx18" path="res://MapContinentGenerator.gd" id="7_continent"]
+[ext_resource type="Script" path="res://MapResourceGenerator.gd" id="8_resgen"]
 
 [sub_resource type="Curve2D" id="Curve2D_1huhg"]
 _data = {
@@ -107,5 +108,8 @@ village_variability = 0.35
 min_edge_length_for_village = 60.0
 max_trunk_villages = 2
 metadata/_custom_type_script = "uid://xw62eb0m2po0"
+
+[node name="MapResourceGenerator" type="Node" parent="."]
+script = ExtResource("8_resgen")
 
 [connection signal="pressed" from="DebugRegenButton" to="." method="regenerate_map"]

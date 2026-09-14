@@ -159,7 +159,7 @@ func train_tick():
 func complete_expedition(completed : ActiveExpedition):
 	if completed.is_scavenge:
 		if completed.scavenge_location != null:
-			completed.scavenge_location.discover_random_resource()
+			ExpeditionDiscoveryHelper.discover_portion(completed.scavenge_location)
 		refresh_options()
 	elif completed.is_train_car_recovery:
 		if completed.resource_spot != null:

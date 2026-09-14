@@ -4,7 +4,7 @@ class_name MapHandler
 
 @onready var map_graph_generator : MapGraphGenerator = $MapGraphGenerator
 @onready var continent_generator : MapContinentGenerator = $MapContinentGenerator
-var resource_generator : MapResourceGenerator = MapResourceGenerator.new()
+@onready var resource_generator : MapResourceGenerator = $MapResourceGenerator
 var map_graph : MapGraph = null
 var active_track : TrackSegment = null
 var _track_segments : Array[TrackSegment] = []
